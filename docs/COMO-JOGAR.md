@@ -276,7 +276,7 @@ Na sua vez, use **Negociar** para propor uma troca direta a outra potência — 
 
 ## 🧱 Influência e parcerias
 
-Além das seis potências, o mapa tem **32 territórios** — países e regiões como o Cone Sul, o Sahel, a Península Arábica ou o Japão e a Coreia do Sul — e a **Antártida**. É um “War” sem guerra: ninguém conquista ninguém. As potências disputam **influência**. Toque num território para ver a ficha dele, com o “Você sabia?”.
+Além das seis potências, o mapa tem **32 territórios** — países e regiões como o Cone Sul, o Sahel, a Península Arábica ou o Japão e a Coreia do Sul — e a **Antártida**. É um jogo de conquista sem guerra: ninguém conquista ninguém à força. As potências disputam **influência**. Toque num território para ver a ficha dele, com o “Você sabia?”.
 
 ### 🧱 Influência
 

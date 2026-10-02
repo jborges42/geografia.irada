@@ -202,7 +202,7 @@ const MANUAL = [
   {
     id: 'territorios', titulo: 'Influência e parcerias', icone: '🧱',
     html: `
-<p>Além das seis potências, o mapa tem <b>32 territórios</b> — países e regiões como o Cone Sul, o Sahel, a Península Arábica ou o Japão e a Coreia do Sul — e a <b>Antártida</b>. É um “War” sem guerra: ninguém conquista ninguém. As potências disputam <b>influência</b>. Toque num território para ver a ficha dele, com o “Você sabia?”.</p>
+<p>Além das seis potências, o mapa tem <b>32 territórios</b> — países e regiões como o Cone Sul, o Sahel, a Península Arábica ou o Japão e a Coreia do Sul — e a <b>Antártida</b>. É um jogo de conquista sem guerra: ninguém conquista ninguém à força. As potências disputam <b>influência</b>. Toque num território para ver a ficha dele, com o “Você sabia?”.</p>
 <h3>🧱 Influência</h3>
 <p>Cada ponto de influência é um tijolo numa torre com a cor da sua potência (até 10). A torre cresce com missões diplomáticas, comércio, investimento, ajuda, cultura e ciência. E encolhe quando um conflito piora no lugar (todos perdem 1), com eventos como golpes, com o desgaste de vetos na ONU e com a <b>reação soberanista</b>.</p>
 <h3>🤝 Parceria</h3>

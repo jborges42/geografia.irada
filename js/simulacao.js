@@ -936,7 +936,7 @@ const Simulacao = (() => {
   function verificarColapso(e) {
     const g = e.global, c = PARAM.colapso;
     if (g.temperatura >= c.temperatura) return { tipo: 'colapso', causa: 'clima', texto: `A temperatura chegou a +${g.temperatura.toFixed(2).replace('.', ',')} °C: o planeta passou do ponto de não retorno.` };
-    if (g.tensao >= c.tensao) return { tipo: 'colapso', causa: 'tensao', texto: 'O Relógio do Juízo Final chegou à meia-noite: as potências entraram em guerra.' };
+    if (g.tensao >= c.tensao) return { tipo: 'colapso', causa: 'tensao', texto: 'O Relógio do Juízo Final chegou à meia-noite: as crises saíram do controle e o mundo entrou em colapso.' };
     if (g.deslocados >= c.deslocados) return { tipo: 'colapso', causa: 'humanitaria', texto: `${Math.round(g.deslocados)} milhões de pessoas deslocadas: uma catástrofe humanitária global.` };
     return null;
   }

@@ -2,6 +2,8 @@
 
 **Geografia Irada – Geopolítica Internacional** foi criado por João Vitor Borges da Silva Matias: criação e direção do jogo.
 
+**Consultor:** Jean Carlos Feltrin - Fraiburgo SC.
+
 **Nome:** inspirado no canal Geografia Irada (https://www.youtube.com/@geografiairada), do professor Marcelo Silva, e usado com a autorização dele.
 
 **Inspiração:** SIIF – Simulação das Organizações Internacionais, projeto executado no IFC Fraiburgo em 2016 pelo professor Marcelo Silva.
