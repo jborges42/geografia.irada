@@ -1,0 +1,660 @@
+[
+ {
+  "id": "arvore-folhosa",
+  "uso": "Floresta/vegetação em geral; some com o desmatamento",
+  "autor": "Kenney",
+  "licenca": "CC0 1.0",
+  "origem": "https://kenney.nl/assets/platformer-kit",
+  "fonte": "platformer-kit/tree.glb",
+  "tris": 408,
+  "dim": [
+   1.28,
+   2.27,
+   1.31
+  ]
+ },
+ {
+  "id": "pinheiro",
+  "uso": "Floresta temperada/boreal (Canadá, Rússia, Europa)",
+  "autor": "Kenney",
+  "licenca": "CC0 1.0",
+  "origem": "https://kenney.nl/assets/castle-kit",
+  "fonte": "castle-kit/tree-large.glb",
+  "tris": 229,
+  "dim": [
+   1.26,
+   2.63,
+   1.26
+  ]
+ },
+ {
+  "id": "pinheiro-neve",
+  "uso": "Regiões frias e polares; inverno",
+  "autor": "Kenney",
+  "licenca": "CC0 1.0",
+  "origem": "https://kenney.nl/assets/holiday-kit",
+  "fonte": "holiday-kit/tree-snow-a.glb",
+  "tris": 378,
+  "dim": [
+   1.63,
+   2.63,
+   1.63
+  ]
+ },
+ {
+  "id": "palmeira",
+  "uso": "Trópicos, ilhas do Pacífico e Caribe, litoral",
+  "autor": "Kenney",
+  "licenca": "CC0 1.0",
+  "origem": "https://kenney.nl/assets/pirate-kit",
+  "fonte": "pirate-kit/palm-straight.glb",
+  "tris": 338,
+  "dim": [
+   1.65,
+   2.8,
+   1.65
+  ]
+ },
+ {
+  "id": "palmeira-curva",
+  "uso": "Variação da palmeira (para não repetir)",
+  "autor": "Kenney",
+  "licenca": "CC0 1.0",
+  "origem": "https://kenney.nl/assets/pirate-kit",
+  "fonte": "pirate-kit/palm-bend.glb",
+  "tris": 338,
+  "dim": [
+   1.78,
+   2.63,
+   1.99
+  ]
+ },
+ {
+  "id": "arvore-savana",
+  "uso": "Savana africana (acácia), Sahel e cerrado",
+  "autor": "Kenney",
+  "licenca": "CC0 1.0",
+  "origem": "https://kenney.nl/assets/nature-kit",
+  "fonte": "nature-kit/tree_plateau.glb",
+  "tris": 215,
+  "dim": [
+   1.03,
+   2.1,
+   1.1
+  ]
+ },
+ {
+  "id": "cacto",
+  "uso": "Desertos (Norte da África, Golfo, México); seca",
+  "autor": "Kenney",
+  "licenca": "CC0 1.0",
+  "origem": "https://kenney.nl/assets/nature-kit",
+  "fonte": "nature-kit/cactus_tall.glb",
+  "tris": 122,
+  "dim": [
+   0.83,
+   1.58,
+   0.71
+  ]
+ },
+ {
+  "id": "nuvem",
+  "uso": "Nuvem no céu; tingida de cinza vira fumaça de emissões; nuvem de tempestade",
+  "autor": "Kenney",
+  "licenca": "CC0 1.0",
+  "origem": "https://kenney.nl/assets/toy-car-kit",
+  "fonte": "toy-car-kit/smoke.glb",
+  "tris": 336,
+  "dim": [
+   2.8,
+   2.54,
+   2.8
+  ]
+ },
+ {
+  "id": "urso-polar",
+  "uso": "Ártico/Groenlândia: aparece no gelo; fica triste quando o gelo derrete",
+  "autor": "Kenney",
+  "licenca": "CC0 1.0",
+  "origem": "https://kenney.nl/assets/cube-pets",
+  "fonte": "cube-pets/animal-polar.glb",
+  "tris": 522,
+  "dim": [
+   1.46,
+   1.75,
+   1.74
+  ]
+ },
+ {
+  "id": "pinguim",
+  "uso": "Antártida",
+  "autor": "Kenney",
+  "licenca": "CC0 1.0",
+  "origem": "https://kenney.nl/assets/cube-pets",
+  "fonte": "cube-pets/animal-penguin.glb",
+  "tris": 558,
+  "dim": [
+   1.4,
+   1.02,
+   0.86
+  ]
+ },
+ {
+  "id": "fabrica",
+  "uso": "Indústria/economia; solta fumaça quando as emissões sobem",
+  "autor": "Kenney",
+  "licenca": "CC0 1.0",
+  "origem": "https://kenney.nl/assets/city-kit-industrial",
+  "fonte": "city-kit-industrial/building-e.glb",
+  "tris": 1484,
+  "dim": [
+   3.68,
+   3.6,
+   2.82
+  ]
+ },
+ {
+  "id": "termeletrica",
+  "uso": "Usina termelétrica (carvão/gás): energia fóssil, grandes emissores",
+  "autor": "Kenney",
+  "licenca": "CC0 1.0",
+  "origem": "https://kenney.nl/assets/city-kit-industrial",
+  "fonte": "city-kit-industrial/building-m.glb",
+  "tris": 1694,
+  "dim": [
+   2.98,
+   3.44,
+   3.85
+  ]
+ },
+ {
+  "id": "torre-resfriamento",
+  "uso": "Usina nuclear (torre de resfriamento com vapor)",
+  "autor": "Kenney",
+  "licenca": "CC0 1.0",
+  "origem": "https://kenney.nl/assets/city-kit-industrial",
+  "fonte": "city-kit-industrial/chimney-large.glb",
+  "tris": 218,
+  "dim": [
+   2,
+   3.15,
+   2
+  ]
+ },
+ {
+  "id": "turbina-eolica",
+  "uso": "Energia limpa (vento); a hélice (nó \"helice\") gira no eixo X local e fica de frente para a câmera",
+  "autor": "Kenney",
+  "licenca": "CC0 1.0",
+  "origem": "https://kenney.nl/assets/city-kit-industrial",
+  "fonte": "city-kit-industrial/windmill.glb",
+  "tris": 456,
+  "dim": [
+   2.22,
+   4.55,
+   1.19
+  ]
+ },
+ {
+  "id": "painel-solar",
+  "uso": "Energia limpa (sol); surge com investimento em renováveis",
+  "autor": "Kenney",
+  "licenca": "CC0 1.0",
+  "origem": "https://kenney.nl/assets/city-kit-industrial",
+  "fonte": "city-kit-industrial/solar-panel-portrait-group.glb",
+  "tris": 976,
+  "dim": [
+   1.67,
+   0.75,
+   2.27
+  ]
+ },
+ {
+  "id": "tanque-combustivel",
+  "uso": "Reserva de petróleo/gás, refinaria, crise do petróleo",
+  "autor": "Kenney",
+  "licenca": "CC0 1.0",
+  "origem": "https://kenney.nl/assets/city-kit-industrial",
+  "fonte": "city-kit-industrial/detail-tank-large.glb",
+  "tris": 566,
+  "dim": [
+   1.76,
+   1.12,
+   1.93
+  ]
+ },
+ {
+  "id": "navio-cargueiro",
+  "uso": "Rotas de comércio (porta-contêineres); mais navios com comércio alto",
+  "autor": "Kenney",
+  "licenca": "CC0 1.0",
+  "origem": "https://kenney.nl/assets/watercraft-kit",
+  "fonte": "watercraft-kit/ship-cargo-a.glb",
+  "tris": 1060,
+  "dim": [
+   2.08,
+   1.79,
+   5.6
+  ]
+ },
+ {
+  "id": "navio-granel",
+  "uso": "Navio graneleiro (grãos, minério): comércio de alimentos e minerais",
+  "autor": "Kenney",
+  "licenca": "CC0 1.0",
+  "origem": "https://kenney.nl/assets/watercraft-kit",
+  "fonte": "watercraft-kit/ship-cargo-b.glb",
+  "tris": 850,
+  "dim": [
+   1.95,
+   1.64,
+   5.25
+  ]
+ },
+ {
+  "id": "conteiner-vermelho",
+  "uso": "Carga/comércio; pilhas no porto",
+  "autor": "Kenney",
+  "licenca": "CC0 1.0",
+  "origem": "https://kenney.nl/assets/watercraft-kit",
+  "fonte": "watercraft-kit/cargo-container-a.glb",
+  "tris": 160,
+  "dim": [
+   0.79,
+   0.63,
+   1.57
+  ]
+ },
+ {
+  "id": "conteiner-azul",
+  "uso": "Carga/comércio (variação de cor)",
+  "autor": "Kenney",
+  "licenca": "CC0 1.0",
+  "origem": "https://kenney.nl/assets/watercraft-kit",
+  "fonte": "watercraft-kit/cargo-container-b.glb",
+  "tris": 160,
+  "dim": [
+   0.79,
+   0.63,
+   1.57
+  ]
+ },
+ {
+  "id": "conteiner-verde",
+  "uso": "Carga/comércio (variação de cor)",
+  "autor": "Kenney",
+  "licenca": "CC0 1.0",
+  "origem": "https://kenney.nl/assets/watercraft-kit",
+  "fonte": "watercraft-kit/cargo-container-c.glb",
+  "tris": 160,
+  "dim": [
+   0.79,
+   0.63,
+   1.57
+  ]
+ },
+ {
+  "id": "caminhao-ajuda",
+  "uso": "Ajuda humanitária (caminhão branco), comboio de alimentos",
+  "autor": "Kenney",
+  "licenca": "CC0 1.0",
+  "origem": "https://kenney.nl/assets/car-kit",
+  "fonte": "car-kit/delivery.glb",
+  "tris": 2476,
+  "dim": [
+   1.05,
+   1.16,
+   2.27
+  ]
+ },
+ {
+  "id": "ambulancia",
+  "uso": "Saúde, pandemia, socorro após desastre",
+  "autor": "Kenney",
+  "licenca": "CC0 1.0",
+  "origem": "https://kenney.nl/assets/car-kit",
+  "fonte": "car-kit/ambulance.glb",
+  "tris": 2804,
+  "dim": [
+   1.05,
+   1.26,
+   2.27
+  ]
+ },
+ {
+  "id": "escavadeira",
+  "uso": "Mineração e obras (minerais críticos, infraestrutura)",
+  "autor": "Kenney",
+  "licenca": "CC0 1.0",
+  "origem": "https://kenney.nl/assets/car-kit",
+  "fonte": "car-kit/tractor-shovel.glb",
+  "tris": 2646,
+  "dim": [
+   1.41,
+   1.29,
+   2.1
+  ]
+ },
+ {
+  "id": "tenda",
+  "uso": "Tendas azuis de acolhimento de refugiados",
+  "autor": "Kenney",
+  "licenca": "CC0 1.0",
+  "origem": "https://kenney.nl/assets/mini-forest",
+  "fonte": "mini-forest/tent.glb",
+  "tris": 847,
+  "dim": [
+   1.75,
+   1.39,
+   1.49
+  ]
+ },
+ {
+  "id": "caixa",
+  "uso": "Caixa de ajuda/carga (alimentos, remédios)",
+  "autor": "Kenney",
+  "licenca": "CC0 1.0",
+  "origem": "https://kenney.nl/assets/survival-kit",
+  "fonte": "survival-kit/box.glb",
+  "tris": 124,
+  "dim": [
+   0.79,
+   0.79,
+   0.79
+  ]
+ },
+ {
+  "id": "barreira",
+  "uso": "Fronteira fechada, bloqueio, sanção (enfileire várias)",
+  "autor": "Kenney",
+  "licenca": "CC0 1.0",
+  "origem": "https://kenney.nl/assets/city-kit-roads",
+  "fonte": "city-kit-roads/construction-barrier.glb",
+  "tris": 60,
+  "dim": [
+   1.75,
+   1.01,
+   1.05
+  ]
+ },
+ {
+  "id": "bandeira",
+  "uso": "Bandeira com mastro; o pano usa o material \"tinta\" (cor do jogador)",
+  "autor": "Kenney",
+  "licenca": "CC0 1.0",
+  "origem": "https://kenney.nl/assets/pirate-kit",
+  "fonte": "pirate-kit/flag.glb",
+  "tris": 144,
+  "dim": [
+   1.79,
+   2.8,
+   0.53
+  ]
+ },
+ {
+  "id": "trofeu",
+  "uso": "Vitória, fim de partida, melhor jogada",
+  "autor": "Kenney",
+  "licenca": "CC0 1.0",
+  "origem": "https://kenney.nl/assets/mini-arena",
+  "fonte": "mini-arena/trophy.glb",
+  "tris": 244,
+  "dim": [
+   2.09,
+   1.75,
+   1.66
+  ]
+ },
+ {
+  "id": "moeda",
+  "uso": "Dinheiro/investimento (💰), recompensa que pula",
+  "autor": "Kenney",
+  "licenca": "CC0 1.0",
+  "origem": "https://kenney.nl/assets/platformer-kit",
+  "fonte": "platformer-kit/coin-gold.glb",
+  "tris": 124,
+  "dim": [
+   1.4,
+   1.4,
+   0.61
+  ]
+ },
+ {
+  "id": "estrela",
+  "uso": "Pontos/selos/acerto",
+  "autor": "Kenney",
+  "licenca": "CC0 1.0",
+  "origem": "https://kenney.nl/assets/platformer-kit",
+  "fonte": "platformer-kit/star.glb",
+  "tris": 30,
+  "dim": [
+   1.4,
+   1.39,
+   0.92
+  ]
+ },
+ {
+  "id": "coracao",
+  "uso": "Apoio popular/bem-estar (❤️)",
+  "autor": "Kenney",
+  "licenca": "CC0 1.0",
+  "origem": "https://kenney.nl/assets/platformer-kit",
+  "fonte": "platformer-kit/heart.glb",
+  "tris": 44,
+  "dim": [
+   1.22,
+   1.14,
+   0.35
+  ]
+ },
+ {
+  "id": "aviao",
+  "uso": "Avião de carreira: turismo, comércio, cúpulas e viagens diplomáticas (voa; nariz para +Z)",
+  "autor": "Geografia Irada (modelado em código com a paleta Kenney)",
+  "licenca": "CC0 1.0",
+  "origem": "ativos/_ferramentas/proprios.mjs",
+  "fonte": "proprios.mjs → aviao()",
+  "tris": 1072,
+  "dim": [
+   4.2,
+   1.69,
+   3.7
+  ]
+ },
+ {
+  "id": "foguete",
+  "uso": "Ciência e tecnologia, corrida espacial (lançamento)",
+  "autor": "Geografia Irada (modelado em código com a paleta Kenney)",
+  "licenca": "CC0 1.0",
+  "origem": "ativos/_ferramentas/proprios.mjs",
+  "fonte": "proprios.mjs → foguete()",
+  "tris": 744,
+  "dim": [
+   1.51,
+   3.85,
+   1.51
+  ]
+ },
+ {
+  "id": "satelite",
+  "uso": "Satélite em órbita: comunicações, ciberespaço, monitoramento do clima",
+  "autor": "Geografia Irada (modelado em código com a paleta Kenney)",
+  "licenca": "CC0 1.0",
+  "origem": "ativos/_ferramentas/proprios.mjs",
+  "fonte": "proprios.mjs → satelite()",
+  "tris": 548,
+  "dim": [
+   2.45,
+   0.72,
+   0.56
+  ]
+ },
+ {
+  "id": "guindaste-porto",
+  "uso": "Porto e comércio exterior (guindaste de contêiner; lança para +Z = mar)",
+  "autor": "Geografia Irada (modelado em código com a paleta Kenney)",
+  "licenca": "CC0 1.0",
+  "origem": "ativos/_ferramentas/proprios.mjs",
+  "fonte": "proprios.mjs → guindaste()",
+  "tris": 2204,
+  "dim": [
+   2.09,
+   5.25,
+   5.23
+  ]
+ },
+ {
+  "id": "bomba-petroleo",
+  "uso": "Extração de petróleo em terra (\"cavalo de pau\"); o nó \"balancim\" balança no eixo X local (vista de perfil)",
+  "autor": "Geografia Irada (modelado em código com a paleta Kenney)",
+  "licenca": "CC0 1.0",
+  "origem": "ativos/_ferramentas/proprios.mjs",
+  "fonte": "proprios.mjs → bombaPetroleo()",
+  "tris": 1000,
+  "dim": [
+   2.45,
+   1.72,
+   0.65
+  ]
+ },
+ {
+  "id": "plataforma-petroleo",
+  "uso": "Plataforma de petróleo no mar (pré-sal, Golfo); chama do queimador",
+  "autor": "Geografia Irada (modelado em código com a paleta Kenney)",
+  "licenca": "CC0 1.0",
+  "origem": "ativos/_ferramentas/proprios.mjs",
+  "fonte": "proprios.mjs → plataforma()",
+  "tris": 1152,
+  "dim": [
+   3.5,
+   3.71,
+   2.3
+  ]
+ },
+ {
+  "id": "hospital",
+  "uso": "Saúde: pandemia, ajuda médica, IDH (placa \"H\" azul, sem emblema protegido)",
+  "autor": "Geografia Irada (modelado em código com a paleta Kenney)",
+  "licenca": "CC0 1.0",
+  "origem": "ativos/_ferramentas/proprios.mjs",
+  "fonte": "proprios.mjs → hospital()",
+  "tris": 1104,
+  "dim": [
+   3.15,
+   2.57,
+   1.85
+  ]
+ },
+ {
+  "id": "escola",
+  "uso": "Educação, IDH, cooperação científica",
+  "autor": "Geografia Irada (modelado em código com a paleta Kenney)",
+  "licenca": "CC0 1.0",
+  "origem": "ativos/_ferramentas/proprios.mjs",
+  "fonte": "proprios.mjs → escola()",
+  "tris": 964,
+  "dim": [
+   3.15,
+   2.39,
+   1.46
+  ]
+ },
+ {
+  "id": "predio-governo",
+  "uso": "Governo, embaixada, ONU/assembleia; bandeira no topo com a cor do jogador (\"tinta\")",
+  "autor": "Geografia Irada (modelado em código com a paleta Kenney)",
+  "licenca": "CC0 1.0",
+  "origem": "ativos/_ferramentas/proprios.mjs",
+  "fonte": "proprios.mjs → governo()",
+  "tris": 1864,
+  "dim": [
+   3.85,
+   3.94,
+   2.54
+  ]
+ },
+ {
+  "id": "pomba",
+  "uso": "Paz e acordos (pomba com ramo de oliveira); asas \"asa-esq\"/\"asa-dir\" batem no eixo Z local",
+  "autor": "Geografia Irada (modelado em código com a paleta Kenney)",
+  "licenca": "CC0 1.0",
+  "origem": "ativos/_ferramentas/proprios.mjs",
+  "fonte": "proprios.mjs → pomba()",
+  "tris": 824,
+  "dim": [
+   1.57,
+   0.57,
+   1.22
+  ]
+ },
+ {
+  "id": "podio",
+  "uso": "Pódio do fim de partida: cada degrau cabe um boneco (≈2,9 pinos)",
+  "autor": "Geografia Irada (modelado em código com a paleta Kenney)",
+  "licenca": "CC0 1.0",
+  "origem": "ativos/_ferramentas/proprios.mjs",
+  "fonte": "proprios.mjs → podio()",
+  "tris": 2052,
+  "dim": [
+   9.63,
+   3.66,
+   3.43
+  ]
+ },
+ {
+  "id": "muro",
+  "uso": "Muro de fronteira fechada (segmento de 1 pino, emende vários)",
+  "autor": "Geografia Irada (modelado em código com a paleta Kenney)",
+  "licenca": "CC0 1.0",
+  "origem": "ativos/_ferramentas/proprios.mjs",
+  "fonte": "proprios.mjs → muro()",
+  "tris": 1616,
+  "dim": [
+   1.75,
+   1.75,
+   0.43
+  ]
+ },
+ {
+  "id": "carga-ajuda",
+  "uso": "Palete de ajuda humanitária / carga de comércio",
+  "autor": "Geografia Irada (modelado em código com a paleta Kenney)",
+  "licenca": "CC0 1.0",
+  "origem": "ativos/_ferramentas/proprios.mjs",
+  "fonte": "proprios.mjs → cargaAjuda()",
+  "tris": 716,
+  "dim": [
+   1.57,
+   1.43,
+   1.5
+  ]
+ },
+ {
+  "id": "usina-nuclear",
+  "uso": "Usina nuclear completa (2 torres Kenney + reator)",
+  "autor": "Geografia Irada (modelado em código com a paleta Kenney)",
+  "licenca": "CC0 1.0",
+  "origem": "ativos/_ferramentas/proprios.mjs",
+  "fonte": "proprios.mjs → usinaNuclear()",
+  "tris": 1104,
+  "dim": [
+   4.2,
+   2.18,
+   2.1
+  ]
+ },
+ {
+  "id": "jazida",
+  "uso": "Mina/jazida de minerais críticos (lítio, terras raras) — 💎",
+  "autor": "Geografia Irada (modelado em código com a paleta Kenney)",
+  "licenca": "CC0 1.0",
+  "origem": "ativos/_ferramentas/proprios.mjs",
+  "fonte": "proprios.mjs → jazida()",
+  "tris": 116,
+  "dim": [
+   1.93,
+   1.28,
+   1.38
+  ]
+ }
+]

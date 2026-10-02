@@ -1,0 +1,6 @@
+<!doctype html>
+<!-- Vitrine de desenvolvimento: confere dados/projecoes.js (não faz parte do jogo) -->
+<html lang="pt-BR"><head><meta charset="utf-8"><title>Projeções</title><style>body{margin:0;background:#0A78F0;font:700 18px system-ui;color:#fff;display:flex;flex-wrap:wrap;gap:16px;padding:16px}figure{margin:0;background:#fff;border:5px solid #111;border-radius:20px;padding:8px;color:#111}svg{width:560px;height:auto;display:block}</style></head><body>
+<script src="../dados/projecoes.js"></script><script>
+for (const p of Object.values(PROJECOES)) document.body.insertAdjacentHTML('beforeend', `<figure><b>${p.nome}</b><svg viewBox="0 0 ${p.largura} ${p.altura}"><path d="${p.contorno}" fill="#bfe8ff" stroke="#111" stroke-width="2"/><path d="${p.terra}" fill="#d8d0b8" stroke="#555" stroke-width=".6"/><path d="${p.groenlandia}" fill="#14B8D4" stroke="#111" stroke-width="1.5"/><path d="${p.africa}" fill="#FF9F1C" stroke="#111" stroke-width="1.5"/><path d="${p.brasil}" fill="#22B14C" stroke="#111" stroke-width="1.5"/></svg></figure>`);
+</script></body></html>

@@ -1,0 +1,11 @@
+/* ESQUELETO da Fundação: o dono da frente substitui.
+   Manual mínimo: abas verticais + capítulo; classes esq-* só existem no esqueleto. */
+.esq-manual { --cor: var(--mesa-topo); --cor-lado: var(--mesa-base); height: calc(86 * var(--u)); }
+.esq-manual .painel-titulo { color: #fff; -webkit-text-stroke: .17em var(--tinta); paint-order: stroke fill; }
+.esq-manual-corpo { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) calc(34 * var(--u)); gap: calc(1.2 * var(--u)); }
+.esq-manual-corpo > .tela { order: -1; overflow: auto; padding: calc(2.4 * var(--u)); background: var(--ladrilho); border: var(--b) solid var(--tinta);
+  border-radius: calc(1.2 * var(--u)); box-shadow: var(--rebaixo); font-size: var(--fs-corpo); }
+.esq-manual-corpo > .tela :is(h2, h3) { font: 700 var(--fs-h2) / 1.1 var(--f-titulo); margin: 0 0 calc(1.2 * var(--u)); }
+.esq-manual-corpo > .tela p, .esq-manual-corpo > .tela li { margin-bottom: calc(1 * var(--u)); }
+.esq-manual-corpo .abas { overflow: auto; align-content: start; padding: calc(.4 * var(--u)) calc(.4 * var(--u)) calc(1 * var(--u)); }
+.esq-manual-corpo .abas [role="tab"] { font-size: var(--fs-min); white-space: normal; text-align: left; min-height: calc(5 * var(--u)); padding: calc(.6 * var(--u)) calc(1.2 * var(--u)); }

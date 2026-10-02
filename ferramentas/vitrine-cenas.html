@@ -1,0 +1,265 @@
+<!doctype html>
+<!-- Vitrine de desenvolvimento dos bonecos e das cenas 3D (não faz parte do jogo).
+     ?cena=lobby|provador|onu|revelacao|podio|fim|foto|retratos|poses|mascote  ·  ?teste roda a checagem automática do boneco -->
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vitrine das cenas</title>
+<link rel="stylesheet" href="../css/base.css">
+<style>
+  body { margin: 0; overflow: hidden; background: linear-gradient(#3550C8, #22339A 55%, #141F66); font-family: var(--f-texto); }
+  #barra { position: fixed; z-index: 30; left: 0; right: 0; top: 0; display: flex; flex-wrap: wrap; gap: calc(.9 * var(--u)); align-items: center;
+    padding: calc(1.4 * var(--u)) calc(2 * var(--u)); pointer-events: none; }
+  #barra > * { pointer-events: auto; }
+  #barra .titulo { font: 400 calc(3.2 * var(--u)) / 1 var(--f-marca); margin-right: calc(1 * var(--u)); }
+  #barra .btn[aria-pressed="true"] { --cor: var(--amarelo); --cor-lado: var(--amarelo-lado); }
+  #extras { position: fixed; z-index: 30; left: 50%; bottom: calc(2.4 * var(--u)); translate: -50% 0; display: flex; gap: calc(1 * var(--u)); flex-wrap: wrap; justify-content: center; }
+  #extras:empty { display: none; }
+  #painel { position: fixed; z-index: 25; inset: calc(11 * var(--u)) calc(3 * var(--u)) calc(3 * var(--u)); display: none; }
+  #painel.aberto { display: flex; }
+  .provador { flex: 1; flex-direction: row; gap: calc(2 * var(--u)); --cor: var(--amarelo); }
+  .provador .palco { flex: 0 0 40%; border-radius: var(--raio); position: relative; overflow: hidden;
+    background: radial-gradient(70% 60% at 50% 45%, #FFFDF6, #F3EAD6); box-shadow: inset 0 calc(.4 * var(--u)) 0 rgb(26 20 51 / .12); }
+  .provador .lado { flex: 1; display: flex; flex-direction: column; gap: calc(1.2 * var(--u)); min-width: 0; }
+  .provador .abas [role="tab"] { font-size: var(--fs-min); }
+  .grade { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: min-content; align-content: start; gap: calc(1.6 * var(--u)) calc(1.2 * var(--u)); overflow: auto; padding: calc(1 * var(--u)) calc(.6 * var(--u)) calc(2 * var(--u)); }
+  .op { --cor: var(--ladrilho); aspect-ratio: 1; display: grid; place-items: center; padding: 0; cursor: pointer; overflow: hidden; }
+  .op img { width: 100%; height: 100%; object-fit: contain; }
+  .op .cor { width: 58%; aspect-ratio: 1; border-radius: 50%; border: var(--b-fino, 3px) solid var(--tinta); box-shadow: inset 0 calc(-.6 * var(--u)) 0 rgb(0 0 0 / .18), inset 0 calc(.5 * var(--u)) 0 rgb(255 255 255 / .35); }
+  .op[aria-checked="true"] { box-shadow: 0 0 0 calc(.6 * var(--u)) var(--amarelo), 0 0 0 calc(1 * var(--u)) var(--tinta); }
+  .op .ok { position: absolute; right: calc(.4 * var(--u)); top: calc(.4 * var(--u)); width: calc(4 * var(--u)); height: calc(4 * var(--u)); border-radius: 50%;
+    background: var(--verde-ok); border: calc(.35 * var(--u)) solid var(--tinta); display: none; place-items: center; color: #fff; font: 900 calc(2.4 * var(--u)) var(--f-texto); }
+  .op[aria-checked="true"] .ok { display: grid; }
+  .item-nome { font: 700 var(--fs-cartao) / 1.1 var(--f-titulo); }
+  .item-frase { font: 800 var(--fs-min) / 1.25 var(--f-texto); color: var(--tinta-suave); }
+  #galeria { position: fixed; z-index: 20; inset: calc(10 * var(--u)) calc(3 * var(--u)) calc(3 * var(--u)); display: none; overflow: auto; }
+  #galeria.aberta { display: block; }
+  #galeria h2 { font: 700 var(--fs-cartao) var(--f-titulo); margin: calc(1.6 * var(--u)) 0 calc(.6 * var(--u)); }
+  #galeria .fila { display: flex; flex-wrap: wrap; gap: calc(1.4 * var(--u)); align-items: end; }
+  #galeria figure { margin: 0; text-align: center; font: 800 var(--fs-min) var(--f-texto); color: #fff; }
+  #galeria figure img { display: block; margin: 0 auto calc(.4 * var(--u)); }
+  #galeria .sobre-creme figure { color: var(--tinta); }
+  #galeria .sobre-creme { background: var(--ladrilho); border-radius: var(--raio); padding: calc(1.4 * var(--u)); border: calc(.45 * var(--u)) solid var(--tinta); }
+  #fotoFinal { position: fixed; z-index: 20; inset: calc(12 * var(--u)) calc(10 * var(--u)) calc(10 * var(--u)); display: none; place-items: center; }
+  #fotoFinal img { max-width: 100%; max-height: 100%; border-radius: var(--raio); border: calc(.6 * var(--u)) solid #fff; box-shadow: 0 0 0 calc(.45 * var(--u)) var(--tinta), 0 calc(1.2 * var(--u)) 0 calc(.45 * var(--u)) var(--tinta); rotate: -1.5deg; }
+  #mascoteArea { position: fixed; z-index: 6; left: 8%; top: 12%; width: 44%; height: 80%; display: none; }
+  .rotulo { position: fixed; z-index: 15; translate: -50% -100%; font: 700 var(--fs-min) var(--f-titulo); white-space: nowrap; pointer-events: none; }
+</style></head><body>
+<div id="mundo" aria-hidden="true"></div>
+<div id="cena" hidden></div>
+<div id="mascoteArea"></div>
+<div id="rotulos"></div>
+<div id="barra">
+  <span class="titulo letra-bolha relevo">Cenas 3D</span>
+</div>
+<div id="extras"></div>
+<section id="painel" aria-label="Provador"></section>
+<section id="galeria" aria-label="Galeria"></section>
+<div id="fotoFinal"></div>
+<div id="anuncio" class="so-leitor" aria-live="polite"></div>
+<div id="aviso" role="status" hidden></div>
+
+<script src="../lib/three.min.js"></script>
+<script src="../lib/gsap.min.js"></script>
+<script src="../dados/mapa.js"></script>
+<script src="../conteudo/potencias.js"></script>
+<script src="../js/ui.js"></script>
+<script src="../js/bonecos.js"></script>
+<script src="../js/cenas3d.js"></script>
+<script src="../js/mascote.js"></script>
+<script>
+'use strict';
+const q = new URLSearchParams(location.search);
+const PIDS = ['brasil', 'eua', 'china', 'ue', 'india', 'russia'];
+const AVATARES = Bonecos.avataresIniciais(PIDS, 7);
+AVATARES[1].humano = false; AVATARES[4].humano = false;   // duas potências com o computador
+AVATARES.forEach((a, i) => (a.comemoracao = ['comemorar', 'pular', 'girar', 'palmas', 'comemorar', 'acenar'][i]));
+if (q.has('leves')) Cenas3D.graficos('leves'); else Cenas3D.graficos('bonitos');
+const barra = document.getElementById('barra'), extras = document.getElementById('extras');
+const painel = document.getElementById('painel'), galeria = document.getElementById('galeria'), fotoFinal = document.getElementById('fotoFinal');
+const nomeCor = pid => ({ brasil: 'Verde', eua: 'Azul', china: 'Vermelha', ue: 'Roxa', india: 'Laranja', russia: 'Rosa' })[pid];
+
+function botao(onde, texto, fn, classe = 'btn btn-mini peca btn-neutro') {
+  const b = document.createElement('button');
+  b.className = classe; b.textContent = texto; b.type = 'button';
+  b.addEventListener('click', fn); onde.appendChild(b); return b;
+}
+function limpar() {
+  painel.className = ''; painel.innerHTML = ''; galeria.className = ''; galeria.innerHTML = ''; extras.innerHTML = '';
+  fotoFinal.style.display = 'none'; fotoFinal.innerHTML = ''; document.getElementById('rotulos').innerHTML = '';
+  document.getElementById('mascoteArea').style.display = 'none'; Mascote.parar();
+}
+// rótulos HTML por cima da cena (como os módulos do jogo fazem com Cenas3D.ancora)
+function rotular() {
+  const r = document.getElementById('rotulos'); r.innerHTML = '';
+  PIDS.forEach(pid => {
+    const a = Cenas3D.ancora(pid); if (!a || !a.visivel) return;
+    const s = document.createElement('span'); s.className = 'rotulo letra-bolha';
+    s.style.left = a.x + 'px'; s.style.top = (a.topo - 14) + 'px';
+    s.innerHTML = formaDe(pid, { classe: 'f' }).replace('class="forma f"', 'class="forma f" style="width:1.1em;height:1.1em;vertical-align:-.2em;margin-right:.25em"') + 'Equipe ' + nomeCor(pid);
+    r.appendChild(s);
+  });
+}
+
+const CENAS = {
+  async lobby() { await Cenas3D.lobby(AVATARES); rotular(); },
+  async provador() {
+    await Cenas3D.lobby(AVATARES);
+    abrirProvador({ ...AVATARES[0] });
+  },
+  async onu() {
+    await Cenas3D.salaONU({}, AVATARES, { emergencia: q.get('sessao') === 'emergencia' });
+    botao(extras, 'Revelar votos', () => Cenas3D.votos({ brasil: 'sim', eua: 'nao', china: 'veto', ue: 'sim', india: 'abst', russia: 'sim' }), 'btn btn-mini peca');
+    let i = 0;
+    botao(extras, 'Próxima fala', () => Cenas3D.fala(PIDS[i++ % 6]));
+    botao(extras, 'Mesa inteira', () => Cenas3D.fala(null));
+  },
+  async revelacao() {
+    await Cenas3D.revelacao(AVATARES[0], q.get('papel') || 'diplomata');
+    ['diplomata', 'infiltrado', 'missao'].forEach(p => botao(extras, p[0].toUpperCase() + p.slice(1), () => Cenas3D.revelacao(AVATARES[0], p)));
+  },
+  async podio() { await Cenas3D.podio(['ue', 'brasil', 'india', 'china', 'eua', 'russia'], AVATARES); },
+  async fim() {
+    await Cenas3D.fim(q.get('vitoria') !== 'nao', AVATARES);
+    botao(extras, 'Vitória', () => Cenas3D.fim(true, AVATARES)); botao(extras, 'Colapso', () => Cenas3D.fim(false, AVATARES));
+  },
+  async foto() {
+    Cenas3D.esconder();
+    const url = await Cenas3D.foto(AVATARES, 'CÚPULA 2050', { data: '02/10/2026' });
+    fotoFinal.innerHTML = `<img alt="Foto oficial da cúpula" src="${url}">`; fotoFinal.style.display = 'grid';
+  },
+  async retratos() {
+    Cenas3D.esconder();
+    galeria.className = 'aberta';
+    const fila = (titulo, itens, creme) => {
+      galeria.insertAdjacentHTML('beforeend', `<h2 class="letra-bolha">${titulo}</h2><div class="fila ${creme ? 'sobre-creme' : ''}"></div>`);
+      const f = galeria.lastElementChild;
+      return Promise.all(itens.map(async ([legenda, p, px]) => { const url = await p; f.insertAdjacentHTML('beforeend', `<figure><img src="${url}" width="${px}" height="${px}" alt="">${legenda}</figure>`); }));
+    };
+    const u = Math.min(innerHeight, innerWidth * .5625) / 100;
+    await fila('Rosto (placar 5,2u · painel 6,8u)', AVATARES.map(a => [nomeCor(a.pid), Cenas3D.retrato(a, { tamanho: 96, expressao: 'feliz' }), Math.round(6.8 * u)]));
+    await fila('Busto (conselheiros e tablet 14u, âncora 26u)', [
+      ['Âncora', Cenas3D.retrato(Bonecos.ancora({ pele: 'tom4' }), { tamanho: 256, expressao: 'falando' }), Math.round(18 * u)],
+      ...['diplomacia', 'economia', 'natureza', 'seguranca', 'pessoas', 'ciencia'].map((c, i) => [Bonecos.CATEGORIAS[c].cargo,
+        Cenas3D.retrato(Bonecos.conselheiro(c, { pele: Bonecos.PELES[i].id, penteado: Bonecos.PENTEADOS[i].id, cabelo: Bonecos.CABELOS[i].id }),
+          { tamanho: 256, expressao: i % 2 ? 'determinado' : 'pensativo' }), Math.round(14 * u)]),
+    ], true);
+    await fila('Expressões', Bonecos.EXPRESSOES.map((e, i) => [e, Cenas3D.retrato({ ...AVATARES[i % 6], humano: true }, { tamanho: 160, expressao: e }), Math.round(11 * u)]));
+    await fila('Computador', ['feliz', 'pensativo', 'triste', 'alegre'].map(e => [e, Cenas3D.retrato(AVATARES[1], { tamanho: 160, expressao: e }), Math.round(11 * u)]));
+  },
+  async rostos() {   // expressões grandes, nas peles clara e mais escura, e o computador (para conferir o rosto de perto)
+    Cenas3D.esconder();
+    galeria.className = 'aberta';
+    const u = Math.min(innerHeight, innerWidth * .5625) / 100, px = Math.round(17 * u);
+    for (const [titulo, av] of [['Tom 1', { pid: 'brasil', pele: 'tom1', cabelo: 'castanho', penteado: 'franja' }], ['Tom 6', { pid: 'india', pele: 'tom6', cabelo: 'preto', penteado: 'black' }],
+      ['Computador', { pid: 'eua', humano: false }]]) {
+      galeria.insertAdjacentHTML('beforeend', `<h2 class="letra-bolha">${titulo}</h2><div class="fila"></div>`);
+      const f = galeria.lastElementChild;
+      for (const e of Bonecos.EXPRESSOES) f.insertAdjacentHTML('beforeend', `<figure><img src="${await Cenas3D.retrato(av, { tamanho: 256, expressao: e, enquadramento: 'rosto' })}" width="${px}" height="${px}" alt="">${e}</figure>`);
+    }
+  },
+  async poses() {
+    Cenas3D.esconder();
+    galeria.className = 'aberta';
+    galeria.insertAdjacentHTML('beforeend', '<h2 class="letra-bolha">Poses (corpo inteiro)</h2><div class="fila"></div>');
+    const f = galeria.lastElementChild, u = Math.min(innerHeight, innerWidth * .5625) / 100;
+    for (const [i, acao] of Bonecos.ACOES.entries()) {
+      const url = await Cenas3D.retrato({ ...AVATARES[i % 6], humano: true, acessorio: Bonecos.ACESSORIOS[i % 8].id }, { tamanho: 256, acao, enquadramento: 'corpo', expressao: 'feliz' });
+      f.insertAdjacentHTML('beforeend', `<figure><img src="${url}" width="${Math.round(16 * u)}" height="${Math.round(16 * u)}" alt="">${acao}</figure>`);
+    }
+    galeria.insertAdjacentHTML('beforeend', '<h2 class="letra-bolha">Chapéus</h2><div class="fila"></div>');
+    const g = galeria.lastElementChild;
+    for (const [i, c] of Bonecos.CHAPEUS.entries()) {
+      const url = await Cenas3D.retrato({ ...AVATARES[i % 6], humano: true, chapeu: c.id, acessorio: 'nenhum', penteado: Bonecos.PENTEADOS[i % 7].id }, { tamanho: 200, enquadramento: 'busto' });
+      g.insertAdjacentHTML('beforeend', `<figure><img src="${url}" width="${Math.round(11 * u)}" height="${Math.round(11 * u)}" alt="">${c.nome}</figure>`);
+    }
+    galeria.insertAdjacentHTML('beforeend', '<h2 class="letra-bolha">Acessórios e penteados</h2><div class="fila"></div>');
+    const h = galeria.lastElementChild;
+    for (const [i, c] of Bonecos.ACESSORIOS.entries()) {
+      const url = await Cenas3D.retrato({ ...AVATARES[(i + 2) % 6], humano: true, chapeu: 'nenhum', acessorio: c.id, penteado: Bonecos.PENTEADOS[i % 7].id, cabelo: Bonecos.CABELOS[i % 6].id }, { tamanho: 200, enquadramento: 'corpo' });
+      h.insertAdjacentHTML('beforeend', `<figure><img src="${url}" width="${Math.round(11 * u)}" height="${Math.round(11 * u)}" alt="">${c.nome}</figure>`);
+    }
+  },
+  async mascote() {
+    Cenas3D.esconder();
+    const area = document.getElementById('mascoteArea'); area.style.display = 'block';
+    Mascote.iniciar(area);
+    ['feliz', 'susto', 'triste', 'comemorar', 'pensando'].forEach(r => botao(extras, r, () => Mascote.reagir(r)));
+    if (q.get('reacao')) Mascote.reagir(q.get('reacao'));
+    galeria.className = 'aberta'; galeria.style.left = '56%';
+    galeria.insertAdjacentHTML('beforeend', '<h2 class="letra-bolha">Retratos do mascote</h2><div class="fila"></div>');
+    const f = galeria.lastElementChild;
+    for (const r of ['feliz', 'susto', 'triste', 'pensando']) f.insertAdjacentHTML('beforeend', `<figure><img src="${await Mascote.retrato(r, 256)}" width="180" height="180" alt="">${r}</figure>`);
+  },
+};
+
+// ---------- Provador (como a frente de Telas pode montar) ----------
+function abrirProvador(av) {
+  painel.className = 'aberto';
+  painel.innerHTML = `<div class="painel peca provador pinos"><div class="palco" id="palcoPrevia"></div><div class="lado">
+    <div class="abas" role="tablist"></div><div class="grade" role="radiogroup"></div>
+    <div><div class="item-nome"></div><div class="item-frase"></div></div>
+    <div style="display:flex;gap:calc(1.2*var(--u));justify-content:flex-end"></div></div></div>`;
+  const abas = painel.querySelector('.abas'), grade = painel.querySelector('.grade'), acoes = painel.querySelector('.lado > div:last-child');
+  const ABAS = [['pele', 'Pele', Bonecos.PELES], ['cabelo', 'Cabelo', Bonecos.CABELOS], ['penteado', 'Penteado', Bonecos.PENTEADOS],
+    ['chapeu', 'Chapéu', Bonecos.CHAPEUS], ['acessorio', 'Acessório', Bonecos.ACESSORIOS], ['comemoracao', 'Comemoração', Bonecos.COMEMORACOES]];
+  let aba = q.get('aba') || 'chapeu';
+  const mostrar = async () => {
+    abas.innerHTML = ABAS.map(([id, nome]) => `<button class="btn btn-mini peca" role="tab" aria-selected="${id === aba}" data-aba="${id}">${nome}</button>`).join('');
+    const [, , lista] = ABAS.find(x => x[0] === aba);
+    grade.innerHTML = lista.map(o => `<button class="op peca" role="radio" aria-checked="${av[aba] === o.id}" data-id="${o.id}" aria-label="${o.nome}">${o.cor ? `<span class="cor" style="background:${o.cor}"></span>` : ''}<span class="ok">✓</span></button>`).join('');
+    const sel = lista.find(o => o.id === av[aba]) || lista[0];
+    painel.querySelector('.item-nome').textContent = sel.nome;
+    painel.querySelector('.item-frase').textContent = sel.frase || '';
+    if (!lista[0].cor) for (const o of lista) {   // miniaturas renderizadas (3/4, fundo transparente)
+      const url = await Cenas3D.retrato({ ...av, [aba]: o.id }, { tamanho: 160, enquadramento: aba === 'acessorio' || aba === 'comemoracao' ? 'corpo' : 'busto',
+        acao: aba === 'comemoracao' ? o.id : 'parado', expressao: aba === 'comemoracao' ? 'alegre' : 'feliz' });
+      const b = grade.querySelector(`[data-id="${o.id}"]`); if (b) b.insertAdjacentHTML('afterbegin', `<img src="${url}" alt="">`);
+    }
+  };
+  abas.addEventListener('click', e => { const b = e.target.closest('[data-aba]'); if (b) { aba = b.dataset.aba; mostrar(); } });
+  grade.addEventListener('click', e => {
+    const b = e.target.closest('[data-id]'); if (!b) return;
+    av[aba] = b.dataset.id; mostrar();
+    Cenas3D.previa(av, { el: document.getElementById('palcoPrevia'), acao: aba === 'comemoracao' ? av.comemoracao : null });
+  });
+  botao(acoes, 'Sortear', () => { const o = Bonecos.avataresIniciais([av.pid])[0]; Object.assign(av, o); mostrar(); Cenas3D.previa(av, { el: document.getElementById('palcoPrevia') }); });
+  botao(acoes, 'PRONTO!', () => { painel.className = ''; AVATARES[0] = { ...av }; Cenas3D.previa(null); Cenas3D.lobby(AVATARES); }, 'btn peca btn-principal');
+  Cenas3D.previa(av, { el: document.getElementById('palcoPrevia') });
+  mostrar();
+}
+
+Object.keys(CENAS).forEach(nome => botao(barra, nome[0].toUpperCase() + nome.slice(1), () => ir(nome)));
+async function ir(nome) {
+  limpar();
+  barra.querySelectorAll('.btn').forEach(b => b.setAttribute('aria-pressed', String(b.textContent.toLowerCase() === nome)));
+  window.pronto = false;
+  try { await CENAS[nome](); } catch (e) { console.error(e); window.erro = String(e.stack || e); }
+  window.pronto = true;
+}
+window.vitrine = { ir, AVATARES };
+
+// ---------- Checagem automática do boneco (?teste) ----------
+function teste() {
+  const falhas = [], ok = (c, msg) => { if (!c) falhas.push(msg); };
+  const caixa = o => { o.updateMatrixWorld(true); return new THREE.Box3().setFromObject(o); };
+  for (const ch of Bonecos.CHAPEUS) for (const pe of Bonecos.PENTEADOS) {
+    const b = Bonecos.criar({ pid: 'brasil', chapeu: ch.id, penteado: pe.id, pele: 'tom6', acessorio: 'globo' }), c = caixa(b);
+    ok(c.min.y > -.08 && c.min.y < .05, `${ch.id}/${pe.id}: pés no chão (${c.min.y.toFixed(2)})`);
+    ok(c.max.y > 2.7 && c.max.y < 4.1, `${ch.id}/${pe.id}: altura plausível (${c.max.y.toFixed(2)})`);
+    b.descartar();
+  }
+  const b = Bonecos.criar({ pid: 'eua' }), corpo = b.children[0], pes = () => caixa(corpo).min.y;
+  b.posar('pular', .3); ok(pes() > .8, 'no meio do pulo os pés estão no ar');
+  b.posar('pular', .8); ok(Math.abs(pes()) < .1, 'o pulo termina no chão');
+  b.posar('parado', .5); const larguraParado = caixa(b).max.x;
+  b.posar('acenar', .5); ok(caixa(b).max.x > larguraParado + .08, 'acenar levanta o braço');
+  ok(Bonecos.ACOES.every(a => (b.acao(a), true)), 'todas as ações aceitas');
+  ok(typeof b.acao('parado') === 'object', 'acao devolve o boneco');
+  const pc = Bonecos.criar({ pid: 'china', humano: false }); ok(caixa(pc).max.y > 2.5, 'computador tem cabeça de monitor'); pc.descartar();
+  ['PELES', 'CABELOS', 'CHAPEUS', 'ACESSORIOS'].forEach(k => ok(Bonecos[k].every(x => x.id && x.nome), `${k}: { id, nome }`));
+  window.resultadoTeste = falhas.length ? 'FALHOU: ' + falhas.join(' | ') : `ok: ${Bonecos.CHAPEUS.length * Bonecos.PENTEADOS.length} combinações, poses, computador e listas`;
+  console.log(window.resultadoTeste);
+}
+if (q.has('teste')) teste();
+fontesProntas.then(() => { if (CENAS[q.get('cena') || 'lobby']) ir(q.get('cena') || 'lobby'); });
+</script>
+</body></html>

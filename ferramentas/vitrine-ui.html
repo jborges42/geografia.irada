@@ -1,0 +1,335 @@
+<!doctype html>
+<!-- Vitrine da Fundação (ferramenta de desenvolvimento, não faz parte do jogo): todos os componentes de css/base.css e os
+     auxiliares de js/ui.js com conteúdo do jogo, sobre o fundo do jogo. ?p=1..6 mostra uma prancha só (capturas 16:9).
+     Ícones (js/icones.js), objetos do kit (js/arte.js) e retratos (Cenas3D.retrato) entram quando existem. -->
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vitrine da interface — Geografia Irada</title>
+<link rel="stylesheet" href="../css/base.css">
+<style>
+  .prancha { position: relative; height: 100vh; min-height: calc(100 * var(--u)); overflow: hidden; display: grid; gap: calc(2.2 * var(--u));
+    padding: calc(10.4 * var(--u)) calc(2.4 * var(--u)) calc(2.6 * var(--u)); }
+  .prancha + .prancha { border-top: 3px dashed rgb(255 255 255 / .14); }
+  .cab { position: absolute; left: calc(2.4 * var(--u)); right: calc(2.4 * var(--u)); top: calc(2.4 * var(--u)); display: flex; align-items: center; gap: calc(1.6 * var(--u)); }
+  .cab .selo { --tam: calc(5.4 * var(--u)); font-size: calc(2.9 * var(--u)); }
+  .cab h1 { font: 700 var(--fs-h2) / 1 var(--f-titulo); }
+  .cab p { margin-left: auto; font: 700 var(--fs-min) / 1.15 var(--f-titulo); text-align: right; }
+  .grupo { min-height: 0; }
+  .grupo > .tela { display: flex; flex-wrap: wrap; align-content: flex-start; align-items: flex-end; gap: calc(2.4 * var(--u)) calc(2.8 * var(--u)); }
+  .mostra { display: grid; justify-items: center; align-content: end; gap: calc(1.3 * var(--u)); }
+  .legenda { font: 800 var(--fs-min) / 1.1 var(--f-texto); color: var(--tinta-suave); white-space: nowrap; }
+  .coluna { display: grid; gap: calc(2.2 * var(--u)); align-content: start; min-height: 0; }
+  /* prancha 1 */
+  #p1 { grid-template-columns: max-content minmax(0, 1fr); grid-template-rows: auto auto auto; align-content: start; gap: calc(1.8 * var(--u)); padding-top: calc(9.4 * var(--u)); }
+  #p1 .largo { grid-column: 1 / -1; }
+  #p1 .grupo { gap: calc(.8 * var(--u)); }
+  #p1 .grupo .painel-cab { min-height: calc(4.2 * var(--u)); }
+  #p1 .grupo > .tela { flex-wrap: nowrap; padding: calc(1.4 * var(--u)) calc(2.2 * var(--u)) calc(1.2 * var(--u)); column-gap: calc(2.2 * var(--u)); }
+  .barra { display: flex; align-items: flex-end; gap: calc(.9 * var(--u)); padding-top: calc(2 * var(--u)); }
+  .fixas { display: grid; gap: calc(1.1 * var(--u)); }
+  .barra .mostra { align-content: end; }
+  .trocar { display: grid; justify-items: center; gap: calc(.9 * var(--u)); margin-left: calc(.6 * var(--u)); align-self: center; }
+  .grupo.centro > .tela { justify-content: center; }
+  /* prancha 2 */
+  #p2 { grid-template-columns: minmax(0, 1fr) calc(66 * var(--u)); align-items: start; }
+  #p2 .painel { max-height: calc(86 * var(--u)); }
+  .lista-tela { display: grid !important; gap: calc(1.2 * var(--u)); }
+  .tela-ajustes { display: grid; gap: calc(.4 * var(--u)); }
+  .tela-ajustes .ajuste + .ajuste { border-top: calc(.25 * var(--u)) dashed rgb(26 20 51 / .16); }
+  .tela-ajustes .divisoria { margin: calc(.6 * var(--u)) 0 0; }
+  .tela-ajustes .campo { padding-top: calc(1.2 * var(--u)); }
+  .ajuste-volume { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: calc(1.4 * var(--u)); }
+  /* prancha 3 */
+  #p3 { grid-template-columns: minmax(0, 1.06fr) minmax(0, 1fr); align-items: start; }
+  .medidor { display: grid; grid-template-columns: calc(5.2 * var(--u)) calc(19 * var(--u)) minmax(0, 1fr) auto; align-items: center; column-gap: calc(1.4 * var(--u));
+    padding: calc(1 * var(--u)) 0; }
+  .medidor + .medidor { border-top: calc(.25 * var(--u)) dashed rgb(26 20 51 / .16); }
+  .medidor .soquete { width: calc(5.2 * var(--u)); }
+  .medidor b { display: block; font: 700 var(--fs-corpo) / 1 var(--f-titulo); }
+  .medidor .valor { font: 900 calc(3.3 * var(--u)) / 1 var(--f-texto); font-variant-numeric: tabular-nums; }
+  .medidor .valor small { font-size: .55em; }
+  .medidor .estado { font: 800 var(--fs-min) / 1 var(--f-texto); color: var(--tinta-suave); }
+  .medidor .trilho { position: relative; padding-top: calc(1 * var(--u)); }
+  .medidor .seg > .zebra { left: 0; right: 0; bottom: calc(-1.5 * var(--u)); border-radius: calc(.3 * var(--u)); }
+  .grupo.empilhado > .tela { display: grid; gap: 0; }
+  .lado-a-lado { display: flex; flex-wrap: wrap; gap: calc(2 * var(--u)); align-items: center; }
+  /* prancha 4 */
+  #p4 { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); grid-template-rows: auto auto; align-items: start; }
+  #p4 .carimbos { grid-column: 1 / -1; }
+  .retratos { display: grid; grid-template-columns: repeat(4, auto); justify-content: space-around; gap: calc(2 * var(--u)) calc(2.4 * var(--u)); align-items: end; width: 100%; }
+  .baloes { display: grid; gap: calc(4.4 * var(--u)); align-content: start; padding: calc(2.6 * var(--u)) calc(1 * var(--u)) 0; }
+  .linha-ficha { display: flex; align-items: center; gap: calc(.7 * var(--u)); margin-top: calc(.5 * var(--u)); }
+  .linha-ficha svg.forma { width: 1.1em; height: 1.1em; }
+  .carimbos .tela { justify-content: center; align-items: center; gap: calc(3 * var(--u)) calc(3.6 * var(--u)); padding: calc(3 * var(--u)) calc(2.4 * var(--u)) calc(3.4 * var(--u)); }
+  /* prancha 5 */
+  #p5 { place-items: center; }
+  #p5 .faixa, #p6 .faixa { min-width: calc(96 * var(--u)); }
+  #p6 { grid-template-rows: 1fr auto; justify-items: center; align-items: center; gap: calc(3 * var(--u)); }
+  .pilha-avisos { display: grid; justify-items: center; gap: calc(1.4 * var(--u)); align-self: end; }
+  .demo { display: grid; gap: calc(1.6 * var(--u)); position: absolute; right: calc(2.4 * var(--u)); bottom: calc(3 * var(--u)); justify-items: stretch; }
+  /* prancha 6 */
+  #p7 { grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr); align-items: start; }
+  #p7 .grupo > .tela { padding: calc(1.4 * var(--u)) calc(1.8 * var(--u)); }
+  .tipos { display: grid; gap: calc(1.2 * var(--u)); }
+  .tipo { display: grid; grid-template-columns: calc(16 * var(--u)) 1fr; align-items: baseline; gap: calc(1.4 * var(--u)); }
+  .tipo .legenda { white-space: normal; line-height: 1.15; }
+  .amostras { display: grid; gap: calc(1.4 * var(--u)); }
+  .equipes { display: grid; grid-template-columns: repeat(3, 1fr); gap: calc(1.2 * var(--u)); }
+  .equipe { display: grid; grid-template-columns: auto 1fr; align-items: center; column-gap: calc(1 * var(--u)); padding: calc(.8 * var(--u)) calc(1 * var(--u));
+    border-radius: calc(1.1 * var(--u)); }
+  .equipe.peca { --lado: calc(.7 * var(--u)); --raio: calc(1.1 * var(--u)); }
+  .equipe .tons { display: flex; gap: calc(.4 * var(--u)); grid-column: 2; }
+  .equipe .tons i { width: calc(2.4 * var(--u)); height: calc(1.5 * var(--u)); border-radius: calc(.35 * var(--u)); border: calc(.22 * var(--u)) solid var(--tinta); }
+  .equipe b { font: 700 var(--fs-corpo) / 1 var(--f-titulo); }
+  .equipe svg.forma { width: calc(4.2 * var(--u)); height: calc(4.2 * var(--u)); grid-row: span 2; }
+  .cats { display: flex; flex-wrap: wrap; gap: calc(1 * var(--u)); }
+  .chips-cor { display: flex; flex-wrap: wrap; gap: calc(.8 * var(--u)); }
+  .chip-cor { display: grid; justify-items: center; gap: calc(.4 * var(--u)); font: 800 max(18px, calc(1.8 * var(--u))) / 1 var(--f-texto); color: var(--tinta-suave); }
+  .chip-cor i { width: calc(5.6 * var(--u)); height: calc(3.2 * var(--u)); border-radius: calc(.8 * var(--u)); border: var(--b-fino) solid var(--tinta); box-shadow: var(--sombra-chip); }
+  .chip-cor i.dupla { background: linear-gradient(90deg, var(--a) 50%, var(--b) 50%); }
+  .sub-titulo { font: 700 var(--fs-min) / 1 var(--f-titulo); margin-bottom: calc(.8 * var(--u)); }
+</style>
+</head>
+<body>
+<main id="vitrine"></main>
+<div id="camada"></div>
+<div id="splash" aria-hidden="true" hidden>
+  <div class="splash-faixa faixa peca pinos cor-herdada">
+    <span id="splash-icone" class="faixa-icone soquete"></span>
+    <div class="faixa-textos"><div id="splash-pre" class="letra-bolha"></div><div id="splash-titulo" class="letra-bolha"></div><div id="splash-sub" class="letra-bolha"></div></div>
+  </div>
+</div>
+<div id="aviso" role="status" hidden></div>
+<div id="anuncio" class="so-leitor" aria-live="polite"></div>
+
+<script src="../lib/three.min.js"></script>
+<script src="../lib/gsap.min.js"></script>
+<script src="../lib/confetti.min.js"></script>
+<script src="../conteudo/potencias.js"></script>
+<script src="../conteudo/politicas.js"></script>
+<script src="../js/icones.js"></script>
+<script src="../js/arte.js"></script>
+<script src="../js/ui.js"></script>
+<script src="../js/bonecos.js"></script>
+<script src="../js/cenas3d.js"></script>
+<script>
+'use strict';
+const PIDS = ['brasil', 'eua', 'china', 'ue', 'india', 'russia'];
+const ic = (e, px = 64) => (typeof imgIcone === 'function' ? imgIcone(e, px) : '');
+// objeto do kit (js/arte.js) ou, enquanto não existir, o ícone 3D grande
+const objeto = (nome, emoji, classe = 'painel-objeto') =>
+  (typeof arte === 'function' && (typeof ARTE === 'undefined' || ARTE.includes?.(nome) || ARTE[nome]) ? arte(nome, { classe, alt: '' }) : ic(emoji, 128).replace('class="ico"', `class="ico ${classe}"`));
+const SVG = {
+  pausa: '<svg viewBox="0 0 24 24"><rect x="5" y="4" width="5" height="16" rx="1.6" fill="#1A1433"/><rect x="14" y="4" width="5" height="16" rx="1.6" fill="#1A1433"/></svg>',
+  som: '<svg viewBox="0 0 24 24"><path d="M3 9.5h4l5-4.5v14l-5-4.5H3z" fill="#1A1433" stroke="#1A1433" stroke-width="1.6" stroke-linejoin="round"/><path d="M16 8.5c1.6 1.8 1.6 5.2 0 7M18.6 6c3 3.4 3 8.6 0 12" fill="none" stroke="#1A1433" stroke-width="2.4" stroke-linecap="round"/></svg>',
+  ajuda: '<svg viewBox="0 0 24 24"><path d="M8.6 8.6a3.6 3.6 0 1 1 5.2 3.3c-1.2.6-1.8 1.4-1.8 2.6v.6" fill="none" stroke="#1A1433" stroke-width="3" stroke-linecap="round"/><circle cx="12" cy="19.4" r="1.9" fill="#1A1433"/></svg>',
+  geral: '<svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="3" fill="none" stroke="#1A1433" stroke-width="2.6"/><path d="M7 14l3-3 2.5 2.5L15 10l2 2" fill="none" stroke="#1A1433" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  trocar: '<svg viewBox="0 0 24 24"><path d="M5 9a7 7 0 0 1 12.5-3.2M19 15a7 7 0 0 1-12.5 3.2" fill="none" stroke="#1A1433" stroke-width="2.8" stroke-linecap="round"/><path d="M18.6 2.6v4.6H14M5.4 21.4v-4.6H10" fill="none" stroke="#1A1433" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+};
+const pinosCP = n => Array.from({ length: n }, () => '<i class="pino-cp"></i>').join('');
+const cab = (n, titulo, sub) => `<header class="cab"><span class="selo ouro">${n}</span><h1 class="letra-bolha relevo">${titulo}</h1><p class="letra-bolha pequena">${sub}</p></header>`;
+const grupo = (titulo, corpo, classe = '', cor = 'escura') => `<section class="painel peca grupo ${cor} ${classe}"><header class="painel-cab"><h2 class="painel-titulo" style="font-size:var(--fs-cartao)">${titulo}</h2></header><div class="tela">${corpo}</div></section>`;
+const mostra = (corpo, legenda) => `<div class="mostra">${corpo}<span class="legenda">${legenda}</span></div>`;
+const retrato = (pid, classe = '', extra = '') => `<span class="retrato ${classe}" data-equipe="${pid}" data-retrato="${pid}">${formaDe(pid, { classe: 'vazio' })}${extra}</span>`;
+
+const PRANCHAS = [
+  // 1 · Botões e tijolos
+  () => `<section class="prancha" id="p1">${cab(1, 'Botões e tijolos', 'Toda peça de ação é um tijolo com pinos.<br>Amarelo = o que avança.')}
+    ${grupo('Botão principal: o que avança', [['', 'normal'], ['is-hover', 'passar o mouse'], ['is-ativo', 'apertado'], ['is-foco', 'foco do teclado'], ['dis', 'desativado']].map(([e, l]) =>
+      mostra(`<button class="btn btn-principal peca pinos ${e === 'dis' ? '' : e}" ${e === 'dis' ? 'disabled' : ''}>Começar!</button>`, l)).join(''), 'largo centro')}
+    ${grupo('Variações e desativado com motivo', mostra(`<button class="btn btn-confirmar peca pinos">${GLIFOS.ok} Votar sim</button>`, 'confirmar') +
+      mostra('<button class="btn btn-perigo peca pinos">Vetar!</button>', 'perigo') +
+      mostra('<button class="btn btn-neutro peca">Cancelar</button>', 'neutro') +
+      mostra('<button class="btn btn-neutro btn-mini peca">Por quê?</button>', 'mini') +
+      mostra(`<button class="btn btn-principal peca pinos bloqueado" aria-disabled="true" aria-describedby="mot1">Negociar<span class="cadeado">${ic('🔒', 48)}</span><span class="motivo" id="mot1">Falta 1 CP</span></button>`, '&nbsp;'), 'centro')}
+    ${grupo('Botões de ícone', [['pausa', 'Pausa'], ['som', 'Som'], ['ajuda', 'Ajuda']].map(([k, n]) => mostra(`<button class="btn btn-ic peca" aria-label="${n}">${SVG[k]}</button>`, n.toLowerCase())).join('') +
+      mostra(`<button class="btn btn-ic peca redondo" aria-label="Aproximar">${GLIFOS.mais}</button>`, 'zoom') +
+      mostra(`<button class="btn btn-ic peca redondo" aria-label="Visão geral">${SVG.geral}</button>`, 'mapa') +
+      mostra(`<button class="btn btn-ic peca" aria-label="Fechar">${GLIFOS.fechar}</button>`, 'fechar'), 'centro')}
+    ${grupo('Barra de ações: tijolos com pinos', `<div class="barra">
+      <div class="fixas"><button class="tijolo baixo peca pinos"><span class="soquete">${ic('🧳')}</span><span class="nome">Missão</span><span class="preco">1</span></button>
+        <button class="tijolo baixo peca pinos"><span class="soquete">${ic('🤝')}</span><span class="nome">Negociar</span></button></div>
+      <span class="divisoria vertical" aria-hidden="true"></span>
+      ${[['🌳', 'Desmata-\nmento zero', 'natureza', 2, null, 'sel', 'selecionado'], ['🚢', 'Livre-\ncomércio', 'economia', 2, null, '', 'normal'],
+        ['🕊️', 'Mediação\nde paz', 'seguranca', 2, null, 'is-hover', 'passar o mouse'], ['🏠', 'Acolher\nrefugiados', 'pessoas', 1, ['🌾', 1], 'usado', 'usada'],
+        ['🔬', 'Pesquisa e\ninovação', 'ciencia', 2, null, 'is-foco', 'foco'], ['🌍', 'Cooperação\nSul-Sul', 'diplomacia', 2, ['💻', 1], 'bloqueado', 'bloqueada']].map(([e, n, cat, cp, rec, est, leg]) =>
+        mostra(`<button class="tijolo peca pinos cat-${cat} ${est}" ${est === 'sel' ? 'aria-pressed="true"' : ''} ${est === 'bloqueado' ? 'aria-disabled="true"' : ''}>
+          <span class="soquete">${ic(e)}</span><span class="nome">${n}</span>
+          ${est === 'bloqueado' ? `<span class="bandeja">${pinosCP(cp)}<span class="falta">${ic(rec[0], 32)}!</span></span><span class="cadeado">${ic('🔒', 40)}</span>`
+            : `<span class="bandeja">${pinosCP(cp)}${rec ? ic(rec[0], 32) + rec[1] : ''}</span>`}
+          ${est === 'usado' ? `<span class="selo ok">${GLIFOS.ok}</span>` : ''}</button>`, leg)).join('')}
+      <div class="trocar"><button class="btn btn-ic peca redondo" aria-label="Trocar ações">${SVG.trocar}</button><span class="pilula amarela">1 CP</span></div>
+    </div>`, 'largo')}
+  </section>`,
+
+  // 2 · Painel, abas, lista de opções e ajustes
+  () => `<section class="prancha" id="p2">${cab(2, 'Painéis, abas, lista e ajustes', 'Painel = moldura na cor do contexto<br>+ tela creme rebaixada.')}
+    <section class="painel peca pinos flutua" data-equipe="brasil" aria-labelledby="t-alvo">
+      <header class="painel-cab">${objeto('maleta', '🧳')}<div class="painel-titulo"><span id="t-alvo">Missão diplomática</span><small class="painel-sub">Escolha o território · custa 1 CP</small></div>
+        <button class="btn btn-ic peca" aria-label="Fechar">${GLIFOS.fechar}</button></header>
+      <div class="abas" role="tablist" aria-label="Onde procurar">
+        <button class="peca" role="tab" aria-selected="true" aria-controls="aba-a">${ic('📍', 48)} Perto de você</button>
+        <button class="peca" role="tab" aria-selected="false" aria-controls="aba-b">${ic('🌐', 48)} Mundo todo</button>
+        <button class="peca" role="tab" aria-selected="false" aria-controls="aba-c">${ic('🤝', 48)} Parceiros</button></div>
+      <div class="tela lista-tela" id="aba-a" role="tabpanel">
+        <div class="lista-opcoes" role="radiogroup" aria-label="Territórios">
+          <button class="opcao peca" role="radio" aria-checked="true"><span class="soquete">${ic('🌽', 48)}</span><span><span class="opcao-nome">Cone Sul</span><span class="opcao-detalhe">América do Sul · sua influência: 3 de 4</span></span><span class="opcao-fim"><span class="pilula ganho">+1</span><span class="marcador">${GLIFOS.ok}</span></span></button>
+          <button class="opcao peca" role="radio" aria-checked="false"><span class="soquete">${ic('🏜️', 48)}</span><span><span class="opcao-nome">Andes</span><span class="opcao-detalhe">América do Sul · sua influência: 1 de 4</span></span><span class="opcao-fim"><span class="marcador">${GLIFOS.ok}</span></span></button>
+          <button class="opcao peca is-hover" role="radio" aria-checked="false"><span class="soquete">${ic('🌾', 48)}</span><span><span class="opcao-nome">África Ocidental</span><span class="opcao-detalhe">África · parceira da China ${formaDe('china')}</span></span><span class="opcao-fim"><span class="marcador">${GLIFOS.ok}</span></span></button>
+          <button class="opcao peca bloqueado" role="radio" aria-checked="false" aria-disabled="true"><span class="soquete">${ic('⚠️', 48)}</span><span><span class="opcao-nome">Venezuela e Guianas</span><span class="opcao-detalhe">Em conflito: missões suspensas neste mandato</span></span><span class="opcao-fim">${ic('🔒', 44)}</span></button>
+        </div></div>
+      <footer class="painel-rodape"><span class="dica">O alvo escolhido também brilha no mapa.</span>
+        <button class="btn btn-neutro peca">Cancelar</button><button class="btn btn-principal peca pinos">Confirmar</button></footer>
+    </section>
+    <section class="painel peca pinos amarela flutua" aria-labelledby="t-ajustes">
+      <header class="painel-cab">${objeto('engrenagem', '🧰')}<h2 class="painel-titulo" id="t-ajustes">Ajustes</h2><button class="btn btn-ic peca" aria-label="Fechar">${GLIFOS.fechar}</button></header>
+      <div class="tela tela-ajustes">
+        <div class="ajuste"><span>${ic('🔊', 48)} Música</span><button class="interruptor" role="switch" aria-checked="true" aria-label="Música"><span>Não</span><span>Sim</span></button></div>
+        <div class="ajuste"><span>${ic('🔊', 48)} Efeitos</span><button class="interruptor" role="switch" aria-checked="true" aria-label="Efeitos"><span>Não</span><span>Sim</span></button></div>
+        <div class="ajuste"><span>${ic('🧠', 48)} Movimento reduzido</span><button class="interruptor" role="switch" aria-checked="false" aria-label="Movimento reduzido"><span>Não</span><span>Sim</span></button></div>
+        <div class="ajuste"><span>${ic('✏️', 48)} Texto</span><span class="alternador" role="radiogroup" aria-label="Tamanho do texto">
+          <button role="radio" aria-checked="false">Normal</button><button role="radio" aria-checked="true">Maior</button><button role="radio" aria-checked="false">Enorme</button></span></div>
+        <div class="ajuste ajuste-volume"><span>${ic('🔊', 48)} Volume</span><input class="deslizante" type="range" min="0" max="100" value="60" style="--v:60%" aria-label="Volume da música"><b class="num">60%</b></div>
+        <hr class="divisoria">
+        <label class="campo"><span class="campo-rotulo">Nome da equipe <span class="campo-conta">12/14</span></span><input class="entrada" value="Equipe Arara" maxlength="14"></label>
+        <label class="campo"><span class="campo-rotulo">Nome da outra equipe</span><input class="entrada is-foco" placeholder="Ex.: Os Diplomatas" maxlength="14"></label>
+      </div>
+    </section>
+  </section>`,
+
+  // 3 · Medidores, contadores, pílulas e selos
+  () => `<section class="prancha" id="p3">${cab(3, 'Medidores, contadores e pílulas', 'Estado sempre com cor + símbolo:<br>✓ bom · ! médio · !! risco · ✕ crítico')}
+    <div class="coluna">
+    ${grupo('Barras de tijolinhos', [
+      ['🚢', 'Comércio', '62', '', 6, 10, 'bom', 'Normal', [40, 75]], ['🕊️', 'Cooperação', '45', '', 5, 10, 'medio', 'Normal, mas frágil', [30, 70]],
+      ['⚠️', 'Tensão', '72', '', 7, 10, 'risco', 'Risco de crise', [80]], ['🧳', 'Deslocados', '190', ' mi', 19, 20, 'critico', 'Catástrofe à vista', [75, 100]],
+      ['🛢️', 'Energia', '55', '', 6, 10, 'bom', 'Preço normal', [35, 50, 70]],
+    ].map(([e, n, v, un, cheio, tot, niv, est, lims]) => `<div class="medidor"><span class="soquete">${ic(e)}</span>
+      <span><b>${n}</b><span class="valor">${v}<small>${un ? FINO + un.trim() : ''}</small></span></span>
+      <span class="trilho"><span class="seg grossa" data-nivel="${niv}" role="meter" aria-label="${n}" aria-valuemin="0" aria-valuemax="${tot}" aria-valuenow="${cheio}" style="--n:${cheio};--total:${tot}">${lims.map(l => `<i class="limiar" style="left:${l}%"></i>`).join('')}${niv === 'risco' ? '<span class="zebra"></span>' : ''}</span></span>
+      <span class="selo grande" data-nivel="${niv}">${{ bom: GLIFOS.ok, medio: '!', risco: '!!', critico: GLIFOS.nao }[niv]}</span></div>`).join('') +
+      `<div class="medidor"><span class="retrato" style="--tam:calc(5.2 * var(--u))" data-equipe="china" data-retrato="china">${formaDe('china', { classe: 'vazio' })}</span>
+        <span><b>Influência</b><span class="estado">China na África Ocidental</span></span>
+        <span class="trilho"><span class="seg grossa" data-equipe="china" style="--n:4;--total:10" role="meter" aria-label="Influência da China" aria-valuenow="4" aria-valuemin="0" aria-valuemax="10"></span></span><span class="selo grande" style="--cor:var(--ladrilho-2)">4</span></div>`, 'empilhado')}
+    </div>
+    <div class="coluna">
+    ${grupo('Contadores com ícone', `<div class="lado-a-lado">
+      <span class="contador peca amarela"><span class="soquete" style="--soquete:#FFE27A"><i class="pino-cp" style="width:62%;height:62%"></i></span><b>5</b><span class="rot">CP</span></span>
+      ${[['🌾', 4, 'alimentos'], ['⚡', 2, 'energia'], ['💎', 2, 'minerais'], ['💻', 1, 'tecnologia']].map(([e, n, nome]) => `<span class="contador peca"><span class="soquete">${ic(e, 48)}</span><b>${n}</b><span class="so-leitor">${nome}</span></span>`).join('')}
+      <span class="contador peca alerta"><span class="soquete">${ic('🗳️', 48)}</span><b>28</b><span class="so-leitor">apoio popular em crise</span></span></div>`)}
+    ${grupo('Pílulas', `<div class="lado-a-lado">
+      <span class="pilula amarela">${pinosCP(2)} 2 CP</span><span class="pilula ganho">${ic('🌳', 40)} Ambiente +5</span><span class="pilula perda">${ic('💰', 40)} Economia −1</span>
+      <span class="pilula cat-natureza">${ic('🌱', 40)} Natureza e Energia</span><span class="pilula" data-equipe="brasil">${formaDe('brasil', { branca: true })} Parceiro do Brasil</span>
+      <span class="pilula fantasma">${ic('🌡️', 40)} Emissões −0,4 Gt</span><span class="pilula fantasma">Cooperação 45 → 49</span>
+      <span class="pilula alerta ao-vivo">AO VIVO</span><span class="pilula escura">${ic('💻', 40)} Computador</span></div>`)}
+    ${grupo('Selos e cronômetro', `<div class="lado-a-lado">
+      ${['bom', 'medio', 'risco', 'critico'].map(n => `<span class="selo grande" data-nivel="${n}">${{ bom: GLIFOS.ok, medio: '!', risco: '!!', critico: GLIFOS.nao }[n]}</span>`).join('')}
+      <span class="selo grande ouro">1º</span><span class="selo grande prata">2º</span><span class="selo grande bronze">3º</span>
+      <span class="cronometro peca">0:45</span><span class="cronometro peca acabando" role="timer">0:04</span></div>`)}
+    </div>
+  </section>`,
+
+  // 4 · Retratos, balões e carimbos
+  () => `<section class="prancha" id="p4">${cab(4, 'Retratos, balões e carimbos', 'Quem = cor saturada + forma.<br>Carimbo = resultado que bate na mesa.')}
+    ${grupo('Retratos das delegações', `<div class="retratos">${PIDS.map(pid => mostra(retrato(pid, 'medio'), nomeEquipe(pid))).join('')}
+      ${mostra(retrato('china', 'grande', `<span class="cpu">${ic('💻', 40)}</span>`), 'Computador')}${mostra(retrato('brasil', 'grande'), 'Brasil')}</div>`)}
+    <div class="baloes">
+      <div class="balao peca flutua" role="tooltip"><span class="balao-tit">${ic('🌾', 48)} África Ocidental</span>
+        <span class="linha-ficha">${formaDe('china')} Parceira da China</span><span class="linha-ficha">Estabilidade: <b class="num">48</b> <span class="selo" data-nivel="medio">!</span></span>
+        <span class="linha-ficha">Produz ${ic('🌾', 36)} alimentos e ${ic('⚡', 36)} energia</span></div>
+      <div class="balao peca flutua fala" data-ponta="baixo" style="--ponta-x:calc(70% - 1.6 * var(--u))">${ic('💡', 48)} Território em crise aceita ajuda com mais facilidade. Que tal uma missão de paz?</div>
+    </div>
+    ${grupo('Carimbos', [['verde', 'ok', 'Aprovada'], ['vermelho', 'nao', 'Rejeitada'], ['vetada', '✋', 'Vetada'], ['cinza', '', 'Sem maioria'], ['indigo', '', 'Decidido'], ['verde', '', 'Votou'], ['vermelho', '', 'Confidencial']]
+      .map(([cor, g, t], i) => `<span class="carimbo ${cor} ${i === 0 ? 'grande' : ''}">${g === 'ok' || g === 'nao' ? GLIFOS[g] : g ? ic(g, 64) : ''}${t}</span>`).join(''), 'carimbos', 'creme')}
+  </section>`,
+
+  // 5 · Faixa do ano (raios)
+  () => `<section class="prancha raios" id="p5">${cab(5, 'Faixa de anúncio: o ano', 'Sol de raios girando devagar + tijolo comprido.<br>Toque, Espaço ou Enter pulam.')}
+    <div class="faixa peca pinos anil"><span class="faixa-icone soquete">${ic('🌍', 128)}</span>
+      <div class="faixa-textos"><div class="letra-bolha faixa-pre">Começa o mandato</div><div class="letra-bolha faixa-titulo">2030</div><div class="letra-bolha faixa-sub">Mandato 2 de 6 · Missão 2050</div></div></div>
+    <div class="demo"><button class="btn btn-neutro btn-mini peca" id="ver-faixa">Ver faixa ao vivo</button><button class="btn btn-neutro btn-mini peca" id="ver-aviso">Novo aviso</button>
+      <button class="btn btn-neutro btn-mini peca" id="ver-painel">Abrir painel</button><button class="btn btn-neutro btn-mini peca" id="ver-carimbo">Carimbar</button></div>
+  </section>`,
+
+  // 6 · Vez da equipe e avisos
+  () => `<section class="prancha" id="p6">${cab(6, 'Vez da equipe e avisos', 'Avisos sobre o oceano do sul, acima da doca:<br>bom, ruim ou neutro, no máximo 2 empilhados.')}
+    <div class="faixa peca pinos" data-equipe="brasil"><span class="faixa-icone soquete">${retrato('brasil', 'grande')}</span>
+      <div class="faixa-textos"><div class="letra-bolha faixa-pre">Equipe Verde</div><div class="letra-bolha faixa-titulo">Vez do Brasil</div><div class="letra-bolha faixa-sub">Hora de decidir!</div></div></div>
+    <div class="pilha-avisos">
+      <div class="aviso peca flutua bom">${ic('🤝', 64)}<span>Cone Sul agora é parceiro do Brasil!</span></div>
+      <div class="aviso peca flutua ruim">${ic('🏜️', 64)}<span>Seca no Sahel: −3 de estabilidade</span></div>
+      <div class="aviso peca flutua">${ic('⏰', 64)}<span>Faltam 2 ações para encerrar a vez</span></div></div>
+  </section>`,
+
+  // 7 · Tipografia e cores
+  () => `<section class="prancha" id="p7">${cab(7, 'Tipografia e cores', 'Fredoka nos títulos, Nunito nos textos e números,<br>Titan One só nos letreiros.')}
+    ${grupo('Escala de texto (1u = 1% da altura)', `<div class="tipos">
+      <div class="tipo"><span class="legenda">Titan One · faixa · 11u</span><span class="marca" style="font-size:var(--fs-faixa)">2050</span></div>
+      <div class="tipo"><span class="legenda">Fredoka 700 · título · 6,5u</span><span style="font:700 var(--fs-h1)/1.05 var(--f-titulo)">Reunião na ONU</span></div>
+      <div class="tipo"><span class="legenda">Fredoka 700 · painel · 4,4u</span><span style="font:700 var(--fs-h2)/1.05 var(--f-titulo)">Vez da Índia</span></div>
+      <div class="tipo"><span class="legenda">Fredoka 700 · cartão · 3,4u</span><span style="font:700 var(--fs-cartao)/1.05 var(--f-titulo)">Acordo de livre-comércio</span></div>
+      <div class="tipo"><span class="legenda">Nunito 800 · corpo · 2,8u</span><span style="font:800 var(--fs-corpo)/1.3 var(--f-texto)">Emissões caem e o clima agradece.</span></div>
+      <div class="tipo"><span class="legenda">Nunito 800 · mínimo · 18 px</span><span style="font:800 var(--fs-min)/1.3 var(--f-texto)">Deslocados: ${fmtMilhoes(120)} · ${fmtGraus(1.62)} · ${sinal(-3)}</span></div>
+      <div class="tipo"><span class="legenda">Nunito 900 · números</span><span class="num" style="font-size:calc(4.4 * var(--u))">0:45 · 1:11 · ${fmtAno(2050)}</span></div>
+    </div>`, '', 'escura')}
+    <div class="coluna">
+    ${grupo('As 6 potências: cor + nome + forma', `<div class="equipes">${PIDS.map(pid => `<div class="equipe peca creme">${formaDe(pid)}<b>${esc(nomeCurto(pid))}</b>
+      <span class="tons">${['cor', 'lado', 'clara'].map(t => `<i style="background:${corDe(pid, t)}"></i>`).join('')}</span></div>`).join('')}</div>`)}
+    ${grupo('Categorias (o quê = pastel, sempre com ícone)', `<div class="cats">${Object.entries(CATEGORIAS).map(([id, c]) => `<span class="pilula grande cat-${id}">${ic(c.icone, 48)} ${esc(c.nome)}</span>`).join('')}</div>`)}
+    ${grupo('Interface e continentes', `<div class="amostras"><div class="chips-cor">${[['tinta', '#1A1433'], ['ladrilho', '#FFF9EC'], ['amarelo', '#FFD21F'], ['verde-ok', '#3CD46A'], ['vermelho', '#F0303A'], ['cinza-peça', '#E3E9F4'], ['placa', '#2E2752'], ['mesa', '#3550C8']]
+      .map(([n, c]) => `<span class="chip-cor"><i style="background:${c}"></i>${n}</span>`).join('')}</div>
+      <div class="chips-cor">${[['an', 'Am. Norte'], ['as', 'Am. Sul'], ['eu', 'Europa'], ['af', 'África'], ['ai', 'Ásia'], ['oc', 'Oceania'], ['po', 'Polos']]
+      .map(([id, n]) => `<span class="chip-cor"><i class="dupla" style="--a:${corDe(id)};--b:${corDe(id, 'b')}"></i>${n}</span>`).join('')}</div></div>`)}
+    </div>
+  </section>`,
+];
+
+async function montarVitrine() {
+  const v = document.getElementById('vitrine');
+  v.innerHTML = PRANCHAS.map(f => f()).join('');
+  const so = new URLSearchParams(location.search).get('p');
+  if (so) $$('.prancha').forEach(p => (p.hidden = p.id !== 'p' + so));
+  $$('.abas').forEach(l => ativarAbas(l));
+  $$('.alternador').forEach(a => a.addEventListener('click', ev => { const b = ev.target.closest('[role="radio"]'); if (!b) return;
+    a.querySelectorAll('[role="radio"]').forEach(x => x.setAttribute('aria-checked', x === b)); }));
+  $$('.interruptor').forEach(b => b.addEventListener('click', () => b.setAttribute('aria-checked', b.getAttribute('aria-checked') !== 'true')));
+  $$('.lista-opcoes').forEach(l => l.addEventListener('click', ev => { const o = ev.target.closest('.opcao:not(.bloqueado)'); if (!o) return;
+    l.querySelectorAll('.opcao').forEach(x => x.setAttribute('aria-checked', x === o)); }));
+  $('#ver-faixa').onclick = () => splash({ pre: 'Começa o mandato', titulo: '2030', sub: 'Mandato 2 de 6 · Missão 2050', icone: ic('🌍', 128), cor: 'anil', raios: true });
+  $('#ver-aviso').onclick = () => aviso(sortear(['Cone Sul agora é parceiro do Brasil!', 'Acordo histórico na Cúpula do Clima!']), { tipo: 'bom', icone: ic('🤝', 64) });
+  $('#ver-painel').onclick = () => {
+    const p = document.createElement('section');
+    p.className = 'painel peca pinos painel-p';
+    p.innerHTML = `<header class="painel-cab"><h2 class="painel-titulo">Pausa</h2><button class="btn btn-ic peca" aria-label="Fechar">${GLIFOS.fechar}</button></header>
+      <div class="tela"><p>Painel aberto com abrirPainel(): o resto fica inerte, Esc fecha e o foco volta.</p></div>
+      <footer class="painel-rodape"><button class="btn btn-principal peca pinos">Continuar</button></footer>`;
+    p.querySelectorAll('button').forEach(b => (b.onclick = () => fecharPainel(p)));
+    abrirPainel(p, { esc: true });
+  };
+  $('#ver-carimbo').onclick = () => { const c = $('#p4 .carimbo') || document.body.appendChild(Object.assign(document.createElement('span'), { className: 'carimbo verde grande', innerHTML: GLIFOS.ok + 'Aprovada', style: 'position:fixed;left:40%;top:40%;z-index:30' })); carimbar(c); };
+  await fontesProntas;
+  window.vitrinePronta = true;
+  preencherRetratos();
+}
+
+// Retratos: Cenas3D.retrato (o boneco de verdade); se faltar, as imagens de window.RETRATOS_VITRINE; se faltar, a forma da equipe
+async function preencherRetratos() {
+  const avs = typeof Bonecos !== 'undefined' && Bonecos.avataresIniciais ? Bonecos.avataresIniciais(PIDS, 7) : null;
+  for (const el of $$('[data-retrato]')) {
+    const pid = el.dataset.retrato, cpu = !!el.querySelector('.cpu');
+    let url = window.RETRATOS_VITRINE?.[pid];
+    if (!url && avs && typeof Cenas3D !== 'undefined') {
+      try { url = await Cenas3D.retrato({ ...avs[PIDS.indexOf(pid)], humano: !cpu }, { tamanho: el.classList.contains('grande') ? 240 : 120, enquadramento: 'rosto' }); }
+      catch { url = null; }
+    }
+    if (url) el.innerHTML = `<img src="${url}" alt="">${el.closest('.faixa-icone') ? '' : formaDe(pid)}${cpu ? `<span class="cpu">${ic('💻', 40)}</span>` : ''}`;
+  }
+  window.retratosProntos = true;
+}
+window.montarVitrine = montarVitrine;
+montarVitrine();
+</script>
+</body>
+</html>

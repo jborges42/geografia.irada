@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<base href="../">
+<title>Vitrine de som — Geografia Irada</title>
+<link rel="stylesheet" href="css/base.css">
+<style>
+  /* Vitrine de som (dono: Som e créditos): tocar cada efeito, humor e vinheta e conferir duração, picos e emendas. */
+  body { padding: var(--e5) var(--e6) var(--e8); }
+  .palco { max-width: calc(176 * var(--u)); margin: 0 auto; display: grid; gap: var(--e6); }
+  .topo { display: flex; flex-wrap: wrap; align-items: center; gap: var(--e4) var(--e6); }
+  .topo h1 { font: 700 var(--fs-h1) / var(--lh-titulo) var(--f-titulo); text-shadow: 0 .07em 0 var(--tinta); }
+  .topo p { flex: 1 1 calc(40 * var(--u)); font: 800 var(--fs-corpo) / var(--lh-texto) var(--f-texto); color: #fff; }
+  .ajustes { display: flex; flex-wrap: wrap; align-items: center; gap: var(--e3) var(--e5); padding: var(--e3) var(--e4); }
+  .ajustes .rotulo { font: 700 var(--fs-min) / 1 var(--f-titulo); }
+  .ajustes label { display: flex; align-items: center; gap: var(--e2); }
+  .ajustes .deslizante { width: calc(18 * var(--u)); }
+  .colunas { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: var(--e6); align-items: start; }
+  .pilha { display: grid; gap: var(--e6); }
+  .painel-cab .soquete { width: calc(5.2 * var(--u)); color: #fff; }
+  .painel-cab .soquete > svg { width: 80%; }
+  .grade { display: flex; flex-wrap: wrap; gap: var(--e5) var(--e3); padding-top: var(--e3); }
+  .grade.humores .tijolo { width: calc(17 * var(--u)); min-height: calc(13 * var(--u)); }
+  .tijolo > .soquete { color: #fff; }
+  .tijolo > .soquete > svg { width: 82%; }
+  .grupo + .grupo { margin-top: var(--e5); }
+  .grupo-tit { display: flex; align-items: center; gap: var(--e2); font: 700 var(--fs-cartao) / 1 var(--f-titulo); }
+  .grupo-tit .pilula { font-size: var(--fs-min); }
+  .efeito { flex-direction: column; gap: calc(.3 * var(--u)); min-width: calc(15 * var(--u)); padding: calc(.9 * var(--u)) calc(1.4 * var(--u)) calc(.7 * var(--u)); }
+  .efeito small { font-weight: 800; color: var(--tinta-suave); }
+  .estado { display: flex; flex-wrap: wrap; gap: var(--e2); margin-top: var(--e4); }
+  .estado .pilula b { font-weight: 900; }
+  .linha-ajuste { display: flex; flex-wrap: wrap; align-items: center; gap: var(--e3) var(--e5); margin-top: var(--e4); font: 700 var(--fs-min) / 1 var(--f-titulo); }
+  .linha-ajuste > span { display: flex; align-items: center; gap: var(--e2); }
+  .nota { font: 800 var(--fs-min) / var(--lh-texto) var(--f-texto); color: var(--tinta-suave); }
+  .aviso-disco { display: flex; align-items: center; gap: var(--e2); padding: var(--e2) var(--e3); border-radius: var(--raio); background: var(--amarelo-claro);
+    border: var(--b-fino) dashed var(--amarelo-lado); font: 800 var(--fs-min) / 1.25 var(--f-texto); }
+  /* medidor do mestre: barra de tijolinhos + número */
+  .medidor { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: var(--e3); margin: var(--e2) 0 var(--e4); }
+  .medidor .seg { --total: 24; }
+  .medidor .num { min-width: 6.5ch; text-align: right; font-size: var(--fs-corpo); }
+  /* tabela de conferência */
+  table { width: 100%; border-collapse: separate; border-spacing: 0; font: 800 var(--fs-min) / 1.15 var(--f-texto); font-variant-numeric: tabular-nums; }
+  caption { text-align: left; padding-bottom: var(--e2); font: 700 var(--fs-cartao) / 1 var(--f-titulo); }
+  th { text-align: left; padding: var(--e2) var(--e2); font: 700 var(--fs-min) / 1 var(--f-titulo); color: var(--tinta-suave); border-bottom: var(--b-fino) solid var(--tinta); }
+  td { padding: calc(.6 * var(--u)) var(--e2); }
+  td.n, th.n { text-align: right; white-space: nowrap; }
+  tbody tr:nth-child(even) td { background: var(--ladrilho-2); }
+  tbody tr td:first-child { border-radius: var(--raio-chip) 0 0 var(--raio-chip); } tbody tr td:last-child { border-radius: 0 var(--raio-chip) var(--raio-chip) 0; }
+  .arq { font-weight: 900; } .uso { color: var(--tinta-suave); }
+  .status { display: inline-flex; align-items: center; gap: var(--e1); white-space: nowrap; }
+  .status .selo { --tam: calc(2.6 * var(--u)); }
+  .status .selo > svg { width: 64%; height: 64%; }
+  .resumo { display: flex; flex-wrap: wrap; gap: var(--e2); margin: var(--e2) 0 var(--e4); }
+  .emendas { display: grid; gap: var(--e2); margin: 0 0 var(--e4); padding: 0; list-style: none; }
+  .emendas li { display: flex; align-items: center; gap: var(--e2); font: 800 var(--fs-min) / 1.25 var(--f-texto); }
+  .acoes { display: flex; flex-wrap: wrap; gap: var(--e4) var(--e3); margin: var(--e4) 0 var(--e2); }
+  @media (max-width: 1100px) { .colunas { grid-template-columns: minmax(0, 1fr); } }
+</style>
+</head>
+<body>
+<main class="palco">
+  <header class="topo">
+    <h1 class="letra-bolha">Vitrine de som</h1>
+    <p>Toque um botão para ouvir. Nada soa antes do primeiro toque, como no jogo. Música e efeitos seguem a tabela do guia de arte.</p>
+    <div class="ajustes peca fina">
+      <button class="interruptor" role="switch" id="sw-musica" aria-checked="true" aria-label="Música"><span>Sem música</span><span>Música</span></button>
+      <button class="interruptor" role="switch" id="sw-efeitos" aria-checked="true" aria-label="Efeitos"><span>Sem efeitos</span><span>Efeitos</span></button>
+      <button class="interruptor" role="switch" id="sw-silenciosa" aria-checked="false" aria-label="Sala silenciosa"><span>Normal</span><span>Sala silenciosa</span></button>
+      <label><span class="rotulo">Música</span><input class="deslizante" id="vol-musica" type="range" min="0" max="100" aria-label="Volume da música"></label>
+      <label><span class="rotulo">Efeitos</span><input class="deslizante" id="vol-efeitos" type="range" min="0" max="100" aria-label="Volume dos efeitos"></label>
+    </div>
+  </header>
+
+  <div class="colunas">
+    <div class="pilha">
+      <section class="painel peca amarela pinos" aria-labelledby="t-trilhas">
+        <div class="painel-cab"><span class="soquete" data-glifo="nota"></span><h2 class="painel-titulo" id="t-trilhas">Trilhas<span class="painel-sub">Humor da música: troca com crossfade de igual potência</span></h2></div>
+        <div class="tela">
+          <div class="grade humores" id="humores"></div>
+          <div class="linha-ajuste">
+            <span><button class="interruptor" role="switch" id="sw-abafar" aria-checked="false" aria-label="Abafar a trilha (painel aberto)"><span>Aberta</span><span>Abafada</span></button></span>
+            <span><button class="interruptor" role="switch" id="sw-discurso" aria-checked="false" aria-label="Abaixar a trilha (discurso na ONU)"><span>Normal</span><span>Discurso</span></button></span>
+          </div>
+          <div class="estado" id="estado" aria-live="off"></div>
+        </div>
+      </section>
+
+      <section class="painel peca cat-pessoas pinos" aria-labelledby="t-vinhetas">
+        <div class="painel-cab"><span class="soquete" data-glifo="estrela"></span><h2 class="painel-titulo" id="t-vinhetas">Vinhetas e momentos<span class="painel-sub">Sequências como o jogo usa</span></h2></div>
+        <div class="tela">
+          <div class="grade" id="vinhetas"></div>
+          <div class="grade" id="momentos"></div>
+        </div>
+      </section>
+    </div>
+
+    <section class="painel peca cat-ciencia pinos" aria-labelledby="t-efeitos">
+      <div class="painel-cab"><span class="soquete" data-glifo="som"></span><h2 class="painel-titulo" id="t-efeitos">Efeitos<span class="painel-sub">Som.efeito(nome) · arquivo ou sintetizado · duração</span></h2></div>
+      <div class="tela" id="efeitos"></div>
+    </section>
+  </div>
+
+  <section class="painel peca escura pinos" aria-labelledby="t-conferencia">
+    <div class="painel-cab"><span class="soquete" data-glifo="medidor"></span><h2 class="painel-titulo" id="t-conferencia">Conferência<span class="painel-sub">Duração, picos, nível no jogo e emenda dos loops</span></h2></div>
+    <div class="tela">
+      <p class="aviso-disco" id="aviso-disco" hidden>Aberta do disco (file://): o navegador não deixa ler os arquivos. Os botões tocam, mas para medir abra pelo servidor.</p>
+      <div class="medidor"><span class="rotulo grupo-tit">Saída</span><span class="seg grossa" id="medidor" role="meter" aria-label="Nível da saída" aria-valuemin="-60" aria-valuemax="0" aria-valuenow="-60" style="--n:0" data-nivel="bom"></span><span class="num" id="medidor-num">−∞ dB</span></div>
+      <div class="acoes">
+        <button class="btn btn-mini peca amarela pinos" id="medir">Medir arquivos</button>
+        <button class="btn btn-mini peca creme pinos" id="emendas">Conferir emendas das trilhas</button>
+      </div>
+      <div class="resumo" id="resumo"></div>
+      <ul class="emendas" id="lista-emendas"></ul>
+      <table id="tabela" hidden>
+        <caption>Arquivos em som/</caption>
+        <thead><tr><th>Arquivo</th><th>Uso</th><th class="n">Duração</th><th class="n">KB</th><th class="n">Pico</th><th class="n">RMS</th><th class="n">No jogo</th><th>Situação</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<script src="js/audio.js"></script>
+<script>
+'use strict';
+const $ = s => document.querySelector(s);
+const fmt = (n, c = 2) => Number(n).toLocaleString('pt-BR', { minimumFractionDigits: c, maximumFractionDigits: c });
+const db = v => (v > 0 ? (20 * Math.log10(v)) : -Infinity);
+const fmtDb = v => (v === -Infinity ? '−∞' : (v < 0 ? '−' : '') + fmt(Math.abs(v), 1)) + ' dB';
+const espera = ms => new Promise(r => setTimeout(r, ms));
+
+// Glifos de traço com contorno (padrão .glifo de base.css): desenhados duas vezes, contorno índigo e miolo
+const GLIFO = {
+  nota: '<path d="M11 23.5V8l14-4v15.5"/><path d="M5.8 24.6l4.6-1.6M19.8 20.6l4.6-1.6"/>',
+  som: '<path d="M5 12.5h4.5L16 7v18l-6.5-5.5H5z"/><path d="M21 12.5a5 5 0 0 1 0 7M24.5 9a10 10 0 0 1 0 14"/>',
+  estrela: '<path d="M16 4.5l3.4 7 7.6 1.1-5.5 5.3 1.3 7.6L16 21.9l-6.8 3.6 1.3-7.6L5 12.6l7.6-1.1z"/>',
+  medidor: '<path d="M6 26v-6M12 26V12M18 26v-9M24 26V6"/>',
+  tocar: '<path d="M10 7l14 9-14 9z"/>',
+  pausa: '<path d="M11 8v16M21 8v16"/>',
+  ok: '<path d="M7 16.5l6 6L25 9.5"/>',
+  alerta: '<path d="M16 7v11M16 24.5h.1"/>',
+};
+const glifo = (nome, classe = '') => `<svg class="glifo ${classe}" viewBox="0 0 32 32" aria-hidden="true"><g class="g-c">${GLIFO[nome]}</g><g class="g-m">${GLIFO[nome]}</g></svg>`;
+document.querySelectorAll('[data-glifo]').forEach(el => (el.innerHTML = glifo(el.dataset.glifo)));
+const fechos = { nota: 'var(--amarelo)', estrela: 'var(--cat-pessoas-lado)', som: 'var(--cat-ciencia-lado)', medidor: 'var(--encaixe)' };
+document.querySelectorAll('.painel-cab .soquete').forEach(s => s.style.setProperty('--soquete', fechos[s.dataset.glifo]));
+
+// ---------- Trilhas ----------
+const HUMOR = { menu: ['Menu', 'menu, lobby e provador'], jogo: ['Partida', 'por baixo da conversa'], tensao: ['Tensão', 'mundo em crise'], assembleia: ['Assembleia', 'reunião na ONU e COP'], '': ['Silêncio', 'musica(null)'] };
+$('#humores').innerHTML = Object.entries(HUMOR).map(([h, [nome, det]]) =>
+  `<button class="tijolo peca pinos ${h ? 'creme' : 'cinza'}" data-humor="${h}" aria-pressed="false"><span class="soquete" style="--soquete:${h ? 'var(--amarelo)' : 'var(--cinza-peca-lado)'}">${glifo(h ? 'nota' : 'pausa')}</span><span class="nome">${nome}</span><span class="detalhe">${det}</span></button>`).join('');
+$('#humores').addEventListener('click', ev => {
+  const b = ev.target.closest('[data-humor]');
+  if (!b) return;
+  Som.musica(b.dataset.humor || null);
+  marcarHumor();
+});
+const marcarHumor = () => document.querySelectorAll('[data-humor]').forEach(b => b.setAttribute('aria-pressed', String((b.dataset.humor || null) === Som.humor)));
+
+// ---------- Efeitos (nome amigável, família e cor) ----------
+const NOME = { clique: 'Clique', tijolo: 'Tijolo', 'tijolo-cai': 'Tijolo caindo', construcao: 'Construção', chuva: 'Chuva de tijolos', pop: 'Pop', whoosh: 'Vuuush',
+  alarme: 'Alarme', plantao: 'Plantão', martelo: 'Martelo', voto: 'Voto', reuniao: 'Reunião', moeda: 'Moeda', pino: 'Pino de CP', sucesso: 'Sucesso', erro: 'Erro',
+  vitoria: 'Vitória', vez: 'Vez', virar: 'Virar', tique: 'Tique', tempo: 'Tempo esgotado', subir: 'Subir', descer: 'Descer', trovao: 'Trovão', pincel: 'Pincel' };
+const FAMILIAS = [
+  ['Peças e interface', 'cat-ciencia', ['clique', 'tijolo', 'tijolo-cai', 'construcao', 'chuva', 'pop', 'whoosh', 'pincel']],
+  ['ONU e notícias', 'cat-diplomacia', ['alarme', 'reuniao', 'plantao', 'martelo', 'voto', 'trovao']],
+  ['Recursos e resultado', 'cat-economia', ['moeda', 'pino', 'sucesso', 'erro', 'subir', 'descer', 'vitoria']],
+  ['Vez e tempo', 'creme', ['vez', 'virar', 'tique', 'tempo']],
+];
+const TAB = Som._tabela.efeitos;
+const fonte = n => (TAB[n] ? TAB[n].arq.join(', ') : 'sintetizado');
+$('#efeitos').innerHTML = FAMILIAS.map(([tit, cor, nomes]) => `<div class="grupo"><h3 class="grupo-tit">${tit}</h3><div class="grade">${nomes.map(n =>
+  `<button class="btn btn-mini peca pinos efeito ${cor}" data-efeito="${n}" title="${fonte(n)}"><span>${NOME[n]}</span><small data-dur="${n}">${TAB[n] ? '…' : 'sintetizado'}</small></button>`).join('')}</div></div>`).join('') +
+  `<div class="grupo"><h3 class="grupo-tit">Nomes antigos <span class="pilula">continuam valendo</span></h3><div class="grade">${Object.entries(Som.ANTIGOS).map(([a, n]) =>
+  `<button class="btn btn-mini peca pinos efeito cinza" data-efeito="${a}"><span>${a}</span><small>→ ${NOME[n]}</small></button>`).join('')}</div></div>`;
+$('#efeitos').addEventListener('click', ev => { const b = ev.target.closest('[data-efeito]'); if (b) Som.efeito(b.dataset.efeito); });
+// Duração de cada efeito: medida no arquivo decodificado (http) ou, no file://, pelos metadados do <audio> (≈: inclui o enchimento do AAC)
+const mostrarDuracao = (n, dur, aprox) => { const el = document.querySelector(`[data-dur="${n}"]`); if (el) el.textContent = `${aprox ? '≈ ' : ''}${fmt(dur)} s · vol. ${fmt(TAB[n].vol)}`; };
+if (location.protocol === 'file:') Object.keys(TAB).forEach(n => {
+  const a = new Audio('som/' + TAB[n].arq[0]);
+  a.preload = 'metadata';
+  a.addEventListener('loadedmetadata', () => mostrarDuracao(n, a.duration, true));
+});
+
+// ---------- Vinhetas e momentos (como o jogo chama) ----------
+const VINH = { vitoria: 'Vitória em 2050', derrota: 'Colapso', rodada: 'Novo ano' };
+$('#vinhetas').innerHTML = Som.VINHETAS.map(v => `<button class="btn btn-mini peca pinos amarela" data-vinheta="${v}">${glifo('estrela')}<span>${VINH[v]}</span></button>`).join('');
+$('#vinhetas').addEventListener('click', ev => { const b = ev.target.closest('[data-vinheta]'); if (b) { Som.vinheta(b.dataset.vinheta); setTimeout(marcarHumor, 50); } });
+const MOMENTOS = {
+  'Construção (10 peças)': () => { for (let i = 0; i < 10; i++) setTimeout(() => Som.efeito('tijolo', i === 9 ? { ultimo: true } : { i }), i * 90); },
+  'Torre de influência': () => { for (let i = 0; i < 9; i++) setTimeout(() => Som.efeito('tijolo-cai', { semitons: Math.floor(i / 3) }), i * 120); },
+  'Contagem (12 moedas)': () => { for (let i = 0; i < 12; i++) setTimeout(() => Som.efeito('moeda'), i * 70); },
+  'Cronômetro (5 s)': () => { for (let i = 0; i < 5; i++) setTimeout(() => Som.efeito('tique', { semitons: i }), i * 1000); setTimeout(() => Som.efeito('tempo'), 5000); },
+  'Chuva longa': () => Som.efeito('chuva', { vezes: 3 }),
+  'Reunião na ONU': async () => {
+    const antes = Som.humor || 'jogo';
+    Som.efeito('alarme'); Som.musica('assembleia'); marcarHumor();
+    await espera(7000); Som.efeito('martelo'); Som.efeito('subir'); Som.musica(antes); marcarHumor();
+  },
+};
+$('#momentos').innerHTML = Object.keys(MOMENTOS).map((m, i) => `<button class="btn btn-mini peca pinos creme" data-momento="${i}">${glifo('tocar')}<span>${m}</span></button>`).join('');
+$('#momentos').addEventListener('click', ev => { const b = ev.target.closest('[data-momento]'); if (b) Object.values(MOMENTOS)[b.dataset.momento](); });
+
+// ---------- Ajustes ----------
+function interruptor(id, ler, mudar) {
+  const b = $(id);
+  b.setAttribute('aria-checked', String(ler()));
+  b.addEventListener('click', () => { mudar(); b.setAttribute('aria-checked', String(ler())); });
+}
+interruptor('#sw-musica', () => Som.musicaLigada, () => Som.alternarMusica());
+interruptor('#sw-efeitos', () => Som.efeitosLigados, () => Som.alternarEfeitos());
+interruptor('#sw-silenciosa', () => Som.salaSilenciosa(), () => Som.salaSilenciosa(!Som.salaSilenciosa()));
+let abafada = false, discurso = false;
+interruptor('#sw-abafar', () => abafada, () => Som.abafar((abafada = !abafada)));
+interruptor('#sw-discurso', () => discurso, () => Som.abaixarTrilha((discurso = !discurso)));
+for (const tipo of ['musica', 'efeitos']) {
+  const r = $('#vol-' + tipo);
+  const pinta = () => r.style.setProperty('--v', r.value + '%');
+  r.value = Math.round(Som.volume(tipo) * 100); pinta();
+  r.addEventListener('input', () => { Som.volume(tipo, r.value / 100); pinta(); });
+}
+
+// ---------- Estado ao vivo + medidor do mestre ----------
+let analisador = null, amostras = null;
+function quadro() {
+  const e = Som._estado();
+  const t = Object.entries(e.trilhas).filter(([, v]) => v.tocando || v.p > 0)
+    .map(([h, v]) => `<span class="pilula">${HUMOR[h][0]} <b>${fmt(v.p * 100, 0)}%</b>${v.tempo !== null ? ` · ${fmt(v.tempo, 1)} s` : ''}${v.reserva ? ' · reserva' : ''}</span>`).join('');
+  $('#estado').innerHTML = `<span class="pilula ${e.destravado ? '' : 'fantasma'}">${e.destravado ? 'Som liberado' : 'Toque para liberar o som'}</span>` +
+    `<span class="pilula">Ducking <b>×${fmt(e.duck, 2)}</b></span><span class="pilula">Filtro <b>${e.intensidade < 1 ? 'abafado' : 'aberto'}</b></span>` + t;
+  const { ctx, mestre } = Som._mixagem();
+  if (ctx && mestre && !analisador) { analisador = ctx.createAnalyser(); analisador.fftSize = 2048; amostras = new Float32Array(analisador.fftSize); mestre.connect(analisador); }
+  if (analisador) {
+    analisador.getFloatTimeDomainData(amostras);
+    let pico = 0; for (const x of amostras) pico = Math.max(pico, Math.abs(x));
+    const d = Math.max(-60, db(pico)), n = Math.round((d + 60) / 60 * 24), m = $('#medidor');
+    m.style.setProperty('--n', n); m.setAttribute('aria-valuenow', Math.round(d));
+    m.dataset.nivel = d > -1 ? 'critico' : d > -6 ? 'risco' : d > -18 ? 'medio' : 'bom';
+    $('#medidor-num').textContent = pico ? fmtDb(db(pico)) : '−∞ dB';
+  }
+  setTimeout(quadro, 120);
+}
+quadro();
+
+// ---------- Conferência: arquivos (decodifica cada um e mede) ----------
+const NO_DISCO = location.protocol === 'file:';
+if (NO_DISCO) { $('#aviso-disco').hidden = false; $('#medir').disabled = true; $('#emendas').disabled = true; }
+function listaArquivos() {
+  const usos = {};
+  for (const [n, e] of Object.entries(TAB)) e.arq.forEach(a => (usos[a] = { uso: `efeito('${n}')`, vol: e.vol }));
+  for (const [h, v] of Object.entries(Som._tabela.trilhas)) usos[`trilha-${h}.m4a`] = { uso: `musica('${h}')`, vol: v, trilha: true };
+  for (const [n, v] of Object.entries(Som._tabela.vinhetas)) usos[`vinheta-${n}.m4a`] = { uso: `vinheta('${n}')`, vol: v };
+  return usos;
+}
+const selo = ok => `<span class="status"><span class="selo ${ok ? 'ok' : ''}" ${ok ? '' : 'data-nivel="risco"'}>${glifo(ok ? 'ok' : 'alerta')}</span>${ok ? 'ok' : 'conferir'}</span>`;
+async function medirArquivos() {
+  const off = new OfflineAudioContext(1, 1, 44100), usos = listaArquivos(), linhas = [], saida = [];
+  for (const [arq, u] of Object.entries(usos)) {
+    const bytes = await (await fetch('som/' + arq)).arrayBuffer(), kb = bytes.byteLength / 1024;
+    const buf = await off.decodeAudioData(bytes), n = buf.length;
+    let pico = 0, soma = 0, passo = 0;
+    const d0 = buf.getChannelData(0);
+    for (let c = 0; c < buf.numberOfChannels; c++) { const d = buf.getChannelData(c); for (let i = 0; i < n; i++) { const x = Math.abs(d[i]); if (x > pico) pico = x; soma += d[i] * d[i]; } }
+    for (let i = 1; i < n; i++) passo += Math.abs(d0[i] - d0[i - 1]);
+    const rms = db(Math.sqrt(soma / (n * buf.numberOfChannels))), emenda = Math.abs(d0[0] - d0[n - 1]) / (passo / (n - 1));
+    const r = { arq, uso: u.uso, dur: buf.duration, kb, pico: db(pico), rms, noJogo: rms + db(u.vol), emenda: u.trilha ? emenda : null };
+    r.ok = r.pico < 0 && r.pico + db(u.vol) <= -1 && (r.emenda === null || r.emenda <= 2);   // sem clipe no arquivo, pico no jogo ≤ −1 dB, loop sem salto
+    saida.push(r);
+    for (const [n, e] of Object.entries(TAB)) if (e.arq[0] === arq) mostrarDuracao(n, r.dur);
+    linhas.push(`<tr><td class="arq">${arq}</td><td class="uso">${u.uso}</td><td class="n">${fmt(r.dur)} s</td><td class="n">${fmt(kb, 0)}</td><td class="n">${fmtDb(r.pico)}</td><td class="n">${fmtDb(r.rms)}</td><td class="n">${fmtDb(r.noJogo)}</td><td>${selo(r.ok)}${r.emenda !== null ? ` <span class="uso">emenda ${fmt(r.emenda, 1)}×</span>` : ''}</td></tr>`);
+  }
+  $('#tabela tbody').innerHTML = linhas.join('');
+  $('#tabela').hidden = false;
+  const total = saida.reduce((s, r) => s + r.kb, 0), ruins = saida.filter(r => !r.ok).length;
+  $('#resumo').innerHTML = `<span class="pilula">${saida.length} arquivos</span><span class="pilula">${fmt(total / 1024, 2)} MB</span>` +
+    `<span class="pilula ${ruins ? 'alerta' : 'ganho'}">${ruins ? ruins + ' para conferir' : 'todos ok'}</span>`;
+  return saida;
+}
+
+// ---------- Conferência: emenda do loop ao vivo (grava a saída do mestre atravessando a emenda) ----------
+async function conferirEmenda(h) {
+  const { ctx, mestre } = Som._mixagem();
+  Som.musica(h); marcarHumor();
+  const ate = performance.now() + 15000;
+  let tr;
+  while (!((tr = Som._trilhas[h]) && tr.tocando && tr.p >= 1 && tr.el && tr.el.readyState >= 3)) { if (performance.now() > ate) return { h, erro: 'não tocou' }; await espera(50); }
+  const el = tr.el;
+  el.currentTime = el.duration - 1.2;
+  await new Promise(r => el.addEventListener('seeked', r, { once: true }));
+  await espera(150);
+  const sp = ctx.createScriptProcessor(2048, 1, 1), partes = [];
+  sp.onaudioprocess = e => partes.push(new Float32Array(e.inputBuffer.getChannelData(0)));
+  mestre.connect(sp); sp.connect(ctx.destination);
+  let voltou = false, ultimo = el.currentTime;
+  const fim = performance.now() + 2200;
+  while (performance.now() < fim) { await espera(5); const c = el.currentTime; if (c < ultimo - .5) voltou = true; ultimo = c; }
+  mestre.disconnect(sp); sp.disconnect();
+  const n = partes.reduce((s, p) => s + p.length, 0), x = new Float32Array(n);
+  partes.reduce((o, p) => (x.set(p, o), o + p.length), 0);
+  // Maior trecho de silêncio (a micro-pausa da volta) e o pico logo antes e logo depois dele (1,5 ms),
+  // comparado ao pico dos 20 ms anteriores: borda alta = corte seco = estalo.
+  let ini = 0; while (ini < n && Math.abs(x[ini]) < 1e-4) ini++;
+  let zeros = 0, run = 0, fimRun = 0;
+  for (let i = ini; i < n; i++) { if (Math.abs(x[i]) < 1e-4) { if (++run > zeros) { zeros = run; fimRun = i; } } else run = 0; }
+  const sr = ctx.sampleRate, h15 = Math.round(sr * .0015), h20 = Math.round(sr * .02), iniRun = fimRun - zeros + 1;
+  const pico = (a, b) => { let m = 0; for (let i = Math.max(0, a); i < Math.min(n, b); i++) m = Math.max(m, Math.abs(x[i])); return m; };
+  const ref = pico(iniRun - h20 - h15, iniRun - h15) || 1e-9, borda = Math.max(pico(iniRun - h15, iniRun), pico(fimRun + 1, fimRun + 1 + h15)) / ref;
+  return { h, voltou, silencio_ms: zeros / sr * 1000, borda, ok: voltou && (zeros / sr < .001 || borda <= .4) };
+}
+async function conferirEmendas() {
+  const antes = Som.humor, res = [];
+  for (const h of Som.HUMORES) {
+    const r = await conferirEmenda(h);
+    res.push(r);
+    $('#lista-emendas').insertAdjacentHTML('beforeend', `<li>${selo(r.ok)} <b>${HUMOR[h][0]}</b>: ${r.erro || `${r.voltou ? 'atravessou a emenda' : 'não chegou à emenda'}; pausa de ${fmt(r.silencio_ms, 1)} ms; borda a ${fmt(r.borda * 100, 0)}% do nível${Som._estado().emenda ? ' (com o filtro de emenda)' : ''}`}</li>`);
+  }
+  Som.musica(antes); marcarHumor();
+  return res;
+}
+$('#medir').addEventListener('click', () => medirArquivos());
+$('#emendas').addEventListener('click', () => { $('#lista-emendas').innerHTML = ''; conferirEmendas(); });
+window.vitrine = { medirArquivos, conferirEmenda, conferirEmendas, medicao: NO_DISCO ? null : medirArquivos() };
+</script>
+</body>
+</html>

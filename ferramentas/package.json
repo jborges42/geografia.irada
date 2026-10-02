@@ -1,0 +1,20 @@
+{
+  "name": "geografia-irada-ferramentas",
+  "private": true,
+  "description": "Ferramentas de desenvolvimento do Geografia Irada (não vão para o site): gerar o mapa, a biblioteca 3D, validar o conteúdo e testar no navegador.",
+  "type": "module",
+  "scripts": {
+    "mapa": "node gerar-mapa.mjs",
+    "three": "node gerar-three.mjs",
+    "conteudo": "node validar-conteudo.mjs"
+  },
+  "devDependencies": {
+    "d3-geo": "^3.1.1",
+    "d3-geo-projection": "^4.0.0",
+    "esbuild": "^0.28.2",
+    "n8ao": "^1.10.3",
+    "three": "^0.186.1",
+    "topojson-client": "^3.1.0",
+    "world-atlas": "^2.0.2"
+  }
+}

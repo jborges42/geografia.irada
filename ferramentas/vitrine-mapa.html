@@ -1,0 +1,149 @@
+<!doctype html>
+<!-- Vitrine de desenvolvimento do Mundo 3D (não faz parte do jogo).
+     Parâmetros: ?rodadas=N (mandatos simulados pelo computador) &perfil=padrao|ganancioso|cooperativo &semente=N
+     &limpo (sem o painel, para capturas) &leve (gráficos leves) &bonitos (fixa os bonitos) &inicio (câmera passeando)
+     &foco=<território> &perto=<fator> &demo (monta uma construção de cada tipo nas casas) &vez=<potência> -->
+<html lang="pt-BR"><head><meta charset="utf-8"><title>Vitrine do mundo 3D</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+@font-face { font-family: 'Fredoka'; font-weight: 300 700; font-display: block; src: url(../fontes/fredoka-latin.woff2) format('woff2'); }
+@font-face { font-family: 'Nunito'; font-weight: 200 1000; font-display: block; src: url(../fontes/nunito-latin.woff2) format('woff2'); }
+html, body { margin: 0; height: 100%; overflow: hidden; background: #22339A; font-family: Nunito, Fredoka, sans-serif; color: #1A1433; }
+#mundo { position: fixed; inset: 0; }
+#rotulos-mapa { position: fixed; inset: 0; pointer-events: none; }
+#painel { position: fixed; top: 12px; right: 12px; bottom: 12px; width: 330px; overflow: auto; background: #FFF9EC; border: 4px solid #1A1433;
+  border-radius: 18px; box-shadow: 0 6px 0 #1A1433; padding: 10px 12px 14px; z-index: 5; }
+#painel[hidden] { display: none; }
+#painel h1 { font: 700 20px/1.1 Fredoka, Nunito, sans-serif; margin: 2px 0 8px; }
+#painel h2 { font: 800 13px/1 Nunito, sans-serif; margin: 12px 0 6px; color: #4A4570; letter-spacing: .02em; }
+#painel .grade { display: flex; flex-wrap: wrap; gap: 5px; }
+#painel button { font: 800 12.5px/1.1 Nunito, sans-serif; color: #1A1433; background: #FFE08A; border: 2.5px solid #1A1433; border-radius: 9px;
+  box-shadow: 0 3px 0 #1A1433; padding: 5px 8px; cursor: pointer; }
+#painel button:active { transform: translateY(2px); box-shadow: 0 1px 0 #1A1433; }
+#painel button:focus-visible { outline: 3px solid #FFD21F; outline-offset: 2px; }
+#painel button.efeito { background: #99CDF8; }
+#painel button[data-cat=diplomacia] { background: #DCCFFF; } #painel button[data-cat=economia] { background: #FFE08A; }
+#painel button[data-cat=natureza] { background: #B3EFC6; } #painel button[data-cat=seguranca] { background: #FFC4AE; }
+#painel button[data-cat=pessoas] { background: #FFCAE6; } #painel button[data-cat=ciencia] { background: #99CDF8; }
+#painel select { font: 800 13px Nunito, sans-serif; border: 2.5px solid #1A1433; border-radius: 9px; padding: 3px 6px; background: #fff; color: #1A1433; max-width: 100%; }
+#painel label { font: 800 12px Nunito, sans-serif; display: flex; gap: 6px; align-items: center; margin: 4px 0; }
+#estado { font: 700 12px/1.3 Nunito, sans-serif; color: #4A4570; margin-top: 6px; }
+#alternar { position: fixed; right: 12px; bottom: 12px; z-index: 6; }
+</style>
+</head><body>
+<div id="mundo" aria-hidden="true"></div>
+<div id="rotulos-mapa"></div>
+<aside id="painel" aria-label="Controles da vitrine">
+  <h1>Vitrine do mundo 3D</h1>
+  <div class="grade">
+    <button id="mandato">Avançar 1 mandato</button>
+    <button id="geral">Visão geral</button>
+    <button id="modo">Modo início</button>
+    <button id="graf">Gráficos leves</button>
+    <button id="alvos">Destacar alvos</button>
+  </div>
+  <label>Vez de <select id="vez"></select></label>
+  <label>Boneco <select id="acao"><option>acenar</option><option>pular</option><option>comemorar</option><option>triste</option><option>votar</option><option>falar</option></select><button id="fazer">Fazer</button></label>
+  <div id="estado"></div>
+  <h2>Efeitos (22)</h2>
+  <label>Onde <select id="onde"></select></label>
+  <div class="grade" id="efeitos"></div>
+  <h2>Construções (uma por ação)</h2>
+  <label>Quem <select id="quem"></select></label>
+  <label>Alvo <select id="alvo"></select></label>
+  <div class="grade" id="acoes"></div>
+</aside>
+<script src="../lib/three.min.js"></script><script src="../lib/gsap.min.js"></script>
+<script src="../dados/mapa.js"></script><script src="../dados/modelos.js"></script>
+<script src="../conteudo/potencias.js"></script><script src="../conteudo/territorios.js"></script><script src="../conteudo/politicas.js"></script>
+<script src="../conteudo/eventos.js"></script><script src="../conteudo/resolucoes.js"></script><script src="../conteudo/dilemas.js"></script>
+<script src="../js/simulacao.js"></script><script src="../js/bonecos.js"></script><script src="../js/mapa3d.js"></script>
+<script>
+'use strict';
+const Q = new URLSearchParams(location.search), S = Simulacao, $ = s => document.querySelector(s);
+gsap.ticker.lagSmoothing(0);   // no Chrome sem placa de vídeo (1 quadro/s) as animações seguem o relógio de verdade
+if (Q.get('lento')) gsap.globalTimeline.timeScale(1 / +Q.get('lento'));   // capturas no meio dos efeitos
+const e = S.criarEstado({ semente: +(Q.get('semente') || 7), perfilIA: Q.get('perfil') || 'padrao', jogadores: [] });
+const pids = Object.keys(e.potencias);
+// Um mandato inteiro só com o computador (como teste-simulacao.mjs): eventos, decisões, COP, vezes e balanço
+function mandato() {
+  if (e.fim) return [];
+  const feitas = [];
+  for (const { id, local } of S.sortearEventos(e)) {
+    const { escolha } = S.aplicarEvento(e, id, local);
+    if (escolha?.tipo === 'votacao') { const res = { id: escolha.resolucao, alvo: escolha.resolucao === 'missao_paz' ? local : null, proponente: null }; S.votacao(e, res, Object.fromEntries(pids.map(p => [p, S.iaVoto(e, p, res)]))); }
+    if (escolha?.tipo === 'doacao') S.resolverDoacao(e, id, local, Object.fromEntries(pids.map(p => [p, S.iaDoacao(e, p, escolha.recurso)])));
+    if (escolha?.tipo === 'decisao') S.resolverDecisao(e, id, local, Object.fromEntries(pids.map(p => [p, S.iaDecisao(e, p, id)])));
+  }
+  if (S.copNestaRodada(e)) S.resolverCop(e, Object.fromEntries(pids.map(p => [p, S.iaCop(e, p)])));
+  for (const p of S.ordemDaRodada(e)) feitas.push(...S.iaJogarVez(e, p).filter(j => j.tipo === 'carta'));
+  S.balanco(e);
+  return feitas;
+}
+for (let r = 0; r < +(Q.get('rodadas') || 0) && !e.fim; r++) mandato();
+
+const PELES = ['#B57A48', '#FFDBB4', '#F2C08E', '#8D5A35', '#D9A066', '#5C3A21'], CABELOS = ['#1B1A22', '#E8C25A', '#3B2414', '#B5532A', '#7A4A2A', '#C9CCD1'];
+const avatares = typeof Bonecos !== 'undefined' && Bonecos.avataresIniciais ? Bonecos.avataresIniciais(pids, 11).map((a, i) => ({ ...a, humano: i % 3 !== 2 }))
+  : pids.map((pid, i) => ({ pid, cor: Mapa3D.EQUIPES[pid].cor, forma: Mapa3D.EQUIPES[pid].forma, pele: PELES[i], cabelo: CABELOS[i], chapeu: 'nenhum', humano: true }));
+Mapa3D.iniciar($('#mundo'));
+if (Q.has('bonitos')) Mapa3D.graficos('bonitos');
+Mapa3D.bonecos(avatares);
+const nome = id => S.nome(id), estado = () => ($('#estado').textContent = `${e.ano} · ${e.global.temperatura.toFixed(2).replace('.', ',')} °C · tensão ${Math.round(e.global.tensao)} · comércio ${Math.round(e.global.comercio)} · ${e.construcoes.length} construções · qualidade ${Mapa3D.qualidade}`);
+
+// Painel
+const opc = (sel, lista) => (sel.innerHTML = lista.map(([v, t]) => `<option value="${v}">${t}</option>`).join(''));
+const terrs = TERRITORIOS.map(t => [t.id, t.nome]).concat(POTENCIAS.map(p => [p.id, p.nome]));
+opc($('#onde'), terrs); $('#onde').value = 'sahel';
+opc($('#vez'), [['', 'ninguém'], ...POTENCIAS.map(p => [p.id, p.nome])]);
+opc($('#quem'), POTENCIAS.map(p => [p.id, p.nome]));
+opc($('#alvo'), terrs.concat()); $('#alvo').value = 'africa_ocidental';
+Mapa3D.EFEITOS().forEach(t => { const b = document.createElement('button'); b.className = 'efeito'; b.textContent = t; b.onclick = () => Mapa3D.efeito(t, $('#onde').value, { pid: $('#quem').value, de: $('#quem').value }); $('#efeitos').appendChild(b); });
+POLITICAS.forEach(c => { const b = document.createElement('button'); b.dataset.cat = c.categoria; b.textContent = c.nome; b.title = c.id;
+  b.onclick = () => { const quem = $('#quem').value, alvo = c.alvo === 'potencia' ? (pids.find(p => p !== quem && p === $('#alvo').value) || pids.find(p => p !== quem)) : c.alvo === 'territorios3' ? [$('#alvo').value, 'sahel', 'andes'] : c.alvo === 'territorio' ? $('#alvo').value : quem;
+    const con = { carta: c.id, potencia: quem, alvo, ano: e.ano }; e.construcoes.push(con); Mapa3D.construir(con, { animar: true }).then(estado); };
+  $('#acoes').appendChild(b); });
+$('#mandato').onclick = () => { mandato(); Mapa3D.atualizarMundo(e, { animar: true }).then(estado); estado(); };
+$('#geral').onclick = () => Mapa3D.visaoGeral();
+let inicio = false; $('#modo').onclick = () => { inicio = !inicio; Mapa3D.modo(inicio ? 'inicio' : 'jogo'); $('#modo').textContent = inicio ? 'Modo jogo' : 'Modo início'; };
+$('#graf').onclick = () => { const leve = Mapa3D.qualidade !== 'leves'; Mapa3D.graficos(leve ? 'leves' : 'bonitos'); $('#graf').textContent = leve ? 'Gráficos bonitos' : 'Gráficos leves'; estado(); };
+let comAlvos = false; $('#alvos').onclick = () => { comAlvos = !comAlvos; Mapa3D.destacarAlvos(comAlvos ? S.alvosValidos(e, $('#quem').value, 'missao_diplomatica') : null); };
+$('#vez').onchange = () => Mapa3D.vez($('#vez').value || null);
+$('#fazer').onclick = () => Mapa3D.acaoBoneco($('#quem').value, $('#acao').value);
+Mapa3D.aoClicar(({ id }) => { $('#onde').value = id; $('#alvo').value = id; Mapa3D.focar(id); });
+if (Q.has('limpo')) $('#painel').hidden = true;
+
+// Demonstração para capturas: uma construção de cada tipo espalhada pelas casas e por alguns territórios
+const DEMO_CASA = { brasil: ['energia_renovavel', 'desmatamento_zero', 'educacao', 'combate_fome', 'povos_originarios'], eua: ['pesquisa', 'transnacionais', 'defesa', 'programa_espacial', 'explorar_petroleo'],
+  china: ['politica_industrial', 'energia_renovavel', 'saude', 'ciberdefesa', 'exportar_commodities'], ue: ['acolher_refugiados', 'meta_climatica', 'nuclear', 'adaptacao', 'combate_desinformacao'],
+  india: ['saude', 'educacao', 'cupula_regional', 'crime_transnacional', 'fronteira_agricola'], russia: ['explorar_petroleo', 'defesa', 'fechar_fronteiras', 'tarifas', 'alianca'] };
+const DEMO_ALVO = [['china', 'infraestrutura_exterior', 'africa_oriental'], ['eua', 'livre_comercio', 'mexico'], ['ue', 'ajuda_humanitaria', 'sahel'], ['brasil', 'cooperacao_sul_sul', 'africa_ocidental'],
+  ['india', 'missao_diplomatica', 'sul_asia'], ['china', 'minerais_criticos', 'africa_central'], ['russia', 'base_militar', 'asia_central'], ['ue', 'mediacao', 'leste_europeu'],
+  ['eua', 'emprestimo', 'andes'], ['brasil', 'internet_para_todos', 'cone_sul'], ['ue', 'reconstrucao', 'levante'], ['eua', 'soft_power', ['japao_coreia', 'australia', 'cone_sul']],
+  ['china', 'sancoes', 'eua'], ['ue', 'florestas_tropicais', null], ['eua', 'fundo_climatico', null]];
+async function demo() {
+  for (const [pid, lista] of Object.entries(DEMO_CASA)) for (const carta of lista) e.construcoes.push({ carta, potencia: pid, alvo: carta === 'alianca' ? 'india' : pid, ano: e.ano });
+  for (const [pid, carta, alvo] of DEMO_ALVO) e.construcoes.push({ carta, potencia: pid, alvo: alvo || pid, ano: e.ano });
+}
+// Galeria: uma construção de cada ação em fileiras sobre o Pacífico (?galeria=1 ou 2: metade das ações em cada)
+async function galeria(parte) {
+  const lista = POLITICAS.filter(c => c.id !== 'propor_resolucao'), metade = Math.ceil(lista.length / 2);
+  const daVez = parte === '2' ? lista.slice(metade) : parte === '1' ? lista.slice(0, metade) : lista;
+  const cols = 7;
+  await Promise.all(daVez.map((c, i) => Mapa3D._galeria(c.id, pids[i % 6], -92 + (i % cols) * 7, -14 + Math.floor(i / cols) * 7.5)));
+  Mapa3D._voar(-71, daVez.length > 21 ? -2 : -6.5, daVez.length > 21 ? 78 : 44, .8);
+  window.galeriaOrdem = daVez.map(c => c.id);
+}
+(async () => {
+  if (Q.has('demo')) await demo();
+  await Mapa3D.pronto;
+  await Mapa3D.atualizarMundo(e, { animar: false });
+  if (Q.get('vez')) Mapa3D.vez(Q.get('vez'));
+  if (Q.has('inicio')) { inicio = true; Mapa3D.modo('inicio'); }
+  if (Q.get('foco')) await Mapa3D.focar(Q.get('foco'), { duracao: 0, perto: +(Q.get('perto') || 1) });
+  if (Q.has('galeria')) await galeria(Q.get('galeria'));
+  estado();
+  window.vitrinePronta = true;
+})();
+window.estadoVitrine = e;
+window.mandatoVitrine = mandato;
+</script></body></html>

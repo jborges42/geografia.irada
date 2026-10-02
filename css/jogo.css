@@ -1,0 +1,12 @@
+/* ESQUELETO da Fundação: o dono da frente substitui.
+   HUD mínimo da partida: classes esq-* só existem no esqueleto. */
+.esq-hud { position: absolute; inset: 0; pointer-events: none; }
+.esq-hud > * { pointer-events: auto; }
+.esq-ano { position: absolute; left: calc(1.5 * var(--u)); top: calc(1.6 * var(--u)); display: flex; align-items: center; gap: calc(1.2 * var(--u));
+  padding: calc(1 * var(--u)) calc(1.6 * var(--u)); font: 900 var(--fs-min) / 1 var(--f-texto); color: var(--amarelo-texto); }
+.esq-ano b { font-size: calc(4.2 * var(--u)); color: var(--tinta); }
+.esq-inds { position: absolute; left: calc(34 * var(--u)); right: calc(1.5 * var(--u)); top: calc(1.6 * var(--u)); display: flex; flex-wrap: wrap; gap: calc(1 * var(--u)); margin: 0; padding: 0; list-style: none; }
+.esq-inds .contador b { font-size: calc(2.6 * var(--u)); }
+.esq-sair { position: absolute; right: calc(1.5 * var(--u)); bottom: calc(6 * var(--u)); }
+.esq-manchete { position: absolute; left: 0; right: 0; bottom: 0; min-height: calc(4.4 * var(--u)); padding: calc(.8 * var(--u)) calc(2 * var(--u));
+  background: var(--placa-escura); border-top: calc(.45 * var(--u)) solid var(--amarelo); color: #fff; font: 800 var(--fs-corpo) / 1.1 var(--f-texto); }

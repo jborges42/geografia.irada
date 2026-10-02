@@ -1,0 +1,238 @@
+/* Geografia Irada — ornamentos e ilustrações (frente de Ilustração e identidade; guia de arte §4).
+   Complementa css/base.css (Fundação: .peca, .pinos, .painel, .balao, .carimbo, .selo, .seg, .zebra, .divisoria).
+   Tudo é peça vista de frente: face + lateral embaixo + contorno índigo + brilho no topo. Medidas em u (--u).
+   O HTML de cada ornamento sai pronto das funções de js/arte.js (cabecalhoJornal, tarjaPlantao, fita…). */
+
+/* =====================================================================================================
+   OBJETOS DO KIT — arte(nome, { classe }): 48 (chip), 96 (botão, selo), 160–220 (cabeçalho), 360 (destaque)
+   ===================================================================================================== */
+.arte { display: inline-block; width: calc(9.6 * var(--u)); height: auto; vertical-align: middle; user-select: none; -webkit-user-drag: none; }
+.arte.chip { width: max(32px, calc(4.4 * var(--u))); }
+.arte.botao { width: calc(8.9 * var(--u)); }
+.arte.cabecalho { width: calc(17 * var(--u)); }
+.arte.destaque { width: calc(33 * var(--u)); }
+.arte.flutua-sombra { filter: drop-shadow(0 calc(.5 * var(--u)) 0 rgb(26 20 51 / .25)); }
+
+/* =====================================================================================================
+   LOGOTIPO (logo() de js/icones.js) — tamanhos do guia §8.2
+   ===================================================================================================== */
+svg.logo { display: block; width: calc(64 * var(--u)); height: auto; overflow: visible; }
+svg.logo.medio { width: calc(28 * var(--u)); }
+svg.logo.pequeno { width: calc(16 * var(--u)); }
+svg.logo.logo-globo { width: calc(12 * var(--u)); }
+img.logo { display: block; height: calc(40 * var(--u)); width: auto; }
+img.logo.medio { height: calc(18 * var(--u)); }
+img.logo.pequeno { height: calc(10 * var(--u)); }
+svg.logo .logo-letra { transform-box: fill-box; }
+
+/* =====================================================================================================
+   JORNAL MUNDIAL (guia §4.5) — papel com retícula + faixa vermelha de tijolo + linha de edição entre filetes
+   ===================================================================================================== */
+.jornal { position: relative; background-color: var(--ladrilho); color: var(--tinta);
+  background-image: radial-gradient(rgb(26 20 51 / .05) calc(.18 * var(--u)), transparent calc(.2 * var(--u)));
+  background-size: calc(.9 * var(--u)) calc(.9 * var(--u)); }
+.jornal-cab { position: relative; display: grid; justify-items: center; gap: calc(1 * var(--u)); padding: calc(1.6 * var(--u)) calc(2.4 * var(--u)) 0; }
+.jornal-faixa { --lado: calc(1 * var(--u)); display: inline-flex; align-items: center; justify-content: center; gap: calc(1.6 * var(--u));
+  min-height: calc(6 * var(--u)); padding: calc(.5 * var(--u)) calc(2.6 * var(--u)) calc(.6 * var(--u)); white-space: nowrap; }
+.jornal-faixa.pinos::before { --pino: calc(2.6 * var(--u)); }
+.jornal-faixa > .ico { width: calc(4 * var(--u)); height: auto; filter: drop-shadow(0 calc(.25 * var(--u)) 0 rgb(26 20 51 / .35)); }
+.jornal-nome { font: 400 calc(4 * var(--u)) / 1 var(--f-marca); text-transform: uppercase; letter-spacing: .03em; color: #fff;
+  -webkit-text-stroke: .17em var(--tinta); paint-order: stroke fill; text-shadow: 0 .08em 0 var(--tinta); padding-bottom: .06em; }
+.jornal-edicao { position: relative; width: 100%; padding: calc(1.1 * var(--u)) 0; text-align: center;
+  font: 800 var(--fs-min) / 1.15 var(--f-texto); color: var(--tinta); font-variant-numeric: tabular-nums; }
+.jornal-edicao::before, .jornal-edicao::after { content: ''; position: absolute; left: 0; right: 0; height: calc(.9 * var(--u));
+  background: linear-gradient(var(--tinta) 0 0) 0 0 / 100% calc(.35 * var(--u)) no-repeat, linear-gradient(var(--tinta) 0 0) 0 calc(.75 * var(--u)) / 100% calc(.15 * var(--u)) no-repeat; }
+.jornal-edicao::before { top: 0; }
+.jornal-edicao::after { bottom: 0; transform: scaleY(-1); }
+.jornal-edicao .sep { display: inline-block; width: calc(.7 * var(--u)); height: calc(.7 * var(--u)); margin: 0 calc(1 * var(--u)) calc(.25 * var(--u));
+  border-radius: 50%; background: var(--vermelho-alerta); border: calc(.18 * var(--u)) solid var(--tinta); vertical-align: middle; }
+/* versão compacta (letreiro): só o bloco do nome, com a borda direita inclinada */
+.jornal-faixa.compacta { --lado: 0px; --b: calc(.3 * var(--u)); min-height: calc(4.44 * var(--u)); gap: calc(.8 * var(--u)); padding: 0 calc(2.4 * var(--u)) 0 calc(1.2 * var(--u));
+  border-radius: 0; clip-path: polygon(0 0, 100% 0, calc(100% - 1.6 * var(--u)) 100%, 0 100%); }
+.jornal-faixa.compacta .jornal-nome { font-size: calc(2.2 * var(--u)); }
+.jornal-faixa.compacta > .ico { width: calc(2.8 * var(--u)); }
+/* selo "EXTRA!": estrela amarela de 12 pontas, girada 12° */
+.selo-extra { position: absolute; right: calc(1.2 * var(--u)); top: calc(-1.8 * var(--u)); width: calc(9 * var(--u)); height: auto; rotate: 12deg;
+  filter: drop-shadow(0 calc(.5 * var(--u)) 0 rgb(26 20 51 / .3)); pointer-events: none; }
+.selo-extra text { font-family: var(--f-marca); }
+/* manchete dentro do jornal */
+.jornal-manchete { margin: 0; font: 700 var(--fs-h2) / var(--lh-titulo) var(--f-titulo); color: var(--tinta); text-wrap: balance; }
+.jornal-colunas { columns: 2; column-gap: calc(2.4 * var(--u)); column-rule: calc(.15 * var(--u)) solid rgb(26 20 51 / .25);
+  font: 800 var(--fs-min) / var(--lh-texto) var(--f-texto); color: var(--tinta-suave); }
+
+/* =====================================================================================================
+   PLANTÃO GLOBAL — tarja (lower third, 74u × 16u) e vinheta de tela cheia (guia §4.5, §5.10)
+   ===================================================================================================== */
+.tarja-plantao { position: relative; display: grid; width: min(calc(74 * var(--u)), 100%); }
+.tarja-topo { position: relative; z-index: 1; display: flex; align-items: flex-end; gap: calc(.8 * var(--u)); padding-left: calc(1.4 * var(--u)); margin-bottom: calc(-.45 * var(--u)); }
+.tarja-marca { --lado: calc(.7 * var(--u)); display: inline-flex; align-items: center; min-height: calc(5.6 * var(--u)); padding: calc(.3 * var(--u)) calc(1.8 * var(--u)) calc(.4 * var(--u));
+  font: 400 calc(3.4 * var(--u)) / 1 var(--f-marca); text-transform: uppercase; letter-spacing: .03em; color: #fff;
+  -webkit-text-stroke: .17em var(--tinta); paint-order: stroke fill; border-radius: calc(1.1 * var(--u)) calc(1.1 * var(--u)) 0 0; }
+.tarja-marca.pinos::before { --pino: calc(2.4 * var(--u)); }
+.tarja-vivo { display: inline-flex; align-items: center; gap: calc(.6 * var(--u)); min-height: calc(3.6 * var(--u)); padding: 0 calc(1.2 * var(--u)) 0 calc(.9 * var(--u));
+  margin-bottom: calc(.9 * var(--u)); background: var(--tinta); color: #fff; border-radius: 99px; border: calc(.3 * var(--u)) solid var(--tinta);
+  font: 900 var(--fs-min) / 1 var(--f-texto); letter-spacing: .06em; text-transform: uppercase; box-shadow: 0 calc(.3 * var(--u)) 0 rgb(26 20 51 / .4); }
+.tarja-lugar { display: inline-flex; align-items: center; gap: calc(.4 * var(--u)); min-height: calc(3.6 * var(--u)); padding: 0 calc(1.3 * var(--u)) 0 calc(.5 * var(--u));
+  margin-bottom: calc(.9 * var(--u)); background: var(--ladrilho); border: calc(.3 * var(--u)) solid var(--tinta); border-radius: 99px;
+  font: 700 var(--fs-min) / 1 var(--f-titulo); box-shadow: 0 calc(.3 * var(--u)) 0 var(--tinta); }
+.tarja-lugar > .ico { width: calc(2.8 * var(--u)); height: auto; }
+.tarja-ano { margin-left: auto; margin-bottom: calc(.9 * var(--u)); display: inline-grid; place-items: center; min-height: calc(3.6 * var(--u)); padding: 0 calc(1.2 * var(--u));
+  background: var(--tinta); color: #fff; border-radius: calc(.8 * var(--u)); font: 900 var(--fs-min) / 1 var(--f-texto); font-variant-numeric: tabular-nums;
+  box-shadow: inset 0 calc(.3 * var(--u)) 0 rgb(255 255 255 / .18); }
+.tarja-corpo { --cor: var(--ladrilho); --cor-lado: var(--ladrilho-lado); --lado: calc(1 * var(--u)); --raio: calc(1.4 * var(--u));
+  display: grid; gap: calc(.5 * var(--u)); padding: calc(1.6 * var(--u)) calc(2.2 * var(--u)) calc(1.4 * var(--u)); }
+.tarja-corpo::after { content: ''; position: absolute; left: calc(1 * var(--u)); right: calc(1 * var(--u)); top: calc(.25 * var(--u)); height: calc(.5 * var(--u));
+  background: var(--amarelo); border-radius: 99px; }
+.tarja-manchete { margin: 0; font: 700 var(--fs-h2) / var(--lh-opcao) var(--f-titulo); color: var(--tinta); text-wrap: balance; }
+.tarja-texto { margin: 0; font: 800 var(--fs-corpo) / var(--lh-texto) var(--f-texto); color: var(--tinta-suave); }
+
+/* Vinheta de tela cheia (1,6 s): listras vermelhas diagonais, globo em órbita de pinos, letreiro que "bate" */
+.vinheta-plantao { position: fixed; inset: 0; z-index: var(--z-splash); display: grid; place-items: center; overflow: hidden; pointer-events: auto; cursor: pointer;
+  background: #C81E2A; }
+.vp-listras { position: absolute; inset: -20%; background: repeating-linear-gradient(-20deg, var(--vermelho-alerta) 0 calc(6 * var(--u)), #C81E2A calc(6 * var(--u)) calc(12 * var(--u)));
+  animation: vp-listras 1.6s linear infinite; }
+@keyframes vp-listras { to { transform: translateX(calc(12.8 * var(--u))); } }
+.vp-listras::after { content: ''; position: absolute; inset: 0; background: radial-gradient(55% 60% at 50% 50%, rgb(255 255 255 / .16), transparent 70%), radial-gradient(90% 90% at 50% 50%, transparent 55%, rgb(60 0 10 / .35)); }
+.vp-palco { position: relative; display: grid; justify-items: center; }
+.vp-globo { position: relative; width: calc(36 * var(--u)); aspect-ratio: 1; display: grid; place-items: center; }
+.vp-globo > .arte { width: 78%; filter: drop-shadow(0 calc(1 * var(--u)) 0 rgb(26 20 51 / .35)); }
+.vp-orbita { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.vp-orbita.a { animation: vp-gira 6s linear infinite; }
+.vp-orbita.b { animation: vp-gira 9s linear infinite reverse; }
+@keyframes vp-gira { to { rotate: 1turn; } }
+.vp-letreiro { position: relative; display: grid; justify-items: center; margin-top: calc(-5 * var(--u)); }
+.vp-plantao { --cor: var(--amarelo); --cor-lado: var(--amarelo-lado); --lado: calc(1.6 * var(--u)); --b: calc(.7 * var(--u)); --raio: calc(2 * var(--u));
+  padding: calc(1.4 * var(--u)) calc(5 * var(--u)) calc(1.6 * var(--u)); rotate: -4deg;
+  font: 400 calc(11 * var(--u)) / .95 var(--f-marca); text-transform: uppercase; letter-spacing: .02em; color: #fff;
+  -webkit-text-stroke: .17em var(--tinta); paint-order: stroke fill; text-shadow: 0 .07em 0 var(--tinta); }
+.vp-plantao.pinos::before { --pino: calc(4.4 * var(--u)); }
+.vp-global { --cor: var(--tinta); --cor-lado: #0B0820; --lado: calc(1.1 * var(--u)); --b: calc(.6 * var(--u)); --raio: calc(1.4 * var(--u));
+  margin-top: calc(-1 * var(--u)); padding: calc(.8 * var(--u)) calc(3.6 * var(--u)) calc(1 * var(--u)); rotate: 2deg;
+  font: 400 calc(5.6 * var(--u)) / 1 var(--f-marca); text-transform: uppercase; letter-spacing: .3em; color: var(--amarelo); }
+.vinheta-plantao.crise .vp-sub { display: block; }
+.vp-sub { display: none; max-width: calc(110 * var(--u)); margin-top: calc(2.4 * var(--u)); padding: calc(.8 * var(--u)) calc(2 * var(--u));
+  background: var(--ladrilho); border: var(--b) solid var(--tinta); border-radius: var(--raio-balao); box-shadow: 0 calc(.8 * var(--u)) 0 var(--tinta);
+  font: 800 var(--fs-corpo) / 1.2 var(--f-texto); text-align: center; color: var(--tinta); }
+
+/* =====================================================================================================
+   FITA (faixa com pontas em cauda de andorinha dobradas para trás) — nomes no pódio, "Missão cumprida"
+   ===================================================================================================== */
+.fita { --cor: var(--amarelo); --cor-lado: var(--amarelo-lado); --h: calc(7 * var(--u)); position: relative; display: inline-flex; isolation: isolate;
+  height: var(--h); margin: 0 calc(4.6 * var(--u)) calc(1.8 * var(--u)); vertical-align: middle; }
+.fita-meio { position: relative; z-index: 1; display: inline-flex; align-items: center; justify-content: center; min-width: calc(14 * var(--u));
+  padding: 0 calc(2.6 * var(--u)) calc(.2 * var(--u)); background: linear-gradient(color-mix(in oklab, var(--cor), #fff 26%) 0 36%, var(--cor) 36%);
+  border-block: calc(.45 * var(--u)) solid var(--tinta);
+  box-shadow: inset 0 calc(.4 * var(--u)) 0 rgb(255 255 255 / .45), inset 0 calc(-.5 * var(--u)) 0 rgb(0 0 0 / .1);
+  font: 700 var(--fs-cartao) / 1 var(--f-titulo); white-space: nowrap; color: #fff; -webkit-text-stroke: .17em var(--tinta); paint-order: stroke fill; letter-spacing: .02em; }
+.fita.marca .fita-meio { font: 400 calc(3.6 * var(--u)) / 1 var(--f-marca); text-transform: uppercase; }
+.fita.clara .fita-meio { color: var(--tinta); -webkit-text-stroke: 0; }
+.fita-cauda { position: absolute; z-index: 0; top: calc(1.8 * var(--u)); width: calc(6.6 * var(--u)); height: var(--h); overflow: visible; }
+.fita-cauda.e { right: calc(100% - 2 * var(--u)); }
+.fita-cauda.d { left: calc(100% - 2 * var(--u)); transform: scaleX(-1); }
+.fita-cauda .c-face { fill: color-mix(in oklab, var(--cor), var(--cor-lado) 45%); }
+.fita-cauda .c-dobra { fill: color-mix(in oklab, var(--cor-lado), var(--tinta) 30%); }
+
+/* =====================================================================================================
+   CONQUISTA (selo de peça redonda com anel de 10 pinos; fita em V opcional) — selos do IGI, Destaque, BNCC
+   ===================================================================================================== */
+.conquista { --tam: calc(9 * var(--u)); display: inline-grid; justify-items: center; gap: calc(.3 * var(--u)); min-width: var(--tam); vertical-align: middle; }
+.conquista > svg { width: var(--tam); }
+.conquista > svg { height: auto; overflow: visible; filter: drop-shadow(0 calc(.35 * var(--u)) 0 rgb(26 20 51 / .25)); }
+.conquista.grande { --tam: calc(16 * var(--u)); }
+.conquista.pequena { --tam: calc(6 * var(--u)); }
+.conquista-rotulo { margin-top: calc(-.8 * var(--u)); padding: calc(.25 * var(--u)) calc(.9 * var(--u)); background: var(--ladrilho); border: var(--b-fino) solid var(--tinta);
+  border-radius: 99px; box-shadow: var(--sombra-chip); font: 700 var(--fs-min) / 1 var(--f-titulo); white-space: nowrap; }
+
+/* =====================================================================================================
+   TÍQUETE (custo, troca, convite, recompensa): ladrilho com entalhes nas laterais e picote separando o canhoto
+   ===================================================================================================== */
+.tiquete { --cor: var(--amarelo); --cor-lado: var(--amarelo-lado); --nota: calc(1.2 * var(--u)); --canhoto: calc(9 * var(--u)); display: inline-flex; vertical-align: middle;
+  filter: drop-shadow(0 calc(-.45 * var(--u)) 0 var(--tinta)) drop-shadow(calc(.45 * var(--u)) 0 0 var(--tinta)) drop-shadow(calc(-.45 * var(--u)) 0 0 var(--tinta))
+          drop-shadow(0 calc(.45 * var(--u)) 0 var(--tinta)) drop-shadow(0 calc(.7 * var(--u)) 0 var(--tinta)); }
+.tiquete-forma { display: flex; align-items: stretch; min-height: calc(7 * var(--u));
+  -webkit-mask: radial-gradient(circle at 0 50%, transparent var(--nota), #000 calc(var(--nota) + .5px)) 0 0 / 51% 100% no-repeat,
+                radial-gradient(circle at 100% 50%, transparent var(--nota), #000 calc(var(--nota) + .5px)) 100% 0 / 51% 100% no-repeat;
+          mask: radial-gradient(circle at 0 50%, transparent var(--nota), #000 calc(var(--nota) + .5px)) 0 0 / 51% 100% no-repeat,
+                radial-gradient(circle at 100% 50%, transparent var(--nota), #000 calc(var(--nota) + .5px)) 100% 0 / 51% 100% no-repeat;
+  border-radius: calc(1 * var(--u)); }
+.tiquete-canhoto { display: grid; place-items: center; width: var(--canhoto); flex: none; padding: calc(.6 * var(--u)) 0 calc(.6 * var(--u)) var(--nota);
+  background: linear-gradient(color-mix(in oklab, var(--cor), #fff 28%), var(--cor) 55%);
+  border-right: calc(.35 * var(--u)) dashed rgb(26 20 51 / .45); }
+.tiquete-canhoto > :is(.ico, img) { width: calc(4.6 * var(--u)); height: auto; }
+.tiquete-corpo { display: flex; flex-direction: column; justify-content: center; gap: calc(.2 * var(--u)); padding: calc(.8 * var(--u)) calc(var(--nota) + 1.6 * var(--u)) calc(.8 * var(--u)) calc(1.4 * var(--u));
+  background: linear-gradient(#fff, var(--ladrilho) 50%); font: 800 var(--fs-min) / 1.15 var(--f-texto); color: var(--tinta); }
+.tiquete-corpo b { font: 900 var(--fs-cartao) / 1 var(--f-texto); font-variant-numeric: tabular-nums; }
+.tiquete.direita .tiquete-forma { flex-direction: row-reverse; }
+.tiquete.direita .tiquete-canhoto { border-right: 0; border-left: calc(.35 * var(--u)) dashed rgb(26 20 51 / .45); padding: calc(.6 * var(--u)) var(--nota) calc(.6 * var(--u)) 0; }
+
+/* =====================================================================================================
+   PONTEIRO "VEZ" (etiqueta-seta amarela presa na borda de cima do painel da vez)
+   ===================================================================================================== */
+.ponteiro-vez { position: absolute; right: calc(2.4 * var(--u)); top: calc(-3.2 * var(--u)); z-index: 2; display: grid; place-items: center;
+  width: calc(7.6 * var(--u)); height: calc(5 * var(--u)); padding-bottom: calc(1.1 * var(--u));
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 76 50'%3E%3Cpath d='M10 3h56a7 7 0 0 1 7 7v19a7 7 0 0 1-7 7H46l-8 10-8-10H10a7 7 0 0 1-7-7V10a7 7 0 0 1 7-7Z' fill='%23B98A00' stroke='%231A1433' stroke-width='4.5' stroke-linejoin='round' transform='translate(0 3)'/%3E%3Cpath d='M10 3h56a7 7 0 0 1 7 7v19a7 7 0 0 1-7 7H46l-8 10-8-10H10a7 7 0 0 1-7-7V10a7 7 0 0 1 7-7Z' fill='%23FFD21F' stroke='%231A1433' stroke-width='4.5' stroke-linejoin='round'/%3E%3Cpath d='M10 7.5h56' stroke='%23fff' stroke-opacity='.6' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+  font: 900 calc(2.1 * var(--u)) / 1 var(--f-texto); letter-spacing: .08em; color: var(--tinta); }
+
+/* =====================================================================================================
+   PADRÕES DE FUNDO (§4.6)
+   ===================================================================================================== */
+.fundo-pinos { background: var(--pinos-mesa) 0 0 / calc(4 * var(--u)) calc(4 * var(--u)), var(--mesa); background-color: var(--mesa-base); }
+.fundo-pinos.fraco { background: radial-gradient(circle at 50% 42%, rgb(255 255 255 / .04) 0 calc(.5 * var(--u)), rgb(0 0 0 / .06) calc(.52 * var(--u)) calc(.7 * var(--u)), transparent calc(.74 * var(--u))) 0 0 / calc(4 * var(--u)) calc(4 * var(--u)), var(--noite); }
+/* planta de montagem: grade + tijolos "explodidos" em traço branco nos cantos */
+.fundo-planta { background-color: var(--mesa-topo);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 200' fill='none' stroke='%23fff' stroke-opacity='.12' stroke-width='2.5' stroke-linejoin='round'%3E%3Cpath d='M20 150l60-30 60 30-60 30z M20 150v22l60 30 60-30v-22 M80 180v22'/%3E%3Cpath d='M50 95l60-30 60 30-60 30z M50 95v22l60 30 60-30V95 M110 125v22' stroke-dasharray='7 6'/%3E%3Cellipse cx='65' cy='138' rx='10' ry='5'/%3E%3Cellipse cx='95' cy='152' rx='10' ry='5'/%3E%3Cpath d='M110 40v-26 M110 14l-6 9 M110 14l6 9'/%3E%3Ccircle cx='200' cy='40' r='16'/%3E%3Cpath d='M200 32v16' stroke-width='4'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 200' fill='none' stroke='%23fff' stroke-opacity='.12' stroke-width='2.5' stroke-linejoin='round'%3E%3Cpath d='M30 120h70v40H30z M30 120l20-14h70l-20 14 M120 106v40l-20 14'/%3E%3Cpath d='M140 60h60v34h-60z M140 60l16-12h60l-16 12 M216 48v34l-16 12' stroke-dasharray='7 6'/%3E%3Ccircle cx='45' cy='50' r='16'/%3E%3Cpath d='M40 44h8l-6 12' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E"),
+    linear-gradient(rgb(255 255 255 / .07) 1px, transparent 1px), linear-gradient(90deg, rgb(255 255 255 / .07) 1px, transparent 1px),
+    linear-gradient(rgb(255 255 255 / .035) 1px, transparent 1px), linear-gradient(90deg, rgb(255 255 255 / .035) 1px, transparent 1px);
+  background-size: calc(36 * var(--u)) calc(30 * var(--u)), calc(36 * var(--u)) calc(30 * var(--u)), calc(10 * var(--u)) calc(10 * var(--u)), calc(10 * var(--u)) calc(10 * var(--u)), calc(2 * var(--u)) calc(2 * var(--u)), calc(2 * var(--u)) calc(2 * var(--u));
+  background-position: calc(2 * var(--u)) calc(100% - 2 * var(--u)), calc(100% - 2 * var(--u)) calc(2 * var(--u)), 0 0, 0 0, 0 0, 0 0;
+  background-repeat: no-repeat, no-repeat, repeat, repeat, repeat, repeat; }
+.fundo-planta.claro { background-color: var(--ladrilho);
+  background-image:
+    linear-gradient(rgb(53 80 200 / .1) 1px, transparent 1px), linear-gradient(90deg, rgb(53 80 200 / .1) 1px, transparent 1px),
+    linear-gradient(rgb(53 80 200 / .05) 1px, transparent 1px), linear-gradient(90deg, rgb(53 80 200 / .05) 1px, transparent 1px);
+  background-size: calc(10 * var(--u)) calc(10 * var(--u)), calc(10 * var(--u)) calc(10 * var(--u)), calc(2 * var(--u)) calc(2 * var(--u)), calc(2 * var(--u)) calc(2 * var(--u));
+  background-position: 0 0; background-repeat: repeat; }
+/* ondas de peças (rodapé de painéis do clima, do comércio, COP) */
+.fundo-ondas { position: relative; }
+.fundo-ondas::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: calc(4 * var(--u)); pointer-events: none; border-radius: inherit;
+  background:
+    radial-gradient(circle at 50% 100%, var(--oceano-2) 0 calc(1.6 * var(--u)), var(--tinta) calc(1.6 * var(--u) + 1px) calc(1.9 * var(--u)), transparent calc(1.9 * var(--u) + 1px)) 0 100% / calc(3.2 * var(--u)) calc(2.2 * var(--u)) repeat-x,
+    radial-gradient(circle at 50% 100%, var(--oceano-0) 0 calc(1.6 * var(--u)), var(--tinta) calc(1.6 * var(--u) + 1px) calc(1.9 * var(--u)), transparent calc(1.9 * var(--u) + 1px)) calc(1.6 * var(--u)) calc(100% - 1.3 * var(--u)) / calc(3.2 * var(--u)) calc(2.2 * var(--u)) repeat-x; }
+/* raios (faixa do ano, vitória, pódio): giram devagar; com movimento reduzido ficam parados */
+.fundo-raios { position: relative; overflow: hidden; isolation: isolate; }
+.fundo-raios::before { content: ''; position: absolute; z-index: -1; left: 50%; top: 60%; width: 300vmax; height: 300vmax; margin: -150vmax 0 0 -150vmax;
+  background: repeating-conic-gradient(from 0deg at 50% 50%, #FFD21F 0 6deg, #FFC400 6deg 12deg); animation: fundo-raios 20s linear infinite; }
+@keyframes fundo-raios { to { rotate: 1turn; } }
+.fundo-raios.anil::before { background: repeating-conic-gradient(from 0deg at 50% 50%, var(--mesa-topo) 0 6deg, var(--mesa-meio) 6deg 12deg); }
+/* zebra parada (crise, colapso iminente, reunião de emergência) */
+.fundo-zebra { background: repeating-linear-gradient(-45deg, var(--amarelo) 0 calc(1 * var(--u)), var(--tinta) calc(1 * var(--u)) calc(2 * var(--u))); }
+
+/* =====================================================================================================
+   GRÁFICOS (§4.7) — SVG de graficoTijolos, graficoLinhas, cascata, tijolosCO2, matrizEnergia
+   ===================================================================================================== */
+.grafico { display: block; width: 100%; height: auto; overflow: visible; font-family: var(--f-texto); }
+.grafico text { font-family: var(--f-texto); font-weight: 900; font-variant-numeric: tabular-nums; }
+.grafico .rot { font-family: var(--f-titulo); font-weight: 700; }
+.grafico .valor { paint-order: stroke fill; }
+.grafico .serie { transition: opacity var(--t-passa); }
+.grafico .serie.apagada { opacity: .55; }
+
+/* =====================================================================================================
+   MEDIDORES (§4.8) — termometroTijolos, relogioJuizo, ponteiroEnergia, anelProgresso, encaixes (SVG)
+   ===================================================================================================== */
+.medidor { display: inline-block; vertical-align: middle; overflow: visible; }
+.medidor text { font-family: var(--f-texto); font-weight: 900; font-variant-numeric: tabular-nums; }
+.medidor .marca-txt { font-family: var(--f-titulo); font-weight: 700; }
+.medidor.termometro { width: calc(40 * var(--u)); height: auto; }
+.medidor.relogio { width: calc(7.2 * var(--u)); height: auto; }
+.medidor.relogio.grande { width: calc(18 * var(--u)); }
+.medidor.energia { width: calc(14 * var(--u)); height: auto; }
+.medidor.anel { width: calc(8 * var(--u)); height: auto; }
+.medidor.encaixes { height: calc(3 * var(--u)); width: auto; }
+.medidor .ponteiro { transition: transform .6s var(--c-volta); transform-box: view-box; }
+@media (prefers-reduced-motion: reduce) {
+  .vp-listras, .vp-orbita.a, .vp-orbita.b, .fundo-raios::before, .tarja-vivo::before { animation: none !important; }
+}
+html.rm .vp-listras, html.rm .vp-orbita, html.rm .fundo-raios::before { animation: none !important; }
