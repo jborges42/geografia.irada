@@ -1,0 +1,199 @@
+<!doctype html>
+<!-- Vitrine de desenvolvimento dos Relatórios (não faz parte do jogo): partidas jogadas só pelo computador, do jeito do
+     teste-simulacao.mjs, para ver o balanço do mandato, o fim (vitória, derrota, colapso, pódio) e os gráficos.
+     ?ver=balanco&mandato=1..6&passo=0..4&modo=competitivo|cooperativo&semente=n · ?ver=fim&caso=competitivo|blocos|coop-vitoria|coop-derrota|colapso&aba=0..5
+     ?ver=graficos · sem ?ver: barra com todos os casos. &semMapa pula o mapa 3D (mais rápido). -->
+<html lang="pt-BR"><head><meta charset="utf-8"><base href="../"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vitrine dos relatórios</title>
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/arte.css">
+<link rel="stylesheet" href="css/relatorios.css">
+<style>
+  #barra { position: fixed; z-index: 45; left: 0; right: 0; top: 0; display: flex; flex-wrap: wrap; gap: calc(.8 * var(--u)); align-items: center; padding: calc(1.2 * var(--u)) calc(2 * var(--u)); pointer-events: none; }
+  #barra > * { pointer-events: auto; }
+  #barra .titulo { font: 400 calc(3 * var(--u)) / 1 var(--f-marca); margin-right: calc(1 * var(--u)); }
+  #barra:empty { display: none; }
+  .v-graficos { position: absolute; inset: calc(3 * var(--u)); display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); gap: calc(2.4 * var(--u)); pointer-events: auto; }
+  .v-graficos .painel { --cor: var(--ladrilho); height: 100%; min-height: 0; display: grid; }
+  .v-graficos .tela { display: grid; min-height: 0; }
+  .v-graficos .rel-fig { min-height: 0; height: 100%; grid-template-rows: minmax(0, 1fr) auto; }
+  .v-graficos .rel-svg { height: 100%; min-height: 0; }
+</style></head><body class="jogo">
+<div id="mundo" aria-hidden="true"></div>
+<div id="rotulos-mapa"></div>
+<div id="cena" hidden></div>
+<main id="telas">
+  <section id="tela-partida" class="tela" aria-label="Partida" hidden></section>
+  <section id="tela-fim" class="tela" aria-label="Fim da partida" hidden></section>
+</main>
+<div id="camada"></div>
+<div id="splash" aria-hidden="true" hidden>
+  <div class="splash-faixa faixa peca pinos cor-herdada">
+    <span id="splash-icone" class="faixa-icone soquete"></span>
+    <div class="faixa-textos"><div id="splash-pre" class="letra-bolha"></div><div id="splash-titulo" class="letra-bolha"></div><div id="splash-sub" class="letra-bolha"></div></div>
+  </div>
+</div>
+<div id="aviso" role="status" hidden></div>
+<div id="anuncio" class="so-leitor" aria-live="polite"></div>
+<div id="barra"></div>
+
+<script src="lib/three.min.js"></script>
+<script src="lib/gsap.min.js"></script>
+<script src="lib/confetti.min.js"></script>
+<script src="dados/mapa.js"></script>
+<script src="dados/modelos.js"></script>
+<script src="conteudo/potencias.js"></script>
+<script src="conteudo/territorios.js"></script>
+<script src="conteudo/politicas.js"></script>
+<script src="conteudo/eventos.js"></script>
+<script src="conteudo/resolucoes.js"></script>
+<script src="conteudo/dilemas.js"></script>
+<script src="conteudo/fichas.js"></script>
+<script src="conteudo/manual.js"></script>
+<script src="conteudo/bncc.js"></script>
+<script src="js/icones.js"></script>
+<script src="js/arte.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/simulacao.js"></script>
+<script src="js/bonecos.js"></script>
+<script src="js/mapa3d.js"></script>
+<script src="js/cenas3d.js"></script>
+<script src="js/mascote.js"></script>
+<script src="js/relatorios.js"></script>
+<script>
+'use strict';
+const Q = new URLSearchParams(location.search), S = Simulacao, PIDS = ['brasil', 'eua', 'china', 'ue', 'india', 'russia'];
+gsap.ticker.lagSmoothing(0);
+const HUMANOS = ['brasil', 'ue', 'india', 'russia'];   // duas potências ficam com o computador
+
+// Um mandato só com o computador (como teste-simulacao.mjs): eventos, decisões, COP, vezes e balanço. Devolve o rel do balanço.
+function mandato(e) {
+  const pids = Object.keys(e.potencias);
+  for (const { id, local } of S.sortearEventos(e)) {
+    const { escolha } = S.aplicarEvento(e, id, local);
+    if (escolha?.tipo === 'votacao') { const res = { id: escolha.resolucao, alvo: escolha.resolucao === 'missao_paz' ? local : null, proponente: null }; S.votacao(e, res, Object.fromEntries(pids.map(p => [p, S.iaVoto(e, p, res)]))); }
+    if (escolha?.tipo === 'doacao') S.resolverDoacao(e, id, local, Object.fromEntries(pids.map(p => [p, S.iaDoacao(e, p, escolha.recurso)])));
+    if (escolha?.tipo === 'decisao') S.resolverDecisao(e, id, local, Object.fromEntries(pids.map(p => [p, S.iaDecisao(e, p, id)])));
+  }
+  if (S.copNestaRodada(e)) S.resolverCop(e, Object.fromEntries(pids.map(p => [p, S.iaCop(e, p)])));
+  for (const p of S.ordemDaRodada(e)) S.iaJogarVez(e, p);
+  return S.balanco(e);
+}
+function novaPartida({ modo = 'competitivo', semente = 7, perfilIA, infiltrado = false } = {}) {
+  const blocos = { brasil: 'A', ue: 'A', india: 'B', russia: 'B' };
+  return S.criarEstado({ modo, rodadas: 6, semente, perfilIA, infiltrado, missoes: modo !== 'cooperativo',
+    jogadores: HUMANOS.map(p => ({ potencia: p, nome: nomeEquipe(p), bloco: modo === 'blocos' ? blocos[p] : undefined })) });
+}
+const ateOFim = e => { let rel = null; while (!e.fim) rel = mandato(e); return rel; };
+// Procura uma semente que dê o resultado pedido (no máximo 40 tentativas)
+function partidaCom(opcoes, quer) {
+  for (let s = opcoes.semente || 1; s < (opcoes.semente || 1) + 40; s++) {
+    const e = novaPartida({ ...opcoes, semente: s });
+    ateOFim(e);
+    if (quer(e, S.resultado(e))) return e;
+  }
+  return null;
+}
+const AVATARES = Bonecos.avataresIniciais(PIDS, 7);
+AVATARES.forEach((a, i) => (a.comemoracao = ['comemorar', 'pular', 'girar', 'palmas', 'comemorar', 'acenar'][i]));
+const avataresDe = e => AVATARES.map(a => ({ ...a, humano: !!e.potencias[a.pid].humano }));
+let avsAtuais = AVATARES;
+window.Jogo = { avatarDe: pid => avsAtuais.find(a => a.pid === pid) || null };
+
+let mapaPronto = Promise.resolve();
+if (!Q.has('semMapa')) { Mapa3D.iniciar(document.querySelector('#mundo')); mapaPronto = Mapa3D.pronto; }
+
+const vitrine = window.vitrine = {
+  // Balanço do mandato n (1..6); passo inicial opcional; sobrevoo pulável
+  async balanco({ mandato: n = 3, modo = 'competitivo', semente = 7, passo = 0, sobrevoo = true } = {}) {
+    const e = novaPartida({ modo, semente, infiltrado: modo === 'cooperativo' });
+    for (let i = 1; i < n && !e.fim; i++) mandato(e);
+    avsAtuais = avataresDe(e);
+    await mapaPronto;
+    if (!Q.has('semMapa')) { await Mapa3D.atualizarMundo(e, { animar: false }); Mapa3D.bonecos?.(avsAtuais); }
+    const rel = mandato(e);
+    vitrine.estado = e; vitrine.rel = rel;
+    const focar = Mapa3D.focar;
+    if (!sobrevoo) Mapa3D.focar = null;   // sem sobrevoo (capturas): o balanço vê o mapa sem câmera e vai direto ao painel
+    const fim = Relatorios.balanco(e, rel);
+    await new Promise(r => { const t = setInterval(() => { if (document.querySelector('.rel-balanco .rb-seguir')) { clearInterval(t); r(); } }, 100); });
+    Mapa3D.focar = focar;
+    for (let i = 0; i < passo; i++) document.querySelector('.rel-balanco .rb-seguir').click();
+    vitrine.resultado = fim;
+    return fim;
+  },
+  async fim({ caso = 'competitivo', aba = -1 } = {}) {
+    const casos = {
+      competitivo: () => partidaCom({ modo: 'competitivo', semente: 3 }, (e, r) => r.fim.tipo === '2050'),
+      blocos: () => partidaCom({ modo: 'blocos', semente: 5 }, (e, r) => r.fim.tipo === '2050'),
+      'coop-vitoria': () => partidaCom({ modo: 'cooperativo', semente: 2, perfilIA: 'cooperativo' }, (e, r) => r.vitoria),
+      'coop-derrota': () => partidaCom({ modo: 'cooperativo', semente: 4, infiltrado: true }, (e, r) => !r.vitoria && r.fim.tipo === '2050'),
+      colapso: () => partidaCom({ modo: 'competitivo', semente: 1, perfilIA: 'ganancioso' }, (e, r) => r.fim.tipo === 'colapso'),
+    };
+    let e = casos[caso]?.() || null;
+    if (!e) {   // não achou na sorte: força o resultado num estado de exemplo (só na vitrine)
+      e = novaPartida({ modo: caso.startsWith('coop') ? 'cooperativo' : caso === 'blocos' ? 'blocos' : 'competitivo', semente: 9 });
+      ateOFim(e);
+      if (caso === 'colapso') { e.global.temperatura = 2.24; e.fim = { tipo: 'colapso', causa: 'clima', texto: 'A temperatura chegou a +2,24 °C: o planeta passou do ponto de não retorno.' }; }
+    }
+    avsAtuais = avataresDe(e);
+    vitrine.estado = e;
+    if (aba >= 0) {   // vai direto ao relatório (capturas)
+      const espera = setInterval(() => {
+        const b = document.querySelector('#tela-fim .rf-seguir');
+        if (b) b.click();
+        const a = document.querySelector(`#rf-a${aba}`);
+        if (a) { clearInterval(espera); a.click(); }
+      }, 250);
+    }
+    vitrine.resultado = Relatorios.fim(e, avsAtuais);
+    return vitrine.resultado;
+  },
+  // Checagem: em várias partidas, as causas de cada indicador somam a variação do mandato. Devolve as falhas ([] = ok).
+  checarCausas(partidas = 6) {
+    const falhas = [];
+    for (let s = 1; s <= partidas; s++) {
+      const e = novaPartida({ semente: s, modo: s % 2 ? 'competitivo' : 'cooperativo' });
+      while (!e.fim) {
+        const rel = mandato(e), cz = Relatorios.causas(e, rel);
+        for (const [k, c] of Object.entries(cz)) {
+          const dif = c.depois - c.antes - c.causas.reduce((t, x) => t + x.valor, 0);
+          if (Math.abs(dif) > (k === 'temperatura' ? .011 : 1.01)) falhas.push(`semente ${s}, ${rel.ano}, ${k}: sobra ${dif.toFixed(3)}`);
+        }
+      }
+    }
+    return falhas;
+  },
+  graficos() {
+    const e = novaPartida({ semente: 3 }); ateOFim(e);
+    const h = e.historico, anos = h.map(x => fmtAno(x.ano)), r = S.resultado(e);
+    const el = document.querySelector('#tela-fim');
+    el.innerHTML = `<div class="v-graficos">
+      <section class="painel peca"><div class="tela">${Relatorios.linha([{ id: 'temperatura', nome: 'Temperatura', pontos: h.map(x => x.global.temperatura), cor: 'amarelo', icone: '🌡️' }],
+        { anos, min: 1.3, max: 2.3, formatar: v => fmtGraus(v), titulo: 'Temperatura', descricao: 'Temperatura do planeta, em graus acima da era pré-industrial.',
+          limiares: [{ valor: 1.5, rotulo: '1,5 Paris', nivel: 'bom' }, { valor: 2, rotulo: '2,0 perigo', nivel: 'risco' }, { valor: 2.2, rotulo: '2,2 colapso', nivel: 'critico' }] })}</div></section>
+      <section class="painel peca"><div class="tela">${Relatorios.linha(PIDS.map(pid => ({ id: pid, nome: nomeCurto(pid), pontos: h.map(x => x.potencias[pid].economia) })), { anos, titulo: 'Economia das potências', descricao: 'Economia de cada potência, mandato a mandato.' })}</div></section>
+      <section class="painel peca"><div class="tela">${Relatorios.barras(PIDS.map(pid => ({ pid, valor: Math.round(r.contribuicoes.find(c => c.id === pid).emissoes) })), { titulo: 'CO₂ emitido', unidade: ' Gt', descricao: 'Gt de CO₂ emitidas de 2026 a 2050.' })}</div></section>
+      <section class="painel peca"><div class="tela">${Relatorios.barras(r.placar.map(x => ({ pid: x.id, valor: x.total })), { titulo: 'IGI final', max: 160, descricao: 'Índice Geografia Irada em 2050.' })}</div></section></div>`;
+    mostrarTela('fim');
+  },
+};
+
+fontesProntas.then(() => {
+  const ver = Q.get('ver');
+  if (ver === 'balanco') vitrine.balanco({ mandato: +(Q.get('mandato') || 3), modo: Q.get('modo') || 'competitivo', semente: +(Q.get('semente') || 7), passo: +(Q.get('passo') || 0), sobrevoo: !Q.has('semSobrevoo') });
+  else if (ver === 'fim') vitrine.fim({ caso: Q.get('caso') || 'competitivo', aba: Q.has('aba') ? +Q.get('aba') : -1 });
+  else if (ver === 'graficos') vitrine.graficos();
+  else {
+    const barra = document.querySelector('#barra');
+    barra.innerHTML = '<span class="titulo letra-bolha relevo">Relatórios</span>';
+    const botao = (t, f) => { const b = document.createElement('button'); b.className = 'btn btn-mini btn-neutro peca'; b.textContent = t; b.onclick = () => { barra.innerHTML = ''; f(); }; barra.append(b); };
+    [1, 3, 6].forEach(n => botao(`Balanço ${n}`, () => vitrine.balanco({ mandato: n })));
+    botao('Balanço cooperativo', () => vitrine.balanco({ mandato: 4, modo: 'cooperativo' }));
+    ['competitivo', 'blocos', 'coop-vitoria', 'coop-derrota', 'colapso'].forEach(c => botao(`Fim: ${c}`, () => vitrine.fim({ caso: c })));
+    botao('Gráficos', () => vitrine.graficos());
+  }
+});
+</script>
+</body></html>

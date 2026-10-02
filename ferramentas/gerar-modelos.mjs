@@ -20,7 +20,13 @@ const Modelos3D = (() => {
   const B64 = {
 ${linhas.join('\n')}
   };
-  const buffer = id => Uint8Array.from(atob(B64[id]), c => c.charCodeAt(0)).buffer;
+  // Decodifica direto (fromBase64 onde existe; senão um laço simples): Uint8Array.from com função custava ~240 ms na CPU da escola
+  const buffer = id => {
+    if (Uint8Array.fromBase64) return Uint8Array.fromBase64(B64[id]).buffer;
+    const s = atob(B64[id]), u = new Uint8Array(s.length);
+    for (let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i);
+    return u.buffer;
+  };
   return { ids: Object.keys(B64), buffer };
 })();
 `);

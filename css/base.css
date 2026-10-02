@@ -58,6 +58,13 @@
   --ganho: #5BE37D; --perda: #FF6B6B;
   --bom: #2FCB62; --medio: #FFC21A; --risco: #FF8A1F; --critico: #F0303A;   /* faixas, sempre com ✓ ! !! ✕ */
 
+  /* marca: cores tiradas da LOGO OFICIAL (img/logo.webp). Só onde a marca aparece (logo, títulos e selos de marca);
+     nunca como cor de estado ou de equipe (azul ≈ Equipe Azul; verde-limão ≈ "ok"/Brasil) — guia §8.2 */
+  --marca-azul: #02569F; --marca-azul-claro: #1E8CCD;      /* oceano do globo (meio-tom · lado aceso) */
+  --marca-verde: #96C513; --marca-verde-claro: #AFD522; --marca-verde-lado: #74AF07;   /* continentes, IRADA, traço */
+  --marca-marinho: #153255; --marca-marinho-escuro: #102949;                            /* base e contorno das letras */
+  --marca-branco: #FAFAF8;                                                             /* GEOGRAFIA e a luva */
+
   /* estados (§2.6) */
   --crise: #FF8A1F; --colapso: #F0303A; --conflito: #FF4B2B; --foco-tensao: #FFD21F; --paz: #BFF5C9; --sancionado: #6C6E68;
   --vetada: #B0001A; --sem-maioria: #8A94A6; --pessego-alerta: #FFE3D0;

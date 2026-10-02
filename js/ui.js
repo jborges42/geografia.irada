@@ -37,6 +37,7 @@ function pxDe(ficha) {
   return px;
 }
 const efeitoSom = nome => { if (nome && typeof Som !== 'undefined') Som.efeito(nome); };
+const abafarTrilha = () => { if (typeof Som !== 'undefined') Som.abafar?.(pilhaPaineis.length > 0); };   // painel aberto: música abafada
 // Fontes do jogo carregadas (para medir texto ou desenhar em canvas/textura)
 const fontesProntas = document.fonts
   ? Promise.all(['700 20px Fredoka', '800 20px Nunito', '900 20px Nunito', '20px "Titan One"'].map(f => document.fonts.load(f))).then(() => {}, () => {})
@@ -199,6 +200,7 @@ function abrirPainel(el, { esc: aoEsc = null, veu = true, foco = null, som = 'wh
   el.style.pointerEvents = '';
   pilhaPaineis.push({ el, veu: v, inertes, aoEsc, antes: document.activeElement });
   efeitoSom(som);
+  abafarTrilha();
   gsap.killTweensOf(el);
   const tl = gsap.timeline();
   if (v) tl.fromTo(v, { opacity: 0 }, { opacity: 1, duration: RM ? .18 : .25 }, 0);
@@ -217,6 +219,7 @@ async function fecharPainel(el) {
   el.inert = true;
   [el, p.veu].forEach(x => x && (x.style.pointerEvents = 'none'));
   p.inertes.forEach(x => (x.inert = false));
+  abafarTrilha();
   if (p.antes?.isConnected && !p.antes.closest('[inert]')) p.antes.focus({ preventScroll: true });
   gsap.killTweensOf(el);
   const tl = gsap.timeline();
@@ -228,6 +231,7 @@ async function fecharPainel(el) {
 // Fecha tudo na hora (sair da partida)
 function fecharPaineis() {
   while (pilhaPaineis.length) { const p = pilhaPaineis.pop(); p.inertes.forEach(x => (x.inert = false)); p.el.remove(); p.veu?.remove(); }
+  abafarTrilha();
 }
 document.addEventListener('keydown', ev => {
   const topo = pilhaPaineis.at(-1);

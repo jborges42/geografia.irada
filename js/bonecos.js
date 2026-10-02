@@ -316,7 +316,7 @@ const Bonecos = (() => {
   }, 320, 192, true);
 
   // ---------- Cabelo: um casco só, com a frente logo atrás do rosto ----------
-  const COBREM = ['cartola', 'capacete', 'bone', 'explorador', 'capacete-paz'];
+  const COBREM = ['cartola', 'capacete', 'bone', 'explorador', 'capacete-paz', 'astronauta'];   // o cabelo fica por baixo
   function cabelo(cab, estilo, cor, ctn, cobre) {
     const m = plastico(cor, .55), topoCabeca = CAB.h + .02, frente = CAB.d / 2 - .01;
     if (estilo === 'careca') return topoCabeca;
@@ -454,10 +454,10 @@ const Bonecos = (() => {
       papel.position.set(0, -.03, .03); g.add(papel);
       add(caixa(.22, .09, .07, .025), plastico('#A0A5A9', .3), 0, .3, .02);
     } else if (tipo === 'megafone') {
-      g.position.set(0, -.6, .15); g.rotation.set(-1.25, 0, 0);
-      add(cil(.21, .09, .44, 28), plastico(LADRILHO, .3), 0, .1);
-      add(cil(.225, .225, .07, 28), plastico(AMARELO, .28), 0, .33);
-      add(caixa(.09, .22, .1, .03), plastico(PRETA, .4), 0, -.06, -.12);
+      g.position.set(-.05, -.62, .12); g.rotation.set(-.5, 0, .95); g.scale.setScalar(1.25);   // de lado, com a boca à mostra
+      add(cil(.21, .09, .44, 28), plastico(AMARELO, .28), 0, .1);          // cone amarelo (guia §4.4)
+      add(cil(.225, .225, .07, 28), plastico('#F0303A', .3), 0, .33);      // aro vermelho
+      add(caixa(.09, .22, .1, .03), plastico(PRETA, .4), 0, -.06, -.12);   // punho
     } else if (tipo === 'maleta') {
       g.position.set(0, -.92, 0);
       add(caixa(.66, .46, .2, .06), plastico('#8A5A2E', .4));
@@ -476,10 +476,10 @@ const Bonecos = (() => {
       bola.position.y = .3; bola.rotation.z = .4; bola.castShadow = true; g.add(bola);
       bola.add(new THREE.Mesh(casca(esfera(.24)), ctn || tinta(TINTA)));
     } else if (tipo === 'microfone') {
-      g.position.set(0, -.58, .15); g.rotation.x = -.7;
-      add(cil(.05, .04, .36, 16), plastico(PRETA, .4), 0, .05);
-      add(cil(.07, .07, .05, 16), plastico(AMARELO, .3), 0, .22);
-      add(esfera(.11, false, 20), plastico('#A0A5A9', .35), 0, .32);
+      g.position.set(-.02, -.58, .14); g.rotation.set(-.5, 0, .35); g.scale.setScalar(1.2);
+      add(cil(.065, .05, .46, 16), plastico(PRETA, .4), 0, .08);
+      add(cil(.09, .09, .07, 16), plastico(AMARELO, .3), 0, .3);
+      add(esfera(.15, false, 20), plastico('#D5DEEA', .35), 0, .43);
     } else if (tipo === 'luneta') {
       g.position.set(-.08, -.6, .12); g.rotation.set(-.55, 0, .75);
       add(cil(.1, .1, .3, 24), plastico(AMARELO, .28), 0, -.05);
@@ -545,10 +545,13 @@ const Bonecos = (() => {
     }
     corpo.position.y = alturaBase;
 
-    const perna = lado => {
+    const perna = lado => {   // coxa + joelho (canela e sapato): dobra para sentar e para encolher no pulo
       const p = new THREE.Group(); p.position.set(lado * .24, .78, 0); corpo.add(p);
-      peca(p, caixa(.4, .64, .46, .12), mCalca, 0, -.32, 0, ctn);
-      peca(p, caixa(.44, .22, .6, .09), mEscuro, 0, -.67, .05, ctn);
+      peca(p, caixa(.4, .38, .46, .12), mCalca, 0, -.19, 0, ctn);
+      const j = new THREE.Group(); j.position.y = -.3; p.add(j);
+      peca(j, caixa(.4, .34, .46, .12), mCalca, 0, -.15, 0, ctn);
+      peca(j, caixa(.44, .22, .6, .09), mEscuro, 0, -.37, .05, ctn);
+      p.userData.joelho = j;
       return p;
     };
     const pernaE = perna(-1), pernaD = perna(1);
@@ -557,6 +560,7 @@ const Bonecos = (() => {
       const ch = new THREE.Group(); corpo.add(ch);
       const mG = plastico(GRAFITE, .4), mAro = plastico('#D5DEEA', .3), mCubo = plastico(AMARELO, .28);
       peca(ch, caixa(1.0, .14, .78, .05), mG, 0, .52, .08, ctn);
+      peca(ch, caixa(.86, .06, .3, .025), mG, 0, .03, .5, ctn);   // apoio dos pés
       for (const s of [-1, 1]) peca(ch, cil(.04, .04, .3, 10), mAro, s * .66, .46, -.04).rotation.z = Math.PI / 2;   // eixo até a roda
       peca(ch, caixa(1.0, .76, .12, .05), mG, 0, .98, -.36, ctn);
       for (const s of [-1, 1]) {
@@ -761,7 +765,8 @@ const Bonecos = (() => {
       sombra.scale.setScalar(Math.max(.5, 1 - atual.y * .32));
       placa.visible = est.acao === 'votar' && (!est.dur || a < est.dur);
       if (placa.visible) placa.scale.setScalar(ease.backOut(lim(a / .2), 2) * (1 - lim((a - .75) / .15)) + .001);
-      pernaE.rotation.x = pernaD.rotation.x = sentado ? -Math.PI / 2 : atual.y > .3 ? -.25 : 0;
+      pernaE.rotation.x = pernaD.rotation.x = sentado ? -Math.PI / 2 : atual.y > .3 ? -.35 : 0;
+      pernaE.userData.joelho.rotation.x = pernaD.userData.joelho.rotation.x = sentado ? Math.PI / 2 : atual.y > .3 ? .6 : 0;
       // expressão (pisca, fala em 2 quadros a 8 Hz)
       let ex = EXPR_DA_ACAO[est.acao] || est.expr;
       if (!REDUZ && !est.congelado) {
@@ -772,8 +777,9 @@ const Bonecos = (() => {
       }
       if (ex !== est.mostrando) {
         est.mostrando = ex;
-        if (mRosto) { mRosto.map = rosto(ex, escura, sobr); mRosto.needsUpdate = true; }
-        if (mTela) { mTela.map = mTela.emissiveMap = texMonitor(ex); mTela.needsUpdate = true; }
+        // trocar uma textura por outra não pede material.needsUpdate (só uniforme): piscar e falar sem reavaliar o shader
+        if (mRosto) mRosto.map = rosto(ex, escura, sobr);
+        if (mTela) mTela.map = mTela.emissiveMap = texMonitor(ex);
       }
       tiqueTijolinhos(t, dt);
     }

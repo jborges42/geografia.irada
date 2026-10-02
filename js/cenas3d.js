@@ -12,7 +12,6 @@ const Cenas3D = (() => {
   const P = () => Bonecos.pecas;
   const som = (nome, o) => { try { if (typeof Som !== 'undefined') Som.efeito(nome, o); } catch { /* sem som */ } };
   const mapaPausar = v => { try { if (typeof Mapa3D !== 'undefined' && Mapa3D.pausar) Mapa3D.pausar(v); } catch { /* mapa ausente */ } };
-  const espera = ms => new Promise(r => setTimeout(r, rapido() ? Math.min(ms, 60) : ms));
   const fimTl = tl => new Promise(r => { if (!tl) return r(); if (rapido()) tl.timeScale(12); tl.eventCallback('onComplete', r); });
   const equipe = pid => Bonecos.EQUIPES[pid] || { cor: '#9AA3B8', sombra: '#5C6680', clara: '#C9CED6', forma: null };
 
@@ -243,7 +242,7 @@ const Cenas3D = (() => {
   }
   // Sai de um palco específico (o Mascote usa ao parar) sem mexer nos outros
   function fechar(p) { if (palco === p) esconder(); }
-  function pular() { palco?.tl?.progress(1); palco?.aoPular?.(); }
+  function pular() { palco?.tl?.progress(1); }
 
   // Posição de um boneco na tela (px da janela): pés, topo da cabeça e se está à vista
   function ancora(pid) {
@@ -399,6 +398,8 @@ const Cenas3D = (() => {
     const q = enquadramento || (tamanho < 120 ? 'rosto' : 'busto');
     const chave = JSON.stringify([avatar.pid, avatar.cor, avatar.forma, avatar.pele, avatar.cabelo, avatar.penteado, avatar.chapeu, avatar.acessorio,
       avatar.humano, avatar.roupa, avatar.calca, avatar.faixa, expressao, acao, tamanho, q]);
+    // Cache com teto (o provador gera dezenas de miniaturas a cada troca): sai o retrato mais antigo, cada um ~50 KB de PNG
+    if (cacheRetratos.size >= 240 && !cacheRetratos.has(chave)) cacheRetratos.delete(cacheRetratos.keys().next().value);
     if (!cacheRetratos.has(chave)) cacheRetratos.set(chave, Promise.resolve().then(() => {
       const b = Bonecos.criar(avatar, { contorno: true });
       b.posar(acao, POSE_T[acao] ?? .4, expressao);
@@ -725,7 +726,7 @@ const Cenas3D = (() => {
     if (pid && p.bonecos[pid]) {   // plano de quem fala: a câmera vem do meio da mesa, de frente para a delegação
       const b = p.bonecos[pid], dir = new THREE.Vector3(b.position.x, 0, b.position.z).normalize();
       alvo = new THREE.Vector3(b.position.x, b.position.y + 2.3, b.position.z);
-      pos = alvo.clone().addScaledVector(dir, -14).add(new THREE.Vector3(0, 3.6, 0));
+      pos = alvo.clone().addScaledVector(dir, -18).add(new THREE.Vector3(0, 4.4, 0));
     }
     som('whoosh');
     const olhar = (p.camBase?.alvo || geral.alvo).clone();
@@ -904,14 +905,15 @@ const Cenas3D = (() => {
     chaoDeSombra(cena, 80, .22);
     const n = avatares.length, atras = avatares.slice(0, Math.ceil(n / 2)), frente = avatares.slice(Math.ceil(n / 2));
     const passoF = 3.3, larg = Math.max(atras.length, frente.length) * passoF + 2;
-    const degrau = malha(pc.bloco(Math.round(larg), 2.4, 2.2), pc.plastico(LADRILHO, .32), cena, 0, 0, -1.7);
+    const ALT = 3.6;   // arquibancada de 3 tijolos: a fileira de trás aparece inteira por cima da da frente
+    const degrau = malha(pc.bloco(Math.round(larg), ALT, 2.2), pc.plastico(LADRILHO, .32), cena, 0, 0, -1.7);
     degrau.add(new THREE.Mesh(pc.casca(degrau.geometry, .03), pc.tinta(TINTA)));
-    malha(pc.caixa(Math.round(larg) - .1, .5, .1, .04), pc.plastico(AMARELO, .28), cena, 0, 1.7, -.58);
+    malha(pc.caixa(Math.round(larg) - .1, .5, .1, .04), pc.plastico(AMARELO, .28), cena, 0, ALT - .7, -.58);
     const piso = malha(pc.bloco(Math.round(larg) + 2, .4, 6), pc.plastico(CREME, .32), cena, 0, -.4, -.4);
     piso.add(new THREE.Mesh(pc.casca(piso.geometry, .03), pc.tinta(TINTA)));
     const POSES = ['acenar', 'comemorar', 'bracos-cruzados', 'apontar', 'palmas', 'acenar'];
     const pose = (b, i) => b.posar(POSES[i % POSES.length], POSE_T[POSES[i % POSES.length]], 'alegre');
-    atras.forEach((av, i) => { const b = Bonecos.criar(av); b.scale.setScalar(1.15); b.position.set((i - (atras.length - 1) / 2) * passoF, 2.4, -1.7); cena.add(b); pose(b, i); });
+    atras.forEach((av, i) => { const b = Bonecos.criar(av); b.scale.setScalar(1.15); b.position.set((i - (atras.length - 1) / 2) * passoF, ALT, -1.7); cena.add(b); pose(b, i); });
     frente.forEach((av, i) => { const b = Bonecos.criar(av); b.scale.setScalar(1.15); b.position.set((i - (frente.length - 1) / 2) * passoF, 0, 1); cena.add(b); pose(b, i + 3); });
     // faixa com cauda de andorinha (§4.5), impressa com o título e a data
     const quando = data || new Date().toLocaleDateString('pt-BR');
@@ -921,7 +923,7 @@ const Cenas3D = (() => {
       letraBolha(g, titulo, w / 2, h * .46, h * .44);
       g.font = `900 ${h * .15}px Nunito, system-ui, sans-serif`; g.fillStyle = '#FFE8A8'; g.textAlign = 'center'; g.fillText(quando, w / 2, h * .84);
     });
-    const faixa = new THREE.Group(); faixa.position.set(0, 8.6, -3.4); cena.add(faixa);
+    const faixa = new THREE.Group(); faixa.position.set(0, ALT + 6.6, -3.4); cena.add(faixa);
     const fw = Math.min(larg + 1, 12), fh = fw / 4;
     const corpo = malha(pc.caixa(fw, fh, .2, .06), [pc.plastico('#F0303A'), pc.plastico('#F0303A'), pc.plastico('#F0303A'), pc.plastico('#F0303A'),
       new THREE.MeshStandardMaterial({ map: tex, roughness: .32 }), pc.plastico('#F0303A')], faixa);
@@ -932,10 +934,10 @@ const Cenas3D = (() => {
       const cauda = malha(new THREE.ExtrudeGeometry(forma, { depth: .16, bevelEnabled: true, bevelSize: .03, bevelThickness: .03, bevelSegments: 2 }), pc.plastico('#A3141F', .32), faixa, s * (fw / 2 - .25), -fh * .18, -.35);
       cauda.scale.x = s; cauda.add(new THREE.Mesh(pc.casca(cauda.geometry, .03), pc.tinta(TINTA)));
     });
-    [-1, 1].forEach(s => { malha(pc.cil(.12, .12, 8.8, 12), pc.plastico(CREME, .3), cena, s * (fw / 2 - .6), 4.2, -3.6); malha(pc.esfera(.24, false, 16), pc.plastico(AMARELO, .28), cena, s * (fw / 2 - .6), 8.7, -3.6); });
+    [-1, 1].forEach(s => { malha(pc.cil(.12, .12, ALT + 6.6, 12), pc.plastico(CREME, .3), cena, s * (fw / 2 - .6), (ALT + 6.6) / 2, -3.6); malha(pc.esfera(.24, false, 16), pc.plastico(AMARELO, .28), cena, s * (fw / 2 - .6), ALT + 6.5, -3.6); });
     // câmera: tudo cabe com folga
-    const caixa = new THREE.Box3(new THREE.Vector3(-larg / 2 - .5, -.4, -3.6), new THREE.Vector3(larg / 2 + .5, 8.6 + fh / 2 + .3, 2));
-    const p = { camera, caixa, elev: 8, margem: .9, mira: new THREE.Vector3(0, 0, 0) };
+    const caixa = new THREE.Box3(new THREE.Vector3(-larg / 2 - .5, -.4, -3.6), new THREE.Vector3(larg / 2 + .5, ALT + 6.6 + fh / 2 + .3, 2));
+    const p = { camera, caixa, elev: 16, margem: .9, mira: new THREE.Vector3(0, 0, 0) };
     enquadrar(p, largura, altura);
     const cv = fotografar(cena, camera, largura, altura);
     const out = document.createElement('canvas'); out.width = largura; out.height = altura;

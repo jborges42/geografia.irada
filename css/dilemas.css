@@ -1,1 +1,175 @@
-/* ESQUELETO da Fundação: o dono da frente substitui. */
+/* Geografia Irada — Dilemas de governo: o Gabinete (guia de arte §5.11). Módulo: js/dilemas.js.
+   Peças do sistema de design (css/base.css): .painel, .peca, .pinos, .balao, .pilula, .soquete, .retrato, .carimbo.
+   Medidas em u (1% da altura do palco 16:9). Prefixo dl- em tudo o que é deste módulo. */
+
+/* Retratos: o lugar fica vazio até a foto ficar pronta (nada de ícone de imagem quebrada) */
+[data-foto="esperando"] img { visibility: hidden; }
+
+/* =====================================================================================================
+   GABINETE (painel G na cor da equipe da vez)
+   ===================================================================================================== */
+#camada > .painel.dl-gabinete { --larg: calc(152 * var(--u)); --alt-max: calc(94 * var(--u)); }
+.dl-gabinete:focus, .dl-efeito:focus { outline: none; }   /* o foco inicial é o painel (leitor de tela); o anel fica nos controles */
+.dl-gabinete .painel-cab { min-height: calc(6.6 * var(--u)); padding-left: calc(13 * var(--u)); }
+.dl-gabinete .painel-titulo { font-size: calc(4 * var(--u) * var(--texto)); }
+/* retrato da equipe vazando a moldura, como o objeto do cabeçalho */
+.retrato.dl-equipe { --tam: calc(11 * var(--u)); position: absolute; left: calc(-1.6 * var(--u)); top: calc(-5 * var(--u));
+  box-shadow: 0 calc(.8 * var(--u)) 0 var(--tinta), var(--sombra-solta); }
+.retrato.dl-equipe > svg.forma { width: 38%; height: 38%; right: -6%; bottom: -4%; }
+
+.dl-mesa { display: grid; grid-template-columns: calc(44 * var(--u)) minmax(0, 1fr); column-gap: calc(2.4 * var(--u));
+  padding: calc(1.6 * var(--u)) calc(2 * var(--u)) calc(2.2 * var(--u)); }
+
+/* ---------- A situação (esquerda) ---------- */
+/* o dossiê da situação: folha rebaixada, com a prancheta do kit no canto */
+.dl-situacao { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; align-content: start;
+  column-gap: calc(1.4 * var(--u)); row-gap: calc(1.2 * var(--u)); margin: calc(1.2 * var(--u)) 0 calc(.4 * var(--u));
+  padding: calc(1.8 * var(--u)) calc(2 * var(--u)) calc(8 * var(--u)); border-radius: var(--raio-painel);
+  background: radial-gradient(circle at 50% 50%, rgb(26 20 51 / .05) 0 calc(.32 * var(--u)), transparent calc(.38 * var(--u))) 0 0 / calc(1.6 * var(--u)) calc(1.6 * var(--u)), var(--ladrilho-2);
+  box-shadow: inset 0 calc(.4 * var(--u)) 0 rgb(26 20 51 / .14), inset 0 calc(-.25 * var(--u)) 0 rgb(255 255 255 / .7); }
+.dl-situacao > .dl-dossie { position: absolute; right: calc(-1.4 * var(--u)); bottom: calc(-1.6 * var(--u)); width: calc(11.5 * var(--u)); rotate: 9deg;
+  filter: drop-shadow(0 calc(.5 * var(--u)) 0 rgb(26 20 51 / .22)); pointer-events: none; }
+.dl-icone { --soquete: color-mix(in oklab, var(--cor-clara, var(--ladrilho-2)), #fff 55%); width: calc(8.6 * var(--u));
+  border-width: var(--b); box-shadow: 0 calc(.5 * var(--u)) 0 var(--tinta); }
+.dl-icone > img { width: 70%; }
+.dl-rotulo { display: flex; flex-direction: column; align-items: flex-start; gap: calc(.7 * var(--u)); font: 700 var(--fs-min) / 1.1 var(--f-titulo); color: var(--tinta-suave); }
+.dl-lugar { color: var(--tinta); }
+.dl-lugar > .ico { width: calc(2.6 * var(--u)); }
+.dl-titulo { grid-column: 1 / -1; margin-top: calc(.4 * var(--u)); font: 700 var(--fs-h2) / var(--lh-titulo) var(--f-titulo); text-wrap: balance; }
+.dl-texto { grid-column: 1 / -1; font: 800 var(--fs-corpo) / var(--lh-texto) var(--f-texto); text-wrap: pretty; }
+
+/* ---------- Os conselheiros (direita): cada caminho é um cartão-botão ---------- */
+.dl-conselho { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); column-gap: calc(1.8 * var(--u)); align-items: stretch; }
+.dl-cartao { --sobe: 0px; position: relative; display: flex; flex-direction: column; min-width: 0; margin: 0; padding: calc(15 * var(--u)) 0 calc(1.2 * var(--u));
+  appearance: none; border: 0; background: none; color: var(--tinta); font: inherit; text-align: left; cursor: pointer;
+  translate: 0 calc(-1 * var(--sobe)); transition: translate var(--t-solta) var(--c-quique); -webkit-tap-highlight-color: transparent; }
+.dl-cartao:focus-visible { outline: none; }
+/* Medalhão do conselheiro (cartões, consequência, vez do computador): disco na cor do tema com contorno e lateral;
+   o busto é recortado pelo disco embaixo e a cabeça (com o chapéu do tema) salta para fora em cima */
+.dl-medalhao { --tam: calc(14.6 * var(--u)); --r: calc(var(--tam) / 2 - var(--b)); position: relative; display: block; flex: none; width: var(--tam); aspect-ratio: 1;
+  border-radius: 50%; border: var(--b) solid var(--tinta);
+  background: radial-gradient(circle at 50% 34%, #fff 0 12%, color-mix(in oklab, var(--cor), #fff 50%) 42%, var(--cor) 70%, color-mix(in oklab, var(--cor), var(--cor-lado) 55%));
+  box-shadow: inset 0 calc(.5 * var(--u)) 0 rgb(255 255 255 / .6), inset 0 calc(-.6 * var(--u)) 0 rgb(26 20 51 / .12), 0 calc(.7 * var(--u)) 0 var(--tinta); }
+.dl-busto { --desce: calc(var(--tam) * .1); position: absolute; left: 50%; bottom: calc(-1 * var(--desce)); width: calc(var(--tam) * 1.38); max-width: none;
+  height: auto; aspect-ratio: 1; margin-left: calc(var(--tam) * -.69); transform-origin: 50% 100%; pointer-events: none; user-select: none; -webkit-user-drag: none;
+  -webkit-mask: radial-gradient(circle var(--r) at 50% calc(100% - var(--r) - var(--desce)), #000 calc(100% - 1px), transparent),
+    linear-gradient(#000 0 0) top / 100% calc(100% - var(--r) - var(--desce)) no-repeat;
+          mask: radial-gradient(circle var(--r) at 50% calc(100% - var(--r) - var(--desce)), #000 calc(100% - 1px), transparent),
+    linear-gradient(#000 0 0) top / 100% calc(100% - var(--r) - var(--desce)) no-repeat; }
+.dl-cartao > .dl-medalhao { position: absolute; z-index: 3; left: 50%; top: calc(4.4 * var(--u)); margin-left: calc(var(--tam) / -2); transition: scale var(--t-solta) var(--c-quique); }
+/* a placa (o "púlpito" de peças) fica na frente do busto e esconde o corte do peito */
+.dl-placa { --raio: calc(1.8 * var(--u)); --lado: calc(1.1 * var(--u)); position: relative; z-index: 2; flex: 1; display: flex; flex-direction: column; gap: calc(1 * var(--u));
+  padding: calc(4.6 * var(--u)) calc(1.3 * var(--u)) calc(1.3 * var(--u)); }
+.dl-cat { justify-content: center; }
+.dl-resumo { display: grid; place-items: center; min-height: calc(2 * 1.08em); text-align: center; }   /* 2 linhas: os balões dos 3 cartões alinham */
+.dl-placa.pinos::before { --pino: calc(2.7 * var(--u)); }
+/* --anel e --solta herdam: as peças de dentro da placa não repetem o brilho de seleção nem o anel de foco */
+.dl-placa .peca, .dl-placa .dl-escolher { --anel: 0 0 #0000; --solta: 0 0 #0000; }
+.dl-cat { display: flex; align-items: center; gap: calc(.6 * var(--u)); font: 700 var(--fs-min) / 1.05 var(--f-titulo); color: var(--tinta); }
+.dl-cat > .soquete { --soquete: color-mix(in oklab, var(--cor-lado), #fff 55%); width: calc(3.6 * var(--u)); }
+.dl-resumo { font: 700 var(--fs-cartao) / 1.08 var(--f-titulo); text-wrap: balance; }
+.dl-fala { --ponta-x: calc(2.6 * var(--u)); flex: 1; display: block; margin-top: calc(1 * var(--u));
+  padding: calc(1 * var(--u)) calc(1.3 * var(--u)) calc(1.1 * var(--u)); font: 900 var(--fs-corpo) / var(--lh-opcao) var(--f-texto); text-wrap: pretty; }
+/* "Escolher": tijolinho amarelo (a ação), vira "Escolhido" verde ao marcar */
+.dl-escolher { --cor: var(--amarelo); --cor-lado: var(--amarelo-lado); --lado: calc(.8 * var(--u)); --raio: var(--raio-btn); position: relative;
+  display: flex; align-items: center; justify-content: center; gap: calc(.8 * var(--u)); min-height: calc(5.8 * var(--u)); margin-top: calc(.4 * var(--u));
+  border: var(--b) solid var(--tinta); border-radius: var(--raio);
+  background: linear-gradient(color-mix(in oklab, var(--cor), #fff 24%), var(--cor) 58%);
+  box-shadow: inset 0 calc(.4 * var(--u)) 0 rgb(255 255 255 / .5), 0 var(--lado) 0 calc(-1 * var(--b)) var(--cor-lado), 0 var(--lado) 0 0 var(--tinta);
+  font: 700 var(--fs-cartao) / 1 var(--f-titulo); transition: translate var(--t-solta) var(--c-quique), box-shadow var(--t-solta) var(--c-quique); }
+.dl-tecla { display: grid; place-items: center; min-width: calc(3.4 * var(--u)); height: calc(3.4 * var(--u)); padding: 0 calc(.5 * var(--u));
+  border: var(--b-fino) solid var(--tinta); border-radius: calc(.7 * var(--u)); background: var(--ladrilho);
+  box-shadow: 0 calc(.3 * var(--u)) 0 var(--tinta); font: 900 var(--fs-min) / 1 var(--f-texto); color: var(--tinta); }
+.dl-rot-escolhido { display: none; align-items: center; gap: calc(.5 * var(--u)); }
+/* carimbo DECIDIDO, no meio do cartão */
+.dl-carimbo { position: absolute; z-index: 4; left: 50%; top: 61%; translate: -50% 0; --tam: calc(5.6 * var(--u)); pointer-events: none; }
+
+/* estados do cartão */
+.dl-cartao:is(:hover, .is-hover):not(:disabled) { --sobe: calc(.6 * var(--u)); transition-duration: var(--t-passa); transition-timing-function: var(--c-saida); }
+.dl-cartao:is(:hover, .is-hover):not(:disabled) .dl-medalhao { scale: 1.05; }
+.dl-cartao:active:not(:disabled) { --sobe: calc(-.4 * var(--u)); transition-duration: var(--t-aperta); }
+.dl-cartao:active:not(:disabled) .dl-escolher { translate: 0 calc(.5 * var(--u)); --lado: calc(.3 * var(--u)); }
+.dl-cartao:focus-visible .dl-placa, .dl-cartao.is-foco .dl-placa { outline: calc(.55 * var(--u)) solid var(--amarelo); outline-offset: calc(.35 * var(--u)); --anel: var(--anel-foco); }
+.dl-cartao[aria-pressed="true"] { --sobe: calc(1.4 * var(--u)); }
+.dl-cartao[aria-pressed="true"] .dl-placa { outline: calc(.6 * var(--u)) solid var(--amarelo); outline-offset: calc(.3 * var(--u));
+  --solta: 0 0 0 calc(1.8 * var(--u)) rgb(255 210 31 / .4); }
+.dl-cartao[aria-pressed="true"]:focus-visible .dl-placa { --solta: var(--anel-foco); }
+.dl-cartao[aria-pressed="true"] .dl-medalhao { scale: 1.08; }
+.dl-cartao[aria-pressed="true"] .dl-escolher { --cor: var(--verde-ok); --cor-lado: var(--verde-ok-lado); color: #fff;
+  -webkit-text-stroke: .17em var(--tinta); paint-order: stroke fill; letter-spacing: .02em; }
+.dl-cartao[aria-pressed="true"] :is(.dl-tecla, .dl-rot-escolher) { display: none; }
+.dl-cartao[aria-pressed="true"] .dl-rot-escolhido { display: inline-flex; }
+.dl-cartao[aria-pressed="true"] .dl-rot-escolhido .glifo { width: .95em; height: .95em; }
+.dl-cartao[aria-pressed="true"] .dl-rot-escolhido .glifo .g-m { stroke: #fff; }
+.dl-cartao:disabled { cursor: default; }
+.decidido .dl-cartao[aria-pressed="true"] { z-index: 3; }
+
+.dl-gabinete .painel-rodape .dica { display: flex; align-items: center; gap: calc(.8 * var(--u)); font-size: var(--fs-min); }
+.dl-gabinete .painel-rodape .dica > .ico { width: calc(3.6 * var(--u)); }
+.dl-confirmar { min-width: calc(24 * var(--u)); }
+.dl-confirmar:disabled { filter: grayscale(.9) brightness(1.05); opacity: .6; }
+
+/* =====================================================================================================
+   CONSEQUÊNCIA (painel ancorado embaixo: o mapa e o HUD continuam à vista)
+   ===================================================================================================== */
+#camada > .painel.dl-efeito { --larg: calc(160 * var(--u)); inset: auto 0 calc(1.8 * var(--u)) 0; margin: 0 auto; --alt-max: calc(60 * var(--u)); }
+.dl-efeito { --solta: var(--sombra-solta); }
+.dl-efeito-tela { display: grid; grid-template-columns: minmax(0, 1fr) calc(48 * var(--u)); column-gap: calc(2.6 * var(--u)); row-gap: calc(1 * var(--u));
+  grid-template-areas: 'jornal jornal' 'manchete manchete' 'mudancas mudancas' 'explica conceito' 'sabia botao';
+  padding: calc(1.2 * var(--u)) calc(2 * var(--u)) calc(1.4 * var(--u)); }
+.dl-jornal { grid-area: jornal; } .dl-manchete { grid-area: manchete; } .dl-mudancas { grid-area: mudancas; }
+.dl-explica { grid-area: explica; } .dl-conceito { grid-area: conceito; } .dl-sabia { grid-area: sabia; }
+.dl-efeito-tela > .btn-continuar { grid-area: botao; justify-self: end; align-self: center; margin: 0; }
+.dl-jornal { display: flex; align-items: center; gap: calc(1.2 * var(--u)); }
+.dl-jornal .jornal-faixa.compacta { --lado: calc(.5 * var(--u)); }
+.dl-edicao { font: 900 var(--fs-min) / 1 var(--f-texto); color: var(--tinta-suave); font-variant-numeric: tabular-nums; }
+.dl-manchete { font: 700 calc(3.5 * var(--u) * var(--texto)) / 1.08 var(--f-titulo); text-wrap: balance; }
+.dl-mudancas { display: flex; flex-wrap: wrap; align-items: center; gap: calc(.9 * var(--u)) calc(.7 * var(--u)); margin: 0; padding: 0; list-style: none; }
+.dl-onde { display: inline-flex; align-items: center; gap: calc(.4 * var(--u)); margin-left: calc(.8 * var(--u)); font: 700 var(--fs-min) / 1 var(--f-titulo); color: var(--tinta-suave); }
+.dl-onde:first-child { margin-left: 0; }
+.dl-onde > :is(.ico, svg.forma) { width: calc(2.4 * var(--u)); height: auto; filter: none; }
+.dl-parceria { background: var(--amarelo-claro); }
+.dl-chip { gap: calc(.5 * var(--u)); background: #fff; }
+.dl-chip-ico { display: inline-grid; place-items: center; width: calc(2.6 * var(--u)); height: calc(2.6 * var(--u)); }
+.dl-chip-ico > .ico { width: 100%; filter: none; }
+.dl-chip-ico > svg.forma { width: 86%; height: 86%; }
+.dl-chip-ico > .pino-cp { width: 80%; height: 80%; }
+.dl-chip b { font-weight: 900; }
+.dl-explica { display: grid; grid-template-columns: calc(11 * var(--u)) minmax(0, 1fr); align-items: center; column-gap: calc(2.4 * var(--u));
+  margin-top: calc(.6 * var(--u)); }
+.dl-quem-fala { --tam: calc(11 * var(--u)); align-self: end; }
+.dl-porque { --lado: calc(.8 * var(--u)); margin: 0; padding: calc(1.2 * var(--u)) calc(1.8 * var(--u)) calc(1.3 * var(--u));
+  font: 800 var(--fs-corpo) / var(--lh-texto) var(--f-texto); text-wrap: pretty; }
+.dl-porque > b { font-family: var(--f-titulo); font-weight: 700; }
+/* ponta do balão apontando para o conselheiro, à esquerda */
+.dl-porque::after { left: calc(-1.75 * var(--u)); top: calc(50% - 1.6 * var(--u)); rotate: -45deg; }
+.dl-conceito { --raio: calc(1.6 * var(--u)); --lado: calc(.8 * var(--u)); display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; align-self: center;
+  column-gap: calc(1.2 * var(--u)); padding: calc(1 * var(--u)) calc(1.6 * var(--u)) calc(1.1 * var(--u)) calc(1 * var(--u)); }
+.dl-conceito .conquista { --tam: calc(9.4 * var(--u)); }
+.dl-conceito p { margin: 0; }
+.dl-conceito-rot { display: block; font: 800 var(--fs-min) / 1.15 var(--f-texto); color: var(--tinta-suave); }
+.dl-conceito-nome { display: block; margin-top: calc(.3 * var(--u)); font: 700 var(--fs-cartao) / 1.08 var(--f-titulo); text-wrap: balance; }
+.dl-sabia { display: grid; grid-template-columns: calc(6.4 * var(--u)) minmax(0, 1fr); align-items: center; column-gap: calc(1 * var(--u)); margin-top: calc(.4 * var(--u));
+  padding: calc(.9 * var(--u)) calc(1.6 * var(--u)) calc(1 * var(--u)) calc(.8 * var(--u)); background: var(--ladrilho-2); border-radius: var(--raio);
+  box-shadow: var(--rebaixo); }
+.dl-sabia p { margin: 0; font: 800 var(--fs-min) / 1.3 var(--f-texto); text-wrap: pretty; }
+.dl-sabia-tit { font: 700 var(--fs-min) / 1.2 var(--f-titulo); margin-right: calc(.3 * var(--u)); }
+.dl-sabia-arte { width: calc(7 * var(--u)); margin: calc(-.6 * var(--u)) 0 calc(-.6 * var(--u)) calc(-.4 * var(--u)); rotate: -8deg; filter: drop-shadow(0 calc(.4 * var(--u)) 0 rgb(26 20 51 / .2)); }
+
+/* =====================================================================================================
+   VEZ DO COMPUTADOR: cartão curto sobre o oceano do sul, acima da doca (Dilemas.mostrarIA)
+   ===================================================================================================== */
+.dl-ia { --lado: calc(.9 * var(--u)); --raio: var(--raio-balao); position: absolute; left: 50%; bottom: calc(22.5 * var(--u)); translate: -50% 0;
+  display: flex; align-items: center; gap: calc(1.6 * var(--u)); width: max-content; max-width: calc(110 * var(--u));
+  padding: calc(1 * var(--u)) calc(2.6 * var(--u)) calc(1.1 * var(--u)) calc(1.2 * var(--u)); cursor: pointer; }
+/* tarja na cor da equipe na borda esquerda */
+.dl-ia-aba { position: absolute; left: calc(-.05 * var(--u)); top: calc(1.4 * var(--u)); bottom: calc(1.4 * var(--u)); width: calc(.9 * var(--u));
+  border-radius: 0 calc(.45 * var(--u)) calc(.45 * var(--u)) 0; background: var(--cor); box-shadow: inset calc(-.2 * var(--u)) 0 0 var(--tinta); }
+.dl-ia-foto { --tam: calc(10.4 * var(--u)); margin-top: calc(-2.6 * var(--u)); }
+.dl-ia-txt { display: grid; gap: calc(.4 * var(--u)); min-width: 0; }
+.dl-ia-quem { display: flex; align-items: center; gap: calc(.5 * var(--u)); font: 700 var(--fs-min) / 1.1 var(--f-titulo); color: var(--tinta-suave); }
+.dl-ia-quem > svg.forma { width: calc(2.4 * var(--u)); height: calc(2.4 * var(--u)); }
+.dl-ia-resumo { font: 700 var(--fs-cartao) / 1.05 var(--f-titulo); }
+.dl-ia-sobre { display: flex; align-items: center; flex-wrap: wrap; gap: calc(.4 * var(--u)) calc(.8 * var(--u)); font: 800 var(--fs-min) / 1.2 var(--f-texto); color: var(--tinta-suave); }
+.dl-ia-sobre .pilula > .ico { width: calc(2.4 * var(--u)); }
+.dl-ia > .carimbo { --tam: calc(3.4 * var(--u)); flex: none; margin-left: calc(1.6 * var(--u)); }
