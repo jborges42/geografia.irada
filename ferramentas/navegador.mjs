@@ -12,7 +12,7 @@
 // Opções de abrirJogo: { pagina, largura, altura, movimentoReduzido, arquivo: true (abre por file://, sem servidor) }
 // Uso direto (captura rápida):  node ferramentas/navegador.mjs [pagina.html] [saida.png] [largura] [altura] [expressao-antes-da-foto]
 import { createServer } from 'node:http';
-import { readFile, mkdtemp, writeFile } from 'node:fs/promises';
+import { readFile, mkdtemp, writeFile, rm } from 'node:fs/promises';
 import { spawn } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join, extname } from 'node:path';
@@ -36,16 +36,17 @@ export async function abrirJogo({ pagina = 'index.html', largura = 1920, altura 
   }).listen(0, '127.0.0.1');
   await new Promise(r => servidor.once('listening', r));
   const base = arquivo ? 'file://' + pasta.replace(/\/?$/, '/') : `http://127.0.0.1:${servidor.address().port}/`;
-  const porta = 9300 + Math.floor(Math.random() * 600);
-  const chrome = spawn(CHROME, ['--headless=new', `--remote-debugging-port=${porta}`, `--user-data-dir=${await mkdtemp(join(tmpdir(), 'gi-nav-'))}`,
+  // Porta 0: o Chrome escolhe uma livre e a grava em DevToolsActivePort (sem colisão entre testes paralelos)
+  const perfil = await mkdtemp(join(tmpdir(), 'gi-nav-'));
+  const chrome = spawn(CHROME, ['--headless=new', '--remote-debugging-port=0', `--user-data-dir=${perfil}`,
     '--no-first-run', '--mute-audio', '--autoplay-policy=no-user-gesture-required', ...GPU,
     '--hide-scrollbars', `--window-size=${largura},${altura}`, 'about:blank'], { stdio: 'ignore' });
-  let alvo;
+  let alvo, porta;
   for (let i = 0; i < 100 && !alvo; i++) {
     await espera(150);
-    try { alvo = (await (await fetch(`http://127.0.0.1:${porta}/json/list`)).json()).find(t => t.type === 'page'); } catch { /* abrindo */ }
+    try { porta ||= +(await readFile(join(perfil, 'DevToolsActivePort'), 'utf8')).split('\n')[0]; alvo = (await (await fetch(`http://127.0.0.1:${porta}/json/list`)).json()).find(t => t.type === 'page'); } catch { /* abrindo */ }
   }
-  if (!alvo) { chrome.kill(); servidor.close(); throw new Error('o Chrome não abriu'); }
+  if (!alvo) { chrome.kill(); servidor.close(); await rm(perfil, { recursive: true, force: true }).catch(() => {}); throw new Error('o Chrome não abriu'); }
   const ws = new WebSocket(alvo.webSocketDebuggerUrl);
   await new Promise(r => (ws.onopen = r));
   let seq = 0;
@@ -111,7 +112,13 @@ export async function abrirJogo({ pagina = 'index.html', largura = 1920, altura 
     },
     espera,
     async ir(pag) { await cmd('Page.navigate', { url: base + pag }); await espera(1500); },
-    async fechar() { try { ws.close(); } catch { /* já fechado */ } chrome.kill(); servidor.close(); },
+    async fechar() {
+      try { ws.close(); } catch { /* já fechado */ }
+      const saiu = chrome.exitCode !== null ? null : new Promise(r => chrome.once('exit', r));
+      chrome.kill(); servidor.close();
+      await Promise.race([saiu, espera(5000)]);
+      await rm(perfil, { recursive: true, force: true }).catch(() => {});   // perfil temporário: até 150 MB por execução
+    },
   };
   return nav;
 }

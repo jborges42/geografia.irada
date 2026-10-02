@@ -4,12 +4,15 @@
    Mascote.parar(); Mascote.reagir('feliz' | 'susto' | 'triste' | 'comemorar' | 'pensando');
    Mascote.criar() → THREE.Group com .tique(dt, t) e .reagir(nome) para as cenas (colapso, vitória);
    Mascote.retrato(reacao, tamanho) → Promise<dataURL> com a receita do estúdio (dicas, "Para conversar").
-   A superfície gira por baixo do rosto; a terra vem de Mapa3D.territorioEm. */
+   A superfície gira por baixo do rosto; a terra vem de Mapa3D.territorioEm. Cores e mão alinhadas à LOGO OFICIAL: oceano azul
+   royal, continentes verde-limão, braço azul com faixa verde no punho, luva branca que faz a mão "irada" (chifrinhos) ao
+   acenar e comemorar. */
 
 const Mascote = (() => {
   const REDUZ = typeof RM !== 'undefined' ? RM : matchMedia('(prefers-reduced-motion: reduce)').matches;   // respeita também o ajuste do jogo (ui.js)
-  const R = 10, PECAS = 1200, TINTA = '#1A1433', AMARELO = '#FFD21F';
-  const OCEANOS = ['#58C6E4', '#38B1DC', '#2397CF'], TERRA = '#7CCB4E', AREIA = '#F2D58A', GELO = '#F6FAFD';
+  const R = 10, PECAS = 1200, TINTA = '#1A1433';
+  // cores da logo oficial (css/base.css --marca-*): oceano azul royal (claro na costa, fundo longe), verde-limão, punho
+  const OCEANOS = ['#1E8CCD', '#0B6DBA', '#02569F'], TERRA = '#96C513', BRACO = '#0B5CAB', FAIXA = '#96C513';
   const P = () => Bonecos.pecas;
   const ease = { backOut: (x, s = 1.70158) => 1 + (s + 1) * (x - 1) ** 3 + s * (x - 1) ** 2, inOut: x => (x < .5 ? 2 * x * x : 1 - (-2 * x + 2) ** 2 / 2) };
   const lim = x => Math.min(1, Math.max(0, x));
@@ -31,10 +34,7 @@ const Mascote = (() => {
   function tipoDoLugar(lon, lat) {
     let t = null;
     try { t = typeof Mapa3D !== 'undefined' && Mapa3D.territorioEm ? Mapa3D.territorioEm(lon, lat) : territorioNoMapa(lon, lat); } catch { t = territorioNoMapa(lon, lat); }
-    if (!t) return null;
-    if (t === 'groenlandia' || t === 'antartida' || lat > 68 || lat < -60) return 'gelo';
-    const deserto = (lat > 15 && lat < 31 && lon > -14 && lon < 33) || (lat > 15 && lat < 30 && lon > 38 && lon < 56) || (lat > -30 && lat < -20 && lon > 122 && lon < 142);
-    return deserto ? 'areia' : 'terra';
+    return t ? 'terra' : null;   // como na logo: toda a terra é verde-limão (sem deserto nem gelo)
   }
 
   // Lente com degradê índigo (de cima para baixo) e um risco de brilho
@@ -63,7 +63,7 @@ const Mascote = (() => {
     const mat = (cor, rug = .3) => pc.plastico(cor, rug);
 
     // ---------- O planeta de peças: ~1.200 peças em espiral de Fibonacci ----------
-    planeta.add(new THREE.Mesh(pc.esfera(R - .05, false, 48), mat('#2A8FCB', .35)));
+    planeta.add(new THREE.Mesh(pc.esfera(R - .05, false, 48), mat('#02569F', .35)));
     const mar = [], terra = [];
     for (let i = 0; i < PECAS; i++) {
       const y = 1 - (i + .5) * 2 / PECAS, rr = Math.sqrt(1 - y * y), a = i * Math.PI * (3 - Math.sqrt(5));
@@ -83,7 +83,7 @@ const Mascote = (() => {
     });
     terra.forEach((x, i) => {
       imTerra.setMatrixAt(i, m4.compose(x.n.clone().multiplyScalar(R - .02), q.setFromUnitVectors(cima, x.n), new THREE.Vector3(1, 1, 1)));
-      imTerra.setColorAt(i, c.set(x.tipo === 'gelo' ? GELO : x.tipo === 'areia' ? AREIA : TERRA).offsetHSL(0, 0, ((x.k * 9301 % 7) - 3) * .006));
+      imTerra.setColorAt(i, c.set(TERRA).offsetHSL(0, 0, ((x.k * 9301 % 7) - 3) * .006));
     });
     [imMar, imTerra].forEach(im => { im.castShadow = true; im.receiveShadow = true; planeta.add(im); });
     proprios.push(imMar, imTerra);
@@ -155,27 +155,30 @@ const Mascote = (() => {
     [bulbo, ponta].forEach(m => m.add(new THREE.Mesh(pc.casca(m.geometry, .14), ctn)));
     const brGota = new THREE.Mesh(pc.esfera(.22, false, 12), new THREE.MeshBasicMaterial({ color: '#FFFFFF' })); brGota.position.set(-.3, .25, .7); gota.add(brGota);
 
-    // ---------- Braços: ombro de peça redonda 2×2 encaixado, braço amarelo, luva branca de desenho ----------
+    // ---------- Braços (como o punho da logo): ombro verde-limão encaixado, braço azul, faixa verde no punho, luva branca ----------
+    // Cada luva tem duas mãos: a aberta (3 dedos + polegar) e a "irada" da logo (indicador e mindinho em pé, médio e anelar
+    // dobrados, polegar por cima deles); mao(s, irada) troca. A palma olha para a câmera (+z).
+    const branco = mat('#FFFFFF', .3);
+    const peca = (pai, geo, m, x, y, z, rz = 0, contorno = .12) => {
+      const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.rotation.z = rz; o.castShadow = true; pai.add(o);
+      o.add(new THREE.Mesh(pc.casca(geo, contorno), ctn)); return o;
+    };
     const braco = s => {
-      const enc = new THREE.Mesh(pc.redonda(1.25, .9, { comPino: false, lados: 32 }), mat(AMARELO, .28));
-      enc.position.set(s * (R - .25), -.6, 0); enc.rotation.z = s * -Math.PI / 2; enc.castShadow = true; corpo.add(enc);
-      enc.add(new THREE.Mesh(pc.casca(enc.geometry, .14), ctn));
+      const enc = peca(corpo, pc.redonda(1.25, .9, { comPino: false, lados: 32 }), mat(FAIXA, .28), s * (R - .25), -.6, 0, s * -Math.PI / 2, .14);
       const piv = new THREE.Group(); piv.position.set(s * (R + .45), -.6, 0); corpo.add(piv);
       const g = new THREE.Group(); piv.add(g);
-      const b = new THREE.Mesh(pc.caixa(1.55, 4.2, 1.55, .5), mat(AMARELO, .28)); b.position.y = -2.1; b.castShadow = true; g.add(b);
-      b.add(new THREE.Mesh(pc.casca(b.geometry, .14), ctn));
-      const punho = new THREE.Mesh(pc.cil(1.05, 1.05, .6, 24), mat('#FFFFFF', .3)); punho.position.y = -4.35; g.add(punho);
-      punho.add(new THREE.Mesh(pc.casca(punho.geometry, .12), ctn));
-      const luva = new THREE.Group(); luva.position.y = -5.45; g.add(luva);
-      const palma = new THREE.Mesh(pc.caixa(2.1, 1.9, 1.3, .55), mat('#FFFFFF', .3)); palma.castShadow = true; luva.add(palma);
-      palma.add(new THREE.Mesh(pc.casca(palma.geometry, .14), ctn));
-      [-.62, 0, .62].forEach(x => {
-        const d = new THREE.Mesh(pc.caixa(.6, 1.35, .9, .28), mat('#FFFFFF', .3)); d.position.set(x, -1.2 + Math.abs(x) * .25, 0); d.rotation.z = x * .18; luva.add(d);
-        d.add(new THREE.Mesh(pc.casca(d.geometry, .12), ctn));
-      });
-      const polegar = new THREE.Mesh(pc.caixa(.6, 1.1, .85, .28), mat('#FFFFFF', .3)); polegar.position.set(s * -1.15, -.1, .15); polegar.rotation.z = s * -.9; luva.add(polegar);
-      polegar.add(new THREE.Mesh(pc.casca(polegar.geometry, .12), ctn));
-      return { piv, g };
+      peca(g, pc.caixa(1.55, 4.2, 1.55, .5), mat(BRACO, .28), 0, -2.1, 0, 0, .14);
+      peca(g, pc.cil(1.08, 1.08, .62, 24), mat(FAIXA, .28), 0, -4.3, 0);          // faixa verde do punho
+      const aberta = new THREE.Group(), irada = new THREE.Group(); aberta.position.y = irada.position.y = -5.45; g.add(aberta, irada);
+      [aberta, irada].forEach(l => peca(l, pc.caixa(2.1, 1.9, 1.3, .55), branco, 0, 0, 0, 0, .14));
+      [-.62, 0, .62].forEach(x => peca(aberta, pc.caixa(.6, 1.35, .9, .28), branco, x, -1.2 + Math.abs(x) * .25, 0, x * .18));
+      peca(aberta, pc.caixa(.6, 1.1, .85, .28), branco, s * -1.15, -.1, .15, s * -.9);
+      // mão irada: chifrinhos compridos nas pontas, dois nós dobrados à frente, polegar atravessado por cima
+      [-.68, .68].forEach(x => peca(irada, pc.caixa(.58, 2.1, .9, .28), branco, x, -1.75, 0, x * .12));
+      [-.22, .22].forEach(x => peca(irada, pc.caixa(.52, .62, .85, .24), branco, x, -1.05, .5));
+      peca(irada, pc.caixa(1.5, .56, .8, .26), branco, s * -.15, -.55, .95, s * .12);
+      irada.visible = false;
+      return { piv, g, mao: v => { irada.visible = v; aberta.visible = !v; } };
     };
     const bE = braco(-1), bD = braco(1);
 
@@ -230,7 +233,7 @@ const Mascote = (() => {
         if (anima) { const k = a % .8; alvo.y += Math.sin(lim(k / .7) * Math.PI) * 3; alvo.bD += Math.sin(a * 14) * .15; alvo.bE -= Math.sin(a * 14) * .15; }
         if (a < .1) est.brilhoEm = t;
       } else if (r === 'pensando') {
-        alvo.bD = -.44; alvo.bDx = -1.07; alvo.bDs = 1.45; alvo.sYE = .7; alvo.sE = -.1;
+        alvo.bD = -.62; alvo.bDx = -1.0; alvo.bDs = 1.6; alvo.sYE = .7; alvo.sE = -.1;
       }
       const k = REDUZ ? 1 : 1 - Math.exp(-dt * 14);
       for (const c in alvo) if (c !== 'y') pose[c] += (alvo[c] - pose[c]) * k;
@@ -238,6 +241,7 @@ const Mascote = (() => {
       corpo.position.y = pose.y; corpo.rotation.z = pose.rz;
       bE.piv.rotation.set(pose.bEx, 0, pose.bE); bD.piv.rotation.set(pose.bDx, 0, pose.bD);
       bD.g.scale.y = pose.bDs;
+      bD.mao(pose.bD > 1.6); bE.mao(pose.bE < -1.6);   // braço no alto (aceno, comemoração) = mão "irada" da logo
       oculos.position.y = 2.1 + pose.ocY; oculos.rotation.z = pose.ocZ; oculos.rotation.x = pose.ocR;
       sobr[0].rotation.z = -pose.sE; sobr[1].rotation.z = -pose.sD;
       porSobr(sobr[0], 4.3 + pose.sYE); porSobr(sobr[1], 4.3 + pose.sYD);

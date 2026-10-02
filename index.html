@@ -6,7 +6,8 @@
 <title>Geografia Irada — Missão 2050</title>
 <meta name="description" content="Jogo de geopolítica para o Ensino Médio: cada equipe governa uma potência de 2026 a 2050 e as decisões mudam o mundo inteiro.">
 <meta name="theme-color" content="#22339A">
-<link rel="icon" href="img/favicon.png" type="image/png">
+<link rel="icon" href="img/marca/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="img/marca/favicon-180.png">
 <!-- Fichas de design e componentes (Fundação) → ornamentos (Ilustração) → um CSS por módulo -->
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/arte.css">
@@ -87,7 +88,8 @@
 <script>
   'use strict';
   // Começa pela tela inicial assim que as fontes do jogo estiverem prontas
-  fontesProntas.then(() => { if (typeof Telas !== 'undefined') Telas.inicio(); });
+  // (sem 3D no navegador, explica como religar em vez de abrir um mapa vazio cheio de erros)
+  fontesProntas.then(() => { if (!TEM_3D) avisoSem3D(); else if (typeof Telas !== 'undefined') Telas.inicio(); });
 </script>
 </body>
 </html>

@@ -9,6 +9,15 @@ const Mapa3D = (() => {
   // ============================== PALETA E MEDIDAS (cópia do guia §2; os valores do guia mandam) ==============================
   const M = MAPA, COLS = M.colunas, LINS = M.linhas, TERR = M.territorios, NC = COLS * LINS;
   const Q = new URLSearchParams(location.search);
+  // PC fraco: WebGL por software (sem GPU), poucos núcleos ou pouca memória. Começa direto nos gráficos leves, sem esperar o medidor
+  const SOFT = (() => { try {
+    const c = document.createElement('canvas'), g = c.getContext('webgl2') || c.getContext('webgl'), x = g?.getExtension('WEBGL_debug_renderer_info');
+    const r = x ? g.getParameter(x.UNMASKED_RENDERER_WEBGL) : '';
+    g?.getExtension('WEBGL_lose_context')?.loseContext();
+    return !g || /swiftshader|llvmpipe|software|basic render/i.test(r);
+  } catch { return true; } })();
+  window.PC_FRACO = SOFT || (navigator.hardwareConcurrency || 8) <= 4 || (navigator.deviceMemory || 8) <= 4;
+  document.documentElement.classList.toggle('pc-fraco', window.PC_FRACO);
   // Movimento reduzido: o do jogo (js/ui.js, que também lê o ajuste do professor) ou o do sistema
   const REDUZ = typeof RM !== 'undefined' ? RM : matchMedia('(prefers-reduced-motion: reduce)').matches;
   const VEL = Q.has('rapido') ? .25 : 1;           // ?rapido (teste automático): animações mais curtas
@@ -61,7 +70,11 @@ const Mapa3D = (() => {
   const celulaParaXZ = (c, r) => [c - COLS / 2 + .5, r - LINS / 2 + .5];
   const xzDe = k => celulaParaXZ(k % COLS, (k / COLS) | 0);
   const celulaEm = (x, z) => { const c = Math.floor(x + COLS / 2), r = Math.floor(z + LINS / 2); return c < 0 || c >= COLS || r < 0 || r >= LINS ? -1 : r * COLS + c; };
-  const ancoraXZ = id => (M.ancoras[id] ? celulaParaXZ(...M.ancoras[id]) : [0, 0]);
+  // Âncoras (onde ficam torres, bandeira, rótulo e blocos de alerta). Territórios pequenos ganham âncora no mar ao lado,
+  // ligada a eles por uma fileira de peças redondas 1×1 (guia §6.5): a fileira de torres não invade o vizinho.
+  const PEQUENOS = ['america_central', 'caribe', 'balcas', 'sul_asia', 'taiwan', 'japao_coreia', 'coreia_norte', 'pacifico', 'levante'];
+  const ANC = { ...M.ancoras }, PONTES = {};   // ponte: território → células de mar entre a âncora nova e o território
+  const ancoraXZ = id => (ANC[id] ? celulaParaXZ(...ANC[id]) : [0, 0]);
   const hash = k => { let h = Math.imul(k ^ 0x9e3779b9, 0x85ebca6b); h ^= h >>> 13; h = Math.imul(h, 0xc2b2ae35); h ^= h >>> 16; return (h >>> 0) / 4294967296; };
   const VIZ4 = [[1, 0], [-1, 0], [0, 1], [0, -1]];
   const ehBorda = k => { const c = k % COLS, r = (k / COLS) | 0, t = terrDaCelula[k];
@@ -84,6 +97,30 @@ const Mapa3D = (() => {
     }
     return d;
   })();
+
+  for (const id of PEQUENOS) {
+    const t = idx(id); if (t < 0 || !pinosDe[t].length) continue;
+    const [ac, ar] = M.ancoras[id], proprias = pinosDe[t];
+    const ocupadas = TERR.filter(o => o !== id).map(o => ANC[o]).filter(Boolean);
+    let melhor = null;
+    for (let r = ar - 12; r <= ar + 12; r++) for (let c = ac - 14; c <= ac + 14; c++) {
+      if (r < 3 || r > LINS - 6 || c < 5 || c > COLS - 6) continue;
+      let livre = true;
+      for (let dr = -1; dr <= 2 && livre; dr++) for (let dc = -4; dc <= 4; dc++) if (terrDaCelula[(r + dr) * COLS + c + dc] !== -1) { livre = false; break; }
+      if (!livre || ocupadas.some(([oc, or]) => Math.abs(oc - c) < 9 && Math.abs(or - r) < 5)) continue;
+      const perto = Math.min(...proprias.map(k => Math.hypot(k % COLS - c, ((k / COLS) | 0) - r)));
+      const custo = perto + Math.hypot(c - ac, r - ar) * .35;
+      if (!melhor || custo < melhor[0]) melhor = [custo, c, r];
+    }
+    if (!melhor) continue;
+    const [, c, r] = melhor;
+    ANC[id] = [c, r];
+    // ponte de peças redondas: da âncora até o pino mais próximo do território, só sobre o mar
+    const alvo = proprias.reduce((a, k) => (Math.hypot(k % COLS - c, ((k / COLS) | 0) - r) < Math.hypot(a % COLS - c, ((a / COLS) | 0) - r) ? k : a));
+    const tc = alvo % COLS, tr = (alvo / COLS) | 0, passos = Math.max(Math.abs(tc - c), Math.abs(tr - r)), ponte = [];
+    for (let i = 2; i < passos; i++) { const k = Math.round(r + (tr - r) * i / passos) * COLS + Math.round(c + (tc - c) * i / passos); if (terrDaCelula[k] === -1 && !ponte.includes(k)) ponte.push(k); }
+    PONTES[id] = ponte;
+  }
 
   // Dados de conteúdo (opcionais: a vitrine e o jogo carregam conteudo/*.js antes)
   const TERRS = typeof TERRITORIOS !== 'undefined' ? TERRITORIOS : [];
@@ -186,6 +223,14 @@ const Mapa3D = (() => {
       [[0, 0], [r, 0], [r, h - ch], [r - ch, h], [0, h]].map(([x, y]) => new THREE.Vector2(x, y)), lados));
     return comPino ? juntar([[g], [pino(), 0, h]]) : g;
   });
+  // Versões de longe (nível de detalhe): pino de 8 lados com o mesmo bisel (um degrau a menos) e peça redonda de 10 lados sem fundo
+  const pinoLonge = () => geoCache('pinoLonge', () => limpar(new THREE.LatheGeometry([[.3, 0], [.3, .17], [.265, .2], [0, .2]].map(([x, y]) => new THREE.Vector2(x, y)), 8)));
+  const redondaLonge = (r, h) => geoCache(`rdl${r}|${h}`, () => {
+    const ch = Math.min(.04, h / 3), g = limpar(new THREE.LatheGeometry([[r, 0], [r, h - ch], [r - ch, h], [0, h]].map(([x, y]) => new THREE.Vector2(x, y)), 10));
+    return juntar([[g], [pinoLonge(), 0, h]]);
+  });
+  const lod = [];   // [malha, geometria de perto, geometria de longe]
+  const trocarLOD = longe => lod.forEach(([m, perto, lg]) => (m.geometry = longe ? lg : perto));
   const cone = (r0 = .48, r1 = .12, h = 1.2, lados = 16) => geoCache(`co${r0}|${r1}|${h}|${lados}`, () => limpar(new THREE.LatheGeometry(
     [[0, 0], [r0, 0], [r1, h], [0, h]].map(([x, y]) => new THREE.Vector2(x, y)), lados)));
   const barra = (r = .25, h = 1, lados = 12) => geoCache(`ba${r}|${h}|${lados}`, () => { const g = new THREE.CylinderGeometry(r, r, h, lados); g.translate(0, h / 2, 0); return limpar(g); });
@@ -249,7 +294,6 @@ const Mapa3D = (() => {
       g.lineWidth = 16; g.strokeStyle = C.tinta; g.strokeText(simbolo, px / 2, px / 2 + 6); g.fillStyle = frente; g.fillText(simbolo, px / 2, px / 2 + 6);
     });
   }
-  const matForma = forma => { const k = 'mf' + forma; if (!mats.has(k)) mats.set(k, new THREE.MeshStandardMaterial({ map: texForma(forma), transparent: true, alphaTest: .5, roughness: .32 })); return mats.get(k); };
   const matImpresso = (tex, rug = .3, extra = {}) => { const k = 'i' + tex.uuid + rug; if (!mats.has(k)) mats.set(k, new THREE.MeshStandardMaterial({ map: tex, roughness: rug, metalness: 0, ...extra })); return mats.get(k); };
 
   // ============================== MODELOS (dados/modelos.js, opcionais) ==============================
@@ -320,7 +364,7 @@ const Mapa3D = (() => {
 
   // ============================== CENA, LUZ, MESA E PÓS-PROCESSAMENTO ==============================
   let renderer, cena, camera, controles, raiz, composer = null, n8 = null, sol, elemento, sobreposicao;
-  let qualidade = Q.has('leve') ? 'leves' : 'bonitos', qualidadeFixa = Q.has('leve'), pausado = false, modoAtual = 'jogo', iniciado = false;
+  let qualidade = Q.has('leve') || window.PC_FRACO ? 'leves' : 'bonitos', qualidadeFixa = Q.has('leve'), pausado = false, modoAtual = 'jogo', iniciado = false;
   let resolverPronto;
   const pronto = new Promise(ok => (resolverPronto = ok));
   const animados = new Set();            // objetos com tique(dt, t)
@@ -344,14 +388,16 @@ const Mapa3D = (() => {
     if (iniciado) return api;
     iniciado = true;
     elemento = el;
-    renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+    renderer = new THREE.WebGLRenderer({ antialias: !window.PC_FRACO, powerPreference: 'high-performance' });
     renderer.toneMapping = THREE.NeutralToneMapping;
-    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.enabled = !SOFT;   // sem GPU: sem sombras
     renderer.shadowMap.type = THREE.PCFShadowMap;
+    renderer.shadowMap.autoUpdate = false;   // o laço pede a sombra (needsUpdate) só quando ela pode ter mudado
     renderer.domElement.style.cssText = 'display:block;width:100%;height:100%;touch-action:none';
     el.appendChild(renderer.domElement);
     sobreposicao = document.getElementById('rotulos-mapa') || Object.assign(el.appendChild(document.createElement('div')), { className: 'rotulos-mapa' });
     sobreposicao.classList.add('rotulos-mapa');
+    sobreposicao.setAttribute('aria-hidden', 'true');   // os rótulos repetem o que a lista de territórios já diz ao leitor de tela
     estilos();
 
     cena = new THREE.Scene();
@@ -395,8 +441,12 @@ const Mapa3D = (() => {
     redimensionar();
     visaoGeral(0);
     modelosProntos = carregarModelos().then(() => montarCenario());
+    if (pendBonecos) bonecos(pendBonecos);
+    if (modoAtual === 'inicio') modo('inicio');
     modelosProntos
       .finally(() => { renderer.setAnimationLoop(pausado ? null : quadro); requestAnimationFrame(() => requestAnimationFrame(() => resolverPronto(true))); });
+    // Shaders do pós-processamento compilados num momento calmo (tela inicial), e não na 1ª vez que a câmera chega perto
+    pronto.then(() => (window.requestIdleCallback || (f => setTimeout(f, 800)))(aquecerPos, { timeout: 3000 }));
     return api;
   }
 
@@ -418,9 +468,9 @@ const Mapa3D = (() => {
     if (!auto) qualidadeFixa = true;
     fpsAuto = !qualidadeFixa && qualidade === 'bonitos';
     const leve = qualidade === 'leves';
-    renderer.setPixelRatio(leve ? 1 : Math.min(devicePixelRatio, 2));
+    renderer.setPixelRatio(leve ? (SOFT ? .6 : 1) : Math.min(devicePixelRatio, 2));
     sol.shadow.mapSize.set(leve ? 2048 : 4096, leve ? 1024 : 2048);
-    sol.shadow.map?.dispose(); sol.shadow.map = null;
+    sol.shadow.map?.dispose(); sol.shadow.map = null; renderer.shadowMap.needsUpdate = true;
     if (terra) terra.castShadow = !leve;
     if (moldura) moldura.castShadow = !leve;
     cenarioMalhas.forEach(m => (m.castShadow = !leve));
@@ -436,6 +486,11 @@ const Mapa3D = (() => {
     if (elemento) redimensionar();
     medidor.reset();
   }
+  function aquecerPos() {
+    if (!composer || !n8 || pausado) return;
+    const i = n8.configuration.intensity;
+    n8.configuration.intensity = 0; composer.render(0); n8.configuration.intensity = i;   // um quadro invisível compila tudo
+  }
   // Troca automática para "leves" se a média dos quadros passar de 22 ms em 3 s (depois dos 3 s iniciais)
   const medidor = { soma: 0, n: 0, inicio: 0, reset() { this.soma = 0; this.n = 0; this.inicio = performance.now(); } };
 
@@ -444,19 +499,19 @@ const Mapa3D = (() => {
     if (!renderer) return;
     renderer.setAnimationLoop(pausado ? null : quadro);
     sobreposicao.style.visibility = pausado ? 'hidden' : '';
-    ultimoQuadro = 0;
+    ultimoQuadro = 0; economico = false;
     medidor.reset();
   }
 
   // ============================== TABULEIRO: rejunte, moldura, mar, espuma, terra, gelo ==============================
-  let terra, pinos, mar, espuma, moldura, geloMar;
+  let terra, pinos, mar, espuma, moldura, geloMar, pontes;
   const instDaCelula = new Int32Array(NC).fill(-1), celulaDaInst = [];
   const alturaBase = new Float32Array(NC), alturaAnim = new Float32Array(NC);
   const corCelula = [];           // cor-base (hex) de cada pino de terra, recalculada por pintarTerritorio
   const uni = { pulso: { value: 0 }, faixa: { value: -400 }, cint: { value: new THREE.Vector4(0, 0, 0, 0) }, cint2: { value: new THREE.Vector4(0, 0, 0, 0) } };
 
   // Placa de topo: só o que aparece (topo, chanfro e laterais), 18 triângulos; cor de vértice = oclusão "assada"
-  function geoPlacaTopo(h, ch = CHANFRO) {
+  function geoPlacaTopo(h, ch = CHANFRO, suave = 0) {
     const a = .5 - ch, pos = [], cols = [];
     const tri = (p, cs) => { pos.push(...p[0], ...p[1], ...p[2]); cols.push(...cs[0], ...cs[1], ...cs[2]); };
     const quad = (A, B, Cc, D, ca, cb, cc, cd) => { tri([A, B, Cc], [ca, cb, cc]); tri([A, Cc, D], [ca, cc, cd]); };
@@ -471,6 +526,8 @@ const Mapa3D = (() => {
     g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
     g.setAttribute('color', new THREE.Float32BufferAttribute(cols, 3));
     g.computeVertexNormals();
+    // mar: chanfro com normal amaciada (puxada para cima): sem riscos claros de reflexo entre os ladrilhos
+    if (suave) { const n = g.getAttribute('normal'); for (let i = 0; i < n.count; i++) if (n.getY(i) > .3 && n.getY(i) < .99) { v3.set(n.getX(i), n.getY(i) + suave, n.getZ(i)).normalize(); n.setXYZ(i, v3.x, v3.y, v3.z); } }
     return g;
   }
   // Brilho por instância (alvos válidos): emissivo amarelo que pulsa
@@ -521,7 +578,7 @@ const Mapa3D = (() => {
       celMar.push([k, n]);
     }
     const matMar = comFaixa(new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .16, metalness: 0, envMapIntensity: 1.4 }));
-    mar = new THREE.InstancedMesh(geoPlacaTopo(ALT_MAR), matMar, celMar.length + celEspuma.length);
+    mar = new THREE.InstancedMesh(geoPlacaTopo(ALT_MAR, CHANFRO, 2.2), matMar, celMar.length + celEspuma.length);
     const tomMar = new Uint8Array(NC);
     celMar.forEach(([k, n], i) => { tomMar[k] = n; const [x, z] = xzDe(k); mar.setMatrixAt(i, m4.makeTranslation(x, 0, z)); mar.setColorAt(i, cor.set(OCEANO[n]).offsetHSL(0, 0, (hash(k) - .5) * .03)); });
     // embaixo da espuma também há mar (aparece entre as peças redondas)
@@ -530,6 +587,7 @@ const Mapa3D = (() => {
     espuma = new THREE.InstancedMesh(redonda(.47, ALT_MAR + .04), plastico(C.espuma, .2), celEspuma.length);
     celEspuma.forEach((k, i) => { const [x, z] = xzDe(k); espuma.setMatrixAt(i, m4.makeTranslation(x, 0, z)); });
     espuma.receiveShadow = true; espuma.castShadow = false; raiz.add(espuma);
+    lod.push([espuma, espuma.geometry, redondaLonge(.47, ALT_MAR + .04)]);
 
     // Gelo do Ártico: placas brancas sobre o mar do extremo norte (derretem com a temperatura)
     const celGelo = [];
@@ -550,6 +608,8 @@ const Mapa3D = (() => {
     terra = new THREE.InstancedMesh(gPlaca, matTerra, n);
     pinos = new THREE.InstancedMesh(gPino, matTerra, n);
     terra.castShadow = terra.receiveShadow = true; pinos.receiveShadow = true; pinos.castShadow = false;
+    const gPinoLonge = pintarGeo(pinoLonge().clone().translate(0, ALT_TERRA, 0), 1, 1, 1); gPinoLonge.setAttribute('aBrilho', brilho);
+    lod.push([pinos, gPino, gPinoLonge]);
     celulaDaInst.forEach((k, i) => (instDaCelula[k] = i));
     raiz.add(terra, pinos);
     // dois tons por continente: vizinhos do mesmo continente nunca repetem (coloração gulosa)
@@ -557,6 +617,12 @@ const Mapa3D = (() => {
     TERR.forEach((id, t) => (M.vizinhos[id] || []).forEach(v => { const u = idx(v); if (u >= 0) { viz[t].add(u); viz[u].add(t); } }));
     TERR.forEach((id, t) => { const usados = new Set([...viz[t]].filter(u => CONT[TERR[u]] === CONT[id] && tomT[u] !== undefined).map(u => tomT[u])); tomT[t] = usados.has(0) ? 1 : 0; });
     TERR.forEach((id, t) => { estadoT[t] = { tipo: ehPotencia(id) ? 'casa' : 'neutro', pid: ehPotencia(id) ? id : null, seca: 0, cinzas: new Set(), rachas: [] }; });
+    const nPontes = Object.values(PONTES).reduce((n, l) => n + l.length, 0);
+    pontes = new THREE.InstancedMesh(redonda(.44, ALT_TERRA, true, 20), new THREE.MeshStandardMaterial({ roughness: .3 }), Math.max(1, nPontes));
+    pontes.count = 0; pontes.castShadow = pontes.receiveShadow = true;
+    for (const [id, l] of Object.entries(PONTES)) { PONTES[id] = { celulas: l, inicio: pontes.count }; l.forEach(k => { const [x, z] = xzDe(k); pontes.setMatrixAt(pontes.count++, m4.makeTranslation(x, 0, z)); }); }
+    pontes.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(Math.max(1, nPontes) * 3), 3);
+    raiz.add(pontes);
     TERR.forEach((_, t) => pintarTerritorio(t));
     celulaDaInst.forEach(k => posicionarCelula(k));
     terra.instanceMatrix.needsUpdate = pinos.instanceMatrix.needsUpdate = true;
@@ -597,6 +663,7 @@ const Mapa3D = (() => {
     const im = new THREE.InstancedMesh(pino(), plastico(C.moldura, .3), lista.length);
     lista.forEach(([x, z], i) => im.setMatrixAt(i, m4.makeTranslation(x, alt, z)));
     im.receiveShadow = true; raiz.add(im);
+    lod.push([im, im.geometry, pinoLonge()]);
   }
 
   // ---------- Território: cores (neutro, casa, parceiro), seca, cinzas, gelo derretido ----------
@@ -627,6 +694,8 @@ const Mapa3D = (() => {
       terra.setColorAt(i, cor); pinos.setColorAt(i, cor);
     }
     terra.instanceColor.needsUpdate = pinos.instanceColor.needsUpdate = true;
+    const pt = PONTES[TERR[t]];
+    if (pt && pontes) { const [hex] = corDoPino(t, pinosDe[t][0]); pt.celulas.forEach((k, j) => pontes.setColorAt(pt.inicio + j, cor.set(st.tipo === 'parceiro' ? eq(st.pid).cor : hex).offsetHSL(0, 0, (hash(k) - .5) * .03))); pontes.instanceColor.needsUpdate = true; }
   }
   function posicionarCelula(k) {
     const i = instDaCelula[k];
@@ -652,7 +721,7 @@ const Mapa3D = (() => {
     aplicar();
     pintarTerritorio(t);
     const depois = pinosDe[t].map(k => corCelula[instDaCelula[k]]);
-    const [ac, ar] = M.ancoras[TERR[t]] || [0, 0];
+    const [ac, ar] = M.ancoras[TERR[t]] || [0, 0];   // a onda começa na âncora original, dentro do território
     const dist = pinosDe[t].map(k => Math.hypot(k % COLS - ac, ((k / COLS) | 0) - ar)), maxD = Math.max(1, ...dist);
     const p = { v: 0 }, ca = new THREE.Color(), cb = new THREE.Color();
     const desenhar = () => {
@@ -672,6 +741,7 @@ const Mapa3D = (() => {
   const elevAlvo = new Float32Array(TERR.length), elevAtual = new Float32Array(TERR.length);
   let sobre = -1, alvos = null;
   function recalcularElevacao(t) { elevAlvo[t] = (alvos?.has(t) ? .2 : 0) + (t === sobre ? (alvos?.has(t) ? .2 : alvos ? 0 : .2) : 0); }
+  let elevMudou = false;   // terra subindo/descendo neste quadro: a sombra precisa ser refeita
   function tiqueElevacao(dt) {
     let mudou = false;
     for (let t = 0; t < TERR.length; t++) {
@@ -681,13 +751,14 @@ const Mapa3D = (() => {
       for (const k of pinosDe[t]) { alturaAnim[k] = elevAtual[t]; posicionarCelula(k); }
       mudou = true;
     }
-    if (mudou) marcarTerra();
+    if (mudou) { marcarTerra(); elevMudou = true; }
   }
   function destacarAlvos(ids) {
+    if (!terra) return;
     const brilho = terra.geometry.getAttribute('aBrilho');
     alvos = ids && ids.length ? new Set(ids.map(idx).filter(t => t >= 0)) : null;
     brilho.array.fill(0);
-    if (alvos) for (const t of alvos) for (const k of pinosDe[t]) brilho.array[instDaCelula[k]] = .25;
+    if (alvos) for (const t of alvos) for (const k of pinosDe[t]) brilho.array[instDaCelula[k]] = .32;
     brilho.needsUpdate = true;
     TERR.forEach((_, t) => recalcularElevacao(t));
     rotulosPor('alvo', ids || []);
@@ -696,7 +767,7 @@ const Mapa3D = (() => {
   // ============================== TORRES DE INFLUÊNCIA (guia §6.5) ==============================
   // Tijolos 2×2 na cor da potência, em fileira da mais alta para a mais baixa; tampa com a forma; fantasmas até a parceria.
   const CAP_TIJOLOS = 1600, CAP_FANT = 400;
-  let imTijolos, imFantasmas, imTampas, imFormas = {};
+  let imTijolos, imFantasmas, imTampas, imPedestais, imFormas = {};
   const torres = {};          // território → { lista: [{ pid, n }], precisa, lider, tijolos: [{ pid, i, y, sy, vis }] }
   let pertoDeMais = false;    // câmera perto (< 70): mostra todas as torres e os números
   function montarTorres() {
@@ -706,6 +777,7 @@ const Mapa3D = (() => {
     imTijolos.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(CAP_TIJOLOS * 3), 3);
     imFantasmas = new THREE.InstancedMesh(gT, new THREE.MeshStandardMaterial({ color: '#FFFFFF', transparent: true, opacity: .28, roughness: .2, depthWrite: false }), CAP_FANT);
     imFantasmas.count = 0;
+    imPedestais = new THREE.InstancedMesh(redonda(1.15, ALT_TERRA - ALT_MAR + .02, false, 28), plastico(C.creme, .3), 120); imPedestais.count = 0; imPedestais.receiveShadow = imPedestais.castShadow = true; raiz.add(imPedestais);
     imTampas = new THREE.InstancedMesh(caixa(1.95, PLACA, 1.95), plastico('#ffffff', .3), 300);
     imTampas.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(300 * 3), 3); imTampas.count = 0; imTampas.castShadow = true;
     const gDecal = new THREE.PlaneGeometry(1.7, 1.7); gDecal.rotateX(-Math.PI / 2);
@@ -717,8 +789,10 @@ const Mapa3D = (() => {
   }
   // Ponto de apoio da torre: âncora do território (as torres ficam em fileira sobre ela)
   const baseTorres = id => { const [x, z] = ancoraXZ(id), k = celulaEm(x, z); return [x, (k >= 0 && terrDaCelula[k] >= 0 ? ALT_TERRA + alturaBase[k] : ALT_TERRA), z]; };
+  const noMar = (x, z) => { const k = celulaEm(x, z); return k >= 0 && terrDaCelula[k] === -1; };
   let torresSujas = true;
   function influencia(id, lista, { animar = true, precisa = 0, resistencia = 0 } = {}) {
+    if (!imTijolos || idx(id) < 0) return Promise.resolve();
     const ant = torres[id] || { lista: [], tijolos: [] };
     const nova = lista.filter(i => i.n > 0).map(i => ({ pid: i.jogador ?? i.pid, n: Math.min(10, i.n) })).sort((a, b) => b.n - a.n || PIDS.indexOf(a.pid) - PIDS.indexOf(b.pid));
     const tj = [], promessas = [];
@@ -746,7 +820,7 @@ const Mapa3D = (() => {
       if (animar && !REDUZ) velhos.slice(inf.n).forEach(b => saltarTijolo(id, inf.pid, b));
     }
     if (animar && !REDUZ) ant.tijolos.filter(b => !nova.some(i => i.pid === b.pid)).forEach(b => saltarTijolo(id, b.pid, b));
-    torres[id] = { lista: nova, tijolos: tj, precisa, resistencia };
+    torres[id] = { lista: nova, tijolos: tj, precisa, resistencia, pressao: ant.pressao || 0 };
     torresSujas = true;
     return Promise.all(promessas);
   }
@@ -758,13 +832,14 @@ const Mapa3D = (() => {
     particulas.lancar({ x, y: y + b.i * TIJOLO + .6, z, cor: eq(pid).cor, escala: 1.95, n: 1 });
   }
   function desenharTorres() {
-    let nT = 0, nF = 0, nC = 0;
+    let nT = 0, nF = 0, nC = 0, nP = 0;
     const nForma = Object.fromEntries(PIDS.map(p => [p, 0]));
     for (const [id, t] of Object.entries(torres)) {
       const mostradas = pertoDeMais ? t.lista.length : Math.min(2, t.lista.length);
       t.mostradas = mostradas;
       t.lista.slice(0, mostradas).forEach((inf, j) => {
         const [x, y0, z] = posTorre(id, j, mostradas), c = cor.set(eq(inf.pid).cor);
+        if (noMar(x, z) && nP < 120) imPedestais.setMatrixAt(nP++, m4.makeTranslation(x, ALT_MAR - .02, z));
         let topo = y0;
         t.tijolos.filter(b => b.pid === inf.pid).forEach(b => {
           if (nT >= CAP_TIJOLOS) return;
@@ -780,7 +855,7 @@ const Mapa3D = (() => {
         imFormas[inf.pid] && (m4.makeTranslation(x, yT + PLACA + .004, z), imFormas[inf.pid].setMatrixAt(nForma[inf.pid]++, m4));
       });
     }
-    imTijolos.count = nT; imFantasmas.count = nF; imTampas.count = nC;
+    imTijolos.count = nT; imFantasmas.count = nF; imTampas.count = nC; imPedestais.count = nP; imPedestais.instanceMatrix.needsUpdate = true; imPedestais.computeBoundingSphere();
     for (const p of PIDS) { imFormas[p].count = nForma[p]; imFormas[p].instanceMatrix.needsUpdate = true; }
     imTijolos.instanceMatrix.needsUpdate = imFantasmas.instanceMatrix.needsUpdate = imTampas.instanceMatrix.needsUpdate = true;
     imTijolos.instanceColor.needsUpdate = imTampas.instanceColor.needsUpdate = true;
@@ -799,11 +874,7 @@ const Mapa3D = (() => {
     });
     g.add(new THREE.Mesh(corpo, matVertice));
     const pano = new THREE.Group(); pano.position.set(0, 4.72, 0);
-    const tecido = new THREE.Mesh(caixa(2.4, 1.6, .12, .04), plastico(e.cor, .32)); tecido.position.set(-1.32, -1.6, 0); pano.add(tecido);
-    const gd = geoCache('decal-bandeira', () => new THREE.PlaneGeometry(1.25, 1.25));
-    const f1 = new THREE.Mesh(gd, matForma(e.forma));
-    f1.position.set(0, .8, .065); tecido.add(f1);
-    const f2 = f1.clone(); f2.rotation.y = Math.PI; f2.position.z = -.065; tecido.add(f2);
+    const tecido = new THREE.Mesh(geoPano(), matPano(pid)); tecido.position.set(-1.32, -.8, 0); pano.add(tecido);
     g.add(pano);
     g.traverse(o => { if (o.isMesh) o.castShadow = true; });
     g.scale.setScalar(escala);
@@ -812,9 +883,20 @@ const Mapa3D = (() => {
     g.tique = (dt, t) => { if (!REDUZ) pano.rotation.y = Math.sin(t * 1.6 + g.userData.fase) * .12; };
     return g;
   }
+  // Pano da bandeira: uma caixa só; frente e verso mostram a forma (textura com fundo na cor), laterais na cor lisa
+  const geoPano = () => geoCache('pano', () => {
+    const g = new THREE.BoxGeometry(2.4, 1.6, .12), uv = g.getAttribute('uv'), n = g.getAttribute('normal');
+    for (let i = 0; i < uv.count; i++) {
+      if (Math.abs(n.getZ(i)) > .5) uv.setXY(i, .5 + (uv.getX(i) - .5) * 1.5, uv.getY(i));   // 2,4 × 1,6: a forma fica redonda
+      else uv.setXY(i, .02, .02);
+    }
+    return g;
+  });
+  const matPano = pid => { const k = 'pano' + pid; if (!mats.has(k)) mats.set(k, new THREE.MeshStandardMaterial({ map: texForma(eq(pid).forma, eq(pid).cor), roughness: .32 })); return mats.get(k); };
   function posBandeira(id) {
     const t = torres[id], n = t ? (t.mostradas ?? Math.min(2, t.lista.length)) : 0, [x, y, z] = baseTorres(id);
-    return [x - (n ? n * 2.3 / 2 + 1.4 : 0), y, z - .6];
+    const bx = x - (n ? n * 2.3 / 2 + 1.4 : 0), bz = z - .6;
+    return [bx, noMar(bx, bz) ? ALT_MAR : y, bz];
   }
   function bandeira(id, pid, { animar = true } = {}) {
     const atual = bandeiras[id];
@@ -836,6 +918,9 @@ const Mapa3D = (() => {
 
   // ============================== PARTÍCULAS: tijolinhos (chuva, desmonte, poeira) e fumaça ==============================
   let particulas, fumaca;
+  // Cor já convertida (a fumaça e os tijolinhos pintam centenas por quadro; ler o texto da cor a cada vez custava caro)
+  const coresProntas = new Map();
+  const corRapida = c => { let k = coresProntas.get(c); if (!k) coresProntas.set(c, (k = new THREE.Color(c))); return k; };
   function montarSistemas() {
     // Tijolinhos 1×1 com pino, física simples (gravidade 25), encolhem no fim (guia §9.1 "Desmontar")
     const CAP = 360, im = new THREE.InstancedMesh(tijolo(1, 1, .9), plastico('#ffffff', .3), CAP);
@@ -843,6 +928,7 @@ const Mapa3D = (() => {
     raiz.add(im);
     const vivas = [];
     particulas = {
+      ativas: () => vivas.length,
       lancar({ x, y, z, cor: c, n = 1, escala = 1, espalha = 1, sobe = [4, 6], vida = .8, lado = [1.5, 3] }) {
         for (let i = 0; i < n && vivas.length < CAP; i++) {
           const a = Math.random() * Math.PI * 2, vl = lerp(lado[0], lado[1], Math.random()) * espalha;
@@ -869,7 +955,7 @@ const Mapa3D = (() => {
         for (const p of vivas) {
           const fim = p.vida - p.t, s = p.s * (fim < .25 ? Math.max(0, fim / .25) : 1);
           m4.compose(v3.set(p.x, p.y, p.z), q4.setFromEuler(eY.set(p.rx, p.ry, p.rz)), s3.set(s, s, s));
-          im.setMatrixAt(n, m4); im.setColorAt(n, cor.set(p.cor)); n++;
+          im.setMatrixAt(n, m4); im.setColorAt(n, corRapida(p.cor)); n++;
         }
         im.count = n;
         if (n) { im.instanceMatrix.needsUpdate = true; im.instanceColor.needsUpdate = true; }
@@ -893,7 +979,7 @@ const Mapa3D = (() => {
           if (b.t < 0) continue;
           const u = b.t / b.vida, s = b.tam * (u < .3 ? .4 + u / .3 * .6 : 1 - (u - .3) / .7 * .9);
           m4.compose(v3.set(b.x + b.vx * b.t, b.y + b.vy * b.t, b.z - b.vx * b.t * .4), q4.identity(), s3.set(s, s, s));
-          imf.setMatrixAt(n, m4); imf.setColorAt(n, cor.set(b.cor)); n++;
+          imf.setMatrixAt(n, m4); imf.setColorAt(n, corRapida(b.cor)); n++;
         }
         imf.count = n;
         if (n) { imf.instanceMatrix.needsUpdate = true; imf.instanceColor.needsUpdate = true; }
@@ -995,6 +1081,7 @@ const Mapa3D = (() => {
   // ============================== CÂMERA ==============================
   let passeio = null;   // modo início: a câmera passeia sozinha
   function voar([x, z], distancia, { duracao = 1.1, inclinacao = .78, comSom = true } = {}) {
+    if (!controles) return Promise.resolve();
     const pos = new THREE.Vector3(x, distancia * Math.cos(inclinacao), z + distancia * Math.sin(inclinacao));
     gsap.killTweensOf(controles.target); gsap.killTweensOf(camera.position);
     if (!duracao || REDUZ) { controles.target.set(x, 0, z); camera.position.copy(pos); controles.update(); return Promise.resolve(); }
@@ -1015,6 +1102,7 @@ const Mapa3D = (() => {
     modoAtual = qual === 'inicio' ? 'inicio' : 'jogo';
     if (!controles) return;
     controles.enabled = modoAtual === 'jogo';
+    sobreposicao.style.opacity = modoAtual === 'inicio' ? '0' : '';
     if (modoAtual === 'inicio') { passeio = { t0: performance.now() }; voar([0, 3], distGeral(), { duracao: 0, inclinacao: .62 }); }
     else { passeio = null; visaoGeral(REDUZ ? 0 : 1.1); }
   }
@@ -1046,7 +1134,9 @@ const Mapa3D = (() => {
       }
       if (!ray.ray.intersectPlane(chao, ponto)) return -1;
       const k = celulaEm(ponto.x, ponto.z);
-      return k < 0 ? -1 : terrDaCelula[k];
+      if (k < 0) return -1;
+      if (terrDaCelula[k] === -1) for (const [id, pt] of Object.entries(PONTES)) if (pt.celulas?.includes(k)) return idx(id);   // ponte de um território pequeno
+      return terrDaCelula[k];
     };
     el.addEventListener('pointerdown', ev => (inicio = { x: ev.clientX, y: ev.clientY }));
     el.addEventListener('pointerup', ev => {
@@ -1054,7 +1144,15 @@ const Mapa3D = (() => {
       const t = terrEm(ev);
       if (t >= 0 && aoClicarFn) aoClicarFn({ id: TERR[t], x: ev.clientX, y: ev.clientY });
     });
+    let movPend = null;
+    el.addEventListener('pointerdown', () => agitar(), { passive: true });
+    el.addEventListener('wheel', () => agitar(), { passive: true });
     el.addEventListener('pointermove', ev => {
+      agitar();
+      if (!movPend) requestAnimationFrame(() => { const e2 = movPend; movPend = null; mover(e2); });
+      movPend = ev;
+    });
+    const mover = ev => {
       if (ev.buttons) return;
       const t = terrEm(ev);
       if (t === sobre) return;
@@ -1064,7 +1162,7 @@ const Mapa3D = (() => {
       el.style.cursor = t >= 0 ? 'pointer' : '';
       rotulosPor('mouse', t >= 0 ? [TERR[t]] : []);
       aoPassarFn?.(t >= 0 ? { id: TERR[t], x: ev.clientX, y: ev.clientY } : null);
-    });
+    };
     el.addEventListener('pointerleave', () => { const a = sobre; sobre = -1; if (a >= 0) recalcularElevacao(a); rotulosPor('mouse', []); aoPassarFn?.(null); });
   }
 
@@ -1131,6 +1229,7 @@ const Mapa3D = (() => {
     if (el.textContent !== texto) el.textContent = texto;
     return el;
   }
+  const transladar = (el, x, y, resto = '') => { const s = `translate(${x.toFixed(1)}px,${y.toFixed(1)}px)${resto}`; if (el._tr !== s) { el._tr = s; el.style.transform = s; } };
   const naTela = (x, y, z) => { v3.set(x, y, z).project(camera); const w = renderer.domElement.clientWidth, h = renderer.domElement.clientHeight; return [(v3.x * .5 + .5) * w, (-v3.y * .5 + .5) * h, v3.z < 1]; };
   function posicionarRotulos() {
     const w = renderer.domElement.clientWidth, h = renderer.domElement.clientHeight, u = Math.min(h, w * .5625) / 100, caixas = [];
@@ -1142,7 +1241,7 @@ const Mapa3D = (() => {
       const b = ehPotencia(id) && bonecosMapa[id];
       if (b) { const p = b.position, esc = b.scale.x; [px, py, ok] = naTela(p.x, p.y, p.z + 1.15 * esc); py += r.h / 2 + .4 * u; }
       else { const [x, y, z] = baseTorres(id); [px, py, ok] = naTela(x, y, z + 2.4); py += r.h / 2; }
-      r.el.style.transform = `translate(${(px - r.w / 2).toFixed(1)}px,${(py - r.h / 2).toFixed(1)}px)`;
+      transladar(r.el, px - r.w / 2, py - r.h / 2);
       const bw = r.w / 2 + .6 * u, bh = r.h / 2 + .6 * u;
       const bate = !ok || caixas.some(c => Math.abs(c.x - px) < c.w + bw && Math.abs(c.y - py) < c.h + bh);
       r.el.classList.toggle('rm-visivel', !bate);
@@ -1154,13 +1253,14 @@ const Mapa3D = (() => {
       const el = pilula(chave, texto); vistos.add(chave);
       const w = el._w || (el._w = el.offsetWidth), h = el._h || (el._h = el.offsetHeight), cx = px, cy = py - h / 2;
       const bate = !ok || caixas.some(c => Math.abs(c.x - cx) < c.w + w / 2 + .2 * u && Math.abs(c.y - cy) < c.h + h / 2 + .2 * u);
-      el.style.transform = `translate(${(cx - w / 2).toFixed(1)}px,${(cy - h / 2).toFixed(1)}px)`;
+      transladar(el, cx - w / 2, cy - h / 2);
       el.classList.toggle('rm-visivel', !bate);
       if (!bate) caixas.push({ x: cx, y: cy, w: w / 2, h: h / 2 });
     };
     for (const [id, t] of Object.entries(torres)) {
       if (!t.lista.length) continue;
-      if (!pertoDeMais && t.lista.length > 2) {
+      // "+N" só onde a turma está olhando (mouse, alvo, foco, evento): na visão geral parada, poluía o mapa
+      if (!pertoDeMais && t.lista.length > 2 && [...(rotulos[id]?.motivos || [])].some(m => m !== 'casa')) {
         const [x, y, z] = posTorre(id, 1, 2), [px, py, ok] = naTela(x + 1.7, y + .2, z + 1);
         poePilula('p:' + id, '+' + (t.lista.length - 2), px + .9 * u, py, ok);
       }
@@ -1176,16 +1276,19 @@ const Mapa3D = (() => {
       const [x, y, z] = posTorre(id, 0, t.mostradas || 2), [px, py, ok] = naTela(x + 1.15, y + a.n * TIJOLO + 2.2, z);
       const el = pilula('d:' + id, ''); vistos.add('d:' + id);
       if (!el.innerHTML) { el.className = 'rm-selo'; el.innerHTML = SVG_BALANCA; el.setAttribute('aria-hidden', 'true'); }
-      const w = el.offsetWidth || 26;
-      el.style.transform = `translate(${(px - w / 2).toFixed(1)}px,${(py - w).toFixed(1)}px)`; el.classList.toggle('rm-visivel', ok);
+      const w = el._w || (el._w = el.offsetWidth || 26), cy = py - w / 2;
+      const bate = !ok || caixas.some(c => Math.abs(c.x - px) < c.w + w / 2 && Math.abs(c.y - cy) < c.h + w / 2);
+      transladar(el, px - w / 2, py - w); el.classList.toggle('rm-visivel', !bate);
+      if (!bate) caixas.push({ x: px, y: cy, w: w / 2, h: w / 2 });
     }
     for (const [k, el] of Object.entries(pilulas)) if (!vistos.has(k)) el.classList.remove('rm-visivel');
     // números flutuantes acompanham o ponto 3D
-    for (const n of numeros) { const [px, py] = naTela(...n.pos); n.el.style.left = px + 'px'; n.el.style.top = py + 'px'; }
+    for (const n of numeros) { const [px, py] = naTela(...n.pos); transladar(n.el, px, py, ' translate(-50%,-100%)'); }   // transform em vez de left/top: sem layout
   }
   // Número flutuante (guia §6.11): nasce 2 módulos acima da âncora, sobe 6u em 1,4 s e some; máx. 4 por lugar, 0,18 s entre eles
   const numeros = [], filaNum = {};
   function numeroFlutuante(id, texto, corNum = 'ganho') {
+    if (!sobreposicao || idx(id) < 0) return Promise.resolve();
     const pid = ehPotencia(corNum) ? corNum : null;
     const corTexto = pid ? eq(pid).cor : corNum === 'ganho' ? '#5BE37D' : corNum === 'perda' ? '#FF6B6B' : corNum === 'branco' ? '#FFFFFF' : corNum;
     const agora = performance.now(), fila = (filaNum[id] = (filaNum[id] || []).filter(t => t > agora - 1400));
@@ -1218,13 +1321,14 @@ const Mapa3D = (() => {
   const criarBoneco = (avatar = {}, opcoes) => (typeof Bonecos !== 'undefined' && Bonecos.criar ? Bonecos.criar(avatar, opcoes) : new THREE.Group());
   const escalaBoneco = () => limitar(distCamera() / 55, 1.25, 2.6);
   // Um boneco por potência, na capital, deslocado para o nordeste da âncora (guia §7.8)
+  let pendBonecos = null;
   function bonecos(avatares = []) {
+    if (!raiz) { pendBonecos = avatares; return; }
     for (const b of Object.values(bonecosMapa)) { b.descartar ? b.descartar() : raiz.remove(b); }
     for (const k of Object.keys(bonecosMapa)) delete bonecosMapa[k];
     for (const av of avatares) {
       const pid = av.pid; if (!ehPotencia(pid)) continue;
-      const b = criarBoneco({ ...av, cor: av.cor || eq(pid).cor, forma: av.forma || eq(pid).forma }, { base: true });
-      b.traverse(o => { if (o.isMesh && !o.material?.transparent) o.castShadow = true; });
+      const b = criarBoneco({ ...av, cor: av.cor || eq(pid).cor, forma: av.forma || eq(pid).forma }, { base: true, tijolinhos: false });
       const [ax, az] = ancoraXZ(pid);
       b.position.set(ax + 3, ALT_TERRA + CASA, az - 3.5); b.rotation.y = -.3;
       b.userData.territorio = pid; b.userData.pid = pid;
@@ -1236,11 +1340,12 @@ const Mapa3D = (() => {
   function acaoBoneco(pid, acao) {
     const b = bonecosMapa[pid]; if (!b) return Promise.resolve();
     b.acao?.(acao);
-    return esperar(DUR_ACAO[acao] ?? 1.2);
+    return acompanhar(esperar(DUR_ACAO[acao] ?? 1.2));
   }
   // Holofote amarelo no chão sob o boneco da vez (guia §2.6 "Vez")
   function vez(pid) {
     vezDe = pid || null;
+    if (!raiz) return;
     if (!holofote) {
       holofote = new THREE.Group();
       const disco = new THREE.Mesh(new THREE.CircleGeometry(1.5, 40).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: C.amarelo, transparent: true, opacity: .35, depthWrite: false }));
@@ -1253,21 +1358,47 @@ const Mapa3D = (() => {
 
   // ============================== LAÇO ==============================
   let ultimoQuadro = 0, relogio = 0;
+  // Quadro econômico (desempenho): quando só o ambiente se mexe (mar, respiração, navios, bandeiras) e a câmera está
+  // parada e longe, o mapa desenha a ~30 quadros/s e refaz a sombra a cada 2 desses quadros. Em ação (câmera, tweens 3D,
+  // efeitos, construções, mouse), tudo a cada quadro, como antes.
+  let economico = false, pulou = false, semSombra = 0, emCurso = 0, agitadoAte = 0, lodLonge = null;
+  const camAnt = new Float32Array(7);
+  const agitar = (s = .6) => { agitadoAte = Math.max(agitadoAte, performance.now() + s * 1000); };
+  const acompanhar = p => { emCurso++; return Promise.resolve(p).finally(() => { emCurso--; agitar(.3); }); };
+  const AMBIENTE = new WeakSet([uni.faixa, uni.cint.value, uni.cint2.value]);   // tweens de enfeite contínuo (mar, alarmes que se repetem)
+  function tweens3D() {   // tweens do GSAP em objetos (não em elementos HTML, como os laços do HUD)
+    for (const t of gsap.globalTimeline.getChildren(true, true, false)) {
+      const a = t.targets()[0];
+      if (a && typeof a === 'object' && !AMBIENTE.has(a) && !(a instanceof Element) && t.isActive()) return true;
+    }
+    return false;
+  }
   function quadro(agora) {
+    const agit = emCurso > 0 || agora < agitadoAte || tweens3D();
+    if (economico && !agit && agora - ultimoQuadro < 30) { pulou = true; return; }
     const dt = ultimoQuadro ? Math.min(.1, (agora - ultimoQuadro) / 1000) : 1 / 60;
     ultimoQuadro = agora; relogio += dt;
-    // medidor de quadros: troca para "leves" se a média passar de 22 ms em 3 s
-    if (fpsAuto && agora - medidor.inicio > 3000) {
+    // medidor de quadros: troca para "leves" se a média passar de 22 ms em 3 s (quadros econômicos não contam)
+    if (fpsAuto && agora - medidor.inicio > 3000 && !pulou) {
       medidor.soma += dt * 1000; medidor.n++;
-      if (agora - medidor.inicio > 6000) { if (medidor.soma / medidor.n > 22) graficos('leves', { auto: true }); medidor.reset(); }
+      if (agora - medidor.inicio > 6000) { if (medidor.n && medidor.soma / medidor.n > 22) graficos('leves', { auto: true }); medidor.reset(); }
     }
+    pulou = false;
     if (modoAtual === 'inicio') tiquePasseio(); else {
       controles.update();
       controles.target.x = limitar(controles.target.x, -COLS / 2, COLS / 2);
       controles.target.z = limitar(controles.target.z, -LINS / 2, LINS / 2);
     }
+    let mexeu = false;
+    const pc = camera.position, qc = camera.quaternion, cv = [pc.x, pc.y, pc.z, qc.x, qc.y, qc.z, qc.w];
+    for (let i = 0; i < 7; i++) if (Math.abs(cv[i] - camAnt[i]) > 1e-4) { mexeu = true; camAnt[i] = cv[i]; }
+    if (modoAtual === 'inicio') mexeu = false;   // o passeio da tela inicial é lento (8° em 40 s): conta como ambiente
     const dist = distCamera(), perto = dist < 70;
     if (perto !== pertoDeMais) { pertoDeMais = perto; torresSujas = true; Object.entries(bandeiras).forEach(([id, b]) => b.position.set(...posBandeira(id))); }
+    // Nível de detalhe: quando cada pino da terra, da espuma e da moldura fica com menos de 6 px na tela (visão geral),
+    // a versão de 8 lados fica igual na imagem com metade dos triângulos (eram ~800 mil por quadro só de pinos)
+    const longe = .6 * renderer.domElement.height / (2 * dist * Math.tan(camera.fov * Math.PI / 360)) < 6;
+    if (longe !== lodLonge) { lodLonge = longe; trocarLOD(longe); }
     uni.pulso.value = REDUZ ? 1 : .6 + .4 * Math.sin(relogio * Math.PI * 2 / 1.2);
     tiqueMar(dt);
     tiqueElevacao(dt);
@@ -1278,12 +1409,18 @@ const Mapa3D = (() => {
     const escB = lerp(.9, 1.5, limitar((dist - 50) / 110, 0, 1));
     for (const b of Object.values(bandeiras)) if (!gsap.isTweening(b.scale)) b.scale.setScalar(escB);
     animados.forEach(o => o.tique?.(dt, relogio));
+    const torresMexeram = torresSujas || elevMudou;
+    elevMudou = false;
     if (torresSujas) desenharTorres();
+    // Sombra em cache: refeita a cada quadro em ação; com tudo calmo e de longe, a cada 2 quadros econômicos (~15/s)
+    const calmo = !agit && !mexeu && !pertoDeMais && !torresMexeram && !particulas.ativas();
+    if (!calmo || ++semSombra >= 2) { renderer.shadowMap.needsUpdate = true; semSombra = 0; }
     // AO entra aos poucos entre as distâncias 100 e 55 (de longe vira pontilhado): longe, desenha direto com MSAA
     let f = 0;
     if (n8) { f = 1 - THREE.MathUtils.smoothstep(dist, 55, 100); n8.configuration.intensity = 2.2 * f; }
     if (composer && f > .01) composer.render(dt); else renderer.render(cena, camera);
     posicionarRotulos();
+    economico = calmo;
   }
   // Faixa de brilho do mar e cintilações (REDUZ: parado)
   let proxFaixa = 2, proxCint = 1.5;
@@ -1547,7 +1684,7 @@ const Mapa3D = (() => {
     if (!c.grupo.parent) { raiz.add(c.grupo); c.grupo.position.set(...posBlocos(id)); c.grupo.userData.territorio = id; }
     const prom = [];
     while (c.blocos.length < nivel) {
-      const b = new THREE.Mesh(geoBloco(), matAlerta()); b.castShadow = true;
+      const b = new THREE.Object3D();   // desenhado pela InstancedMesh dos blocos de alerta
       const i = c.blocos.length; b.userData.x = (i - (nivel - 1) / 2) * 1.15; b.userData.fase = Math.random() * 6;
       c.grupo.add(b); c.blocos.push(b);
       b.position.set(b.userData.x, 1.5, 0);
@@ -1578,12 +1715,25 @@ const Mapa3D = (() => {
     c.nivel = nivel;
     return Promise.all(prom);
   }
+  let imAlertas = null;
   const tiqueConflitos = { tique(dt, t) {
+    if (!imAlertas) { imAlertas = new THREE.InstancedMesh(geoBloco(), matAlerta(), 120); imAlertas.castShadow = true; imAlertas.frustumCulled = false; raiz.add(imAlertas); }
+    let nA = 0;
     for (const [id, c] of Object.entries(conflitos)) {
       c.grupo.position.set(...posBlocos(id));
       c.blocos.forEach(b => { if (!gsap.isTweening(b.position)) { b.position.x = b.userData.x; b.position.y = 1.5 + (REDUZ ? 0 : Math.sin(t * 2 + b.userData.fase) * .15); } b.rotation.y = REDUZ ? 0 : Math.sin(t * .8 + b.userData.fase) * .25; });
+      c.grupo.updateMatrixWorld(true);
+      c.blocos.forEach(b => { if (nA < 120) imAlertas.setMatrixAt(nA++, b.matrixWorld); });
       if (c.pulso) { const u = REDUZ ? .5 : (t % 1.4) / 1.4; c.pulso.scale.setScalar(1 + u * 5); c.pulso.material.opacity = 1 - u; }
       if (c.nivel >= 3 && !REDUZ && Math.random() < dt * 1.2) { const [x, y, z] = baseTorres(id); fumaca.soltar({ x: x + (Math.random() - .5) * 4, y: y + .5, z: z - 1.5, cor: C.fumacaConflito, tam: .9, sobe: 1.6, vida: 2.4 }); }
+    }
+    imAlertas.count = nA; imAlertas.instanceMatrix.needsUpdate = true;
+    // pressão sobre o território (guia §2.6): fumacinha branca ≥ 40; ≥ 60, tijolos saltam da torre de quem pressiona
+    if (!REDUZ) for (const [id, tr] of Object.entries(torres)) {
+      if ((tr.pressao || 0) < 40 || Math.random() > dt * .8) continue;
+      const [x, y, z] = baseTorres(id);
+      fumaca.soltar({ x: x - 1.2, y: y + .4, z: z + 1.6, cor: '#FFFFFF', tam: .6, sobe: 1.2, vida: 1.6 });
+      if (tr.pressao >= 60 && tr.lista[0] && Math.random() < .5) { const [tx, ty, tz] = posTorre(id, 0, tr.mostradas || 1); particulas.lancar({ x: tx, y: ty + tr.lista[0].n * TIJOLO, z: tz, cor: eq(tr.lista[0].pid).cor, escala: .5, sobe: [3, 4], lado: [1, 2], vida: .7 }); }
     }
     for (const f of Object.values(focos)) if (!REDUZ) f.anel.rotation.y += dt * .2;
     for (const b of Object.values(pazes)) b.tique?.(dt, t);
@@ -1714,7 +1864,7 @@ const Mapa3D = (() => {
     combate_desinformacao: { onde: 'casa', pecas: () => [P(tijolo(2, 2, .4), C.cinzaClaro, -.6, B, -.5), ...[0, 1, 2, 3, 4].map(i => P(caixa(.62 - i * .08, .7, .62 - i * .08, .06), i % 2 ? '#FFFFFF' : C.vermelho, -.6, B + .4 + i * .7, -.5)), P(barra(.05, .6), C.cinzaEscuro, -.6, B + 3.9, -.5), P(esfera(.16), C.vermelho, -.6, B + 4.55, -.5, { mat: brilhante(C.vermelho, .7) }), ...antena(-.25, B + 2.1, -.25, .55, 1.2), ...antena(-.95, B + 1.4, -.25, .5, 1.2), ...placaComSimbolo('check', C.verdeOk, .9, B, .75, 1.3)] },
     programa_espacial: { onde: 'casa', pecas: () => [P(redonda(1.5, .3, true, 28), C.cinzaClaro, 0, B), P(caixa(.34, 3.4, .34), C.laranja, -1.15, B + .3, 0), ...[1, 2, 3].map(y => P(caixa(.7, .1, .1), C.laranja, -.75, B + .3 + y, 0)), ...MD('foguete', .1, B + .3, 0, { s: .85 })], extra: c => lancarFoguete(c) },
     soft_power: { onde: 'alvos', pecas: () => [P(tijolo(4, 2, .6), C.madeira, 0, B, -.5), P(caixa(2.6, 1.6, .2), C.pecaPreta, 0, B + .6, -1.3), P(new THREE.PlaneGeometry(2.3, 1.3), null, 0, B + 1.4, -1.19, { mat: brilhante('#99CDF8', .6) }), P(barra(.08, 2.6), C.cinzaEscuro, -1.8, B, -1.3), P(barra(.08, 2.6), C.cinzaEscuro, 1.8, B, -1.3), P(caixa(4, .2, .2), C.cinzaEscuro, 0, B + 2.6, -1.3), ...[-1.2, 1.2].map(x => P(cone(.15, .3, .4, 10), C.amarelo, x, B + 2.25, -1.1, { mat: brilhante(C.amarelo, .8) })), ...MD('estrela', 0, B + 3, -1.3, { s: .55 })] },
-    internet_para_todos: { onde: 'alvo', pecas: () => [P(tijolo(1, 1, .4), C.cinzaClaro, .4, B, -.6), P(barra(.1, 2), C.cinzaClaro, .4, B + .4, -.6), ...antena(.4, B + 2.3, -.6, 1.25, 1.1), P(tijolo(2, 1, 1), C.pecaPreta, -.9, B, -.5), ...[.3, .6].map(y => P(caixa(1.5, .08, .05), '#3CD46A', -.9, B + y, .02, { mat: brilhante('#3CD46A', .8) })), P(toro(.5, .14, Math.PI * 2, 24), C.amarelo, .6, B + .14, 1, { rx: Math.PI / 2 }), P(toro(.32, .14, Math.PI * 2, 20), C.amarelo, .6, B + .4, 1, { rx: Math.PI / 2 })], extra: c => caboSubmarino(c) },
+    internet_para_todos: { onde: 'alvo', pecas: () => [P(tijolo(1, 1, .4), C.cinzaClaro, .4, B, -.6), P(barra(.1, 2), C.cinzaClaro, .4, B + .4, -.6), ...antena(.4, B + 2.3, -.6, .95, 1.1), P(tijolo(2, 1, 1), C.pecaPreta, -.9, B, -.5), ...[.3, .6].map(y => P(caixa(1.5, .08, .05), '#3CD46A', -.9, B + y, .02, { mat: brilhante('#3CD46A', .8) })), P(toro(.5, .14, Math.PI * 2, 24), C.amarelo, .6, B + .14, 1, { rx: Math.PI / 2 }), P(toro(.32, .14, Math.PI * 2, 20), C.amarelo, .6, B + .4, 1, { rx: Math.PI / 2 })], extra: c => caboSubmarino(c) },
   };
   // Hangar em arco: meia-casca com fundo fechado, deitada (sem armas)
   const hangar = () => geoCache('hangar', () => { const g = new THREE.CylinderGeometry(1.15, 1.15, 2.6, 20, 1, false, -Math.PI / 2, Math.PI); g.rotateX(-Math.PI / 2); return limpar(g); });
@@ -1727,24 +1877,29 @@ const Mapa3D = (() => {
   function vizinhosCores(c) { const vz = (M.vizinhos[c.pid] || []).slice(0, 6); while (vz.length < 6) vz.push(null); return vz.map(v => (v && ultimoEstado?.territorios?.[v]?.parceiro ? eq(ultimoEstado.territorios[v].parceiro).cor : v ? (CONTINENTES[CONT[v]] || CONTINENTES.po)[1] : C.creme)); }
 
   // ---------- Lugar e vaga (anel ao redor da âncora, longe das torres e do boneco) ----------
-  function vagaEm(id, { tipo = null, escala = 1.3 } = {}) {
+  // Procura do mais exigente para o mais solto: território pequeno ou lotado ainda acha lugar (no mar ao lado, como um píer)
+  function vagaEm(id, { tipo = null } = {}) {
+    for (const nivel of [0, 1, 2]) { const v = procurarVaga(id, tipo, nivel); if (v) return v; }
+    return null;
+  }
+  function procurarVaga(id, tipo, nivel) {
     const t = idx(id), [ax, az] = ancoraXZ(id), proprias = new Set(pinosDe[t]);
-    const ocupadas = construcoes.filter(c => c.territorio === id || Math.hypot(c.x - ax, c.z - az) < 20).map(c => [c.x, c.z]);
-    const raioMin = 4.4 * escala, cands = [];
-    const [ac, ar] = M.ancoras[id] || [0, 0], meiaFileira = Math.max(2, torres[id]?.lista.length || 0) * 1.15 + 4.2;
-    for (let r = ar - 12; r <= ar + 12; r++) for (let c0 = ac - 14; c0 <= ac + 14; c0++) {
-      if (r < 1 || r > LINS - 4 || c0 < 1 || c0 > COLS - 4) continue;
+    const ocupadas = construcoes.filter(c => Math.hypot(c.x - ax, c.z - az) < 30).map(c => [c.x, c.z]);
+    const raioMin = [5.6, 5, 4.4][nivel], dMax = [14, 18, 22][nivel], outrosMax = [1, 4, 16][nivel], cands = [];
+    const [ac, ar] = ANC[id] || [0, 0], meiaFileira = Math.max(2, torres[id]?.lista.length || 0) * 1.15 + 4.2;
+    for (let r = ar - dMax; r <= ar + dMax; r++) for (let c0 = ac - dMax; c0 <= ac + dMax; c0++) {
+      if (r < 2 || r > LINS - 4 || c0 < 3 || c0 > COLS - 4) continue;
       const x = c0 - COLS / 2, z = r - LINS / 2;    // canto entre células: a placa 4×4 fica alinhada aos pinos
       const d = Math.hypot(x - ax, z - az);
-      if (d < 3.4 || d > 14) continue;
+      if (d < 3.4 || d > dMax) continue;
       if (Math.abs(x - ax) < meiaFileira && Math.abs(z - az) < 3.2) continue;   // fileira de torres e bandeira
       if (ehPotencia(id) && Math.hypot(x - ax - 3, z - az + 3.5) < 4.2) continue;              // boneco
       if (Math.abs(x - ax) < 3.5 && z - az > 0 && z - az < 5.4) continue;                       // rótulo e blocos de alerta
-      let meus = 0, mar = 0, outros = 0;
-      for (let dr = -2; dr < 2; dr++) for (let dc = -2; dc < 2; dc++) { const k = (r + dr) * COLS + c0 + dc, tt = terrDaCelula[k]; if (proprias.has(k)) meus++; else if (tt === -1) mar++; else outros++; }
-      if (outros > 1 || meus < Math.min(10, proprias.size * .45)) continue;
+      let meus = 0, mar = 0, outros = 0, fora = 0;
+      for (let dr = -2; dr < 2; dr++) for (let dc = -2; dc < 2; dc++) { const k = (r + dr) * COLS + c0 + dc, tt = terrDaCelula[k]; if (proprias.has(k)) meus++; else if (tt === -1) mar++; else if (tt === -2) fora++; else outros++; }
+      if (fora || outros > outrosMax || meus < [Math.min(10, proprias.size * .45), Math.min(4, proprias.size * .3), 0][nivel]) continue;
       if (ocupadas.some(([ox, oz]) => Math.hypot(ox - x, oz - z) < raioMin)) continue;
-      let custo = Math.abs(d - 5.5) + hash(r * COLS + c0) * .8 + mar * .2;
+      let custo = Math.abs(d - 5.5) + hash(r * COLS + c0) * .8 + mar * .2 + outros * .6 - meus * (nivel ? .3 : 0);
       if (tipo === 'costa') custo -= Math.min(4, mar) * .8;
       if (tipo === 'floresta' && id === 'brasil') custo += Math.max(0, z - az) * .5;
       if (tipo === 'fronteira') custo -= outros * 1.5 + (meus < 16 ? 1 : 0);
@@ -1777,7 +1932,8 @@ const Mapa3D = (() => {
 
   function construir(c, { animar = true } = {}) {
     if (!c || !RECEITAS[c.carta]) return Promise.resolve();
-    return modelosProntos.then(() => {
+    if (!renderer) return pronto.then(() => construir(c, { animar: false }));
+    return acompanhar(modelosProntos.then(() => {
       const chave = chaveDe(c), noEstado = ultimoEstado ? ultimoEstado.construcoes.filter(x => chaveDe(x) === chave).length : Infinity;
       if (noEstado > 0 && (feitas.get(chave) || 0) >= noEstado) {     // já montada (ex.: atualizarMundo veio antes): só destaca
         const ja = construcoes.filter(x => x.chave === chave);
@@ -1790,7 +1946,7 @@ const Mapa3D = (() => {
       if (rec.extra && animar) prom.push(rec.extra(c, animar));
       else if (rec.extra && rec.persistente) rec.extra(c, false);
       return Promise.all(prom);
-    });
+    }));
   }
   function montarEm(id, rec, c, chave, animar, vagaFixa = null) {
     const t = idx(id); if (t < 0) return Promise.resolve();
@@ -1800,8 +1956,9 @@ const Mapa3D = (() => {
     if (!vaga) return sair;
     const pid = c.potencia, ctx = { ...c, pid, alvo: c.alvo, naCosta: vaga.naCosta };
     const grupo = new THREE.Group(), [ax] = ancoraXZ(id);
-    const k = celulaEm(vaga.x - .5, vaga.z - .5), yBase = ALT_TERRA + (k >= 0 && terrDaCelula[k] >= 0 ? alturaBase[k] : 0);
-    grupo.position.set(vaga.x, Math.max(ALT_TERRA, yBase), vaga.z);
+    let terraSob = 0, alt = 0;
+    for (const [dx, dz] of [[-.5, -.5], [.5, -.5], [-.5, .5], [.5, .5]]) { const k = celulaEm(vaga.x + dx, vaga.z + dz); if (k >= 0 && terrDaCelula[k] >= 0) { terraSob++; alt = Math.max(alt, alturaBase[k]); } }
+    grupo.position.set(vaga.x, terraSob >= 2 ? ALT_TERRA + Math.max(0, alt) : ALT_MAR, vaga.z);
     grupo.rotation.y = (vaga.x < ax ? .12 : -.12);    // postura viva: leve giro para o centro
     grupo.userData.territorio = id;
     liberarArea(vaga.x, vaga.z, 3);
@@ -1867,27 +2024,29 @@ const Mapa3D = (() => {
     tl.timeScale(1 / VEL);
     return new Promise(ok => { tl.eventCallback('onComplete', () => { fim(); ok(); }); tl.play(); });
   }
-  // Junta as peças paradas numa malha só (uma chamada de desenho); peças com textura e partes animadas ficam à parte
+  // Junta as peças paradas por material: as lisas e os modelos viram uma malha só com cor de vértice; as impressas e as que
+  // brilham juntam-se com as do mesmo material (poucas chamadas de desenho por construção); partes animadas ficam à parte
   function assar(reg) {
-    const g = reg.grupo, juntas = [], ficam = [];
+    const g = reg.grupo, grupos = new Map();
     g.updateMatrixWorld(true);
     const inv = new THREE.Matrix4().copy(g.matrixWorld).invert();
     for (const o of [...g.children]) {
       const pp = o.userData.peca;
-      if (!pp) continue;
-      if (pp.nome || pp.mat) { ficam.push(o); if (pp.nome) reg.animadas.push({ obj: o, nome: pp.nome }); continue; }
-      const m = o.isMesh ? o : null; if (!m) { ficam.push(o); continue; }
-      let geo = m.geometry.clone();
-      if (!pp.modelo || !geo.getAttribute('color')) { const c = corLinear(pp.c || C.cinzaClaro); c.offsetHSL(0, 0, (Math.random() - .5) * .03); pintarGeo(geo, c.r, c.g, c.b); }
-      geo.applyMatrix4(m4.multiplyMatrices(inv, m.matrixWorld));
-      juntas.push(geo);
-      g.remove(m);
+      if (!pp || !o.isMesh || pp.nome) { if (pp?.nome) reg.animadas.push({ obj: o, nome: pp.nome }); continue; }
+      let geo = semIndice(o.geometry).clone(), chave = pp.mat || matVertice;
+      if (!pp.mat && (!pp.modelo || !geo.getAttribute('color') || pp.tintaHex)) { const c = corLinear(pp.c || C.cinzaClaro); c.offsetHSL(0, 0, (Math.random() - .5) * .03); pintarGeo(geo, c.r, c.g, c.b); }
+      geo.applyMatrix4(m4.multiplyMatrices(inv, o.matrixWorld));
+      if (!grupos.has(chave)) grupos.set(chave, []);
+      grupos.get(chave).push(geo);
+      g.remove(o);
     }
-    if (juntas.length) {
-      const malha = new THREE.Mesh(THREE.mergeGeometries(juntas), matVertice);
-      malha.castShadow = malha.receiveShadow = true; malha.userData.assada = true;
+    for (const [mat, geos] of grupos) {
+      const nomes = Object.keys(geos[0].attributes).filter(n => geos.every(q => q.getAttribute(n)) && (mat === matVertice ? n !== 'uv' : n !== 'color'));
+      geos.forEach(q => Object.keys(q.attributes).forEach(n => { if (!nomes.includes(n)) q.deleteAttribute(n); }));
+      const malha = new THREE.Mesh(THREE.mergeGeometries(geos), mat);
+      malha.castShadow = !mat.transparent; malha.receiveShadow = true; malha.userData.assada = true;
       g.add(malha);
-      juntas.forEach(j => j.dispose());
+      geos.forEach(q => q.dispose());
     }
     reg.grupo.userData.territorio = reg.territorio;
   }
@@ -1940,7 +2099,7 @@ const Mapa3D = (() => {
     const a = capital(c.potencia), b = capital(c.alvo), ar = arco(a, b, { cor: eq(c.potencia).cor, duplo: eq(c.alvo).cor, altura: 10, passo: 1.4, tam: .4, duracao: 1 });
     arcosFixos[chave] = ar;
     som('subir');
-    return ar.pronto.then(() => esperar(2)).then(() => { ar.malha.material = new THREE.MeshStandardMaterial({ color: '#FFFFFF', transparent: true, opacity: .4, depthWrite: false, roughness: .3 }); });
+    return ar.pronto.then(() => esperar(2)).then(() => { ar.malha.material = new THREE.MeshStandardMaterial({ color: '#FFFFFF', transparent: true, opacity: .25, depthWrite: false, roughness: .3 }); });
   }
   function arcoSancao(c) {
     const chave = 'sa:' + c.potencia + '-' + c.alvo;
@@ -1994,12 +2153,22 @@ const Mapa3D = (() => {
   // efeito(tipo, id, { pid, de, para }): id = território ou potência onde acontece
   function temporario(obj, dur) { raiz.add(obj); return esperar(dur).then(() => raiz.remove(obj)); }
   function marPerto(id) {
-    const [ac, ar] = M.ancoras[id] || [0, 0];
+    const [ac, ar] = ANC[id] || [0, 0];
     for (let r = 1; r < 25; r++) for (let a = 0; a < 16; a++) { const c = Math.round(ac + Math.cos(a / 16 * Math.PI * 2) * r), rr = Math.round(ar + Math.sin(a / 16 * Math.PI * 2) * r), k = rr * COLS + c; if (rr >= 0 && rr < LINS && c >= 0 && c < COLS && terrDaCelula[k] === -1) return xzDe(k); }
     return ancoraXZ(id);
   }
   const raioDe = id => limitar(Math.sqrt(pinosDe[idx(id)]?.length || 30) * .75, 3.5, 13);
   const sortearPinos = (id, n, semente = 1) => { const todos = pinosDe[idx(id)] || [], dentro = todos.filter(k => !ehBorda(k)); return [...(dentro.length >= Math.min(n, 6) ? dentro : todos)].sort((a, b) => hash(a * semente + 7) - hash(b * semente + 7)).slice(0, n); };
+  // Nuvem de chuva passageira (enchente): uma nuvem azul-acinzentada com gotas caindo
+  function chuva(x, z, dur) {
+    const g = new THREE.Group(), n = nuvem('#8A92AE', 1.2), gotas = new THREE.InstancedMesh(caixa(.08, .6, .08, .02), translucido('#CFEFFF', .85), 24);
+    g.add(n, gotas); g.position.set(x, 7, z); raiz.add(g);
+    const d = Array.from({ length: 24 }, (_, i) => ({ a: i * 2.4, r: .3 + (i % 5) * .45, y: (i * .37) % 5 })), p = { t: 0 };
+    const poe = () => { d.forEach((q, i) => { gotas.setMatrixAt(i, m4.makeTranslation(Math.cos(q.a) * q.r, -((q.y + (REDUZ ? 0 : p.t * 8)) % 5) - .3, Math.sin(q.a) * q.r)); }); gotas.instanceMatrix.needsUpdate = true; };
+    poe(); g.scale.setScalar(.01);
+    return anim(g.scale, { x: 1, y: 1, z: 1, duration: REDUZ ? 0 : .35, ease: 'back.out(1.6)' }).then(() => anim(p, { t: dur, duration: dur, ease: 'none', onUpdate: poe }))
+      .then(() => anim(g.scale, { x: .01, y: .01, z: .01, duration: REDUZ ? 0 : .3 })).then(() => { raiz.remove(g); gotas.material.dispose(); gotas.dispose(); });
+  }
   // Chama de peças: base vermelha, corpo laranja e miolo amarelo, levemente torta (só incêndio florestal)
   function chama() {
     const f = new THREE.Group();
@@ -2026,11 +2195,12 @@ const Mapa3D = (() => {
     poe(); raiz.add(im);
     return anim(p, { v: 1, duration: REDUZ ? 0 : .6, ease: 'power2.out', onUpdate: poe }).then(() => esperar(dur)).then(() => anim(p, { v: 0, duration: REDUZ ? 0 : .6, ease: 'power2.in', onUpdate: poe })).then(() => { raiz.remove(im); mat.dispose(); im.dispose(); });
   }
-  function anelExpande(x, y, z, { cor: c = C.amarelo, de = 1, ate = 8, dur = 1, largura = .35, vezes = 1 } = {}) {
+  function anelExpande(x, y, z, { cor: c = C.amarelo, de = 1, ate = 8, dur = 1, largura = .35, vezes = 1, ambiente = false } = {}) {
     const mat = new THREE.MeshBasicMaterial({ color: c, transparent: true, depthWrite: false }), m = new THREE.Mesh(anelChao(1 - largura / 2, 1 + largura / 2, 64), mat);
     m.position.set(x, y + .06, z); raiz.add(m);
     const p = { u: 0 }, poe = () => { m.scale.setScalar(lerp(de, ate, p.u)); mat.opacity = 1 - p.u; };
     poe();
+    if (ambiente) AMBIENTE.add(p);
     if (REDUZ) { m.scale.setScalar(ate * .6); mat.opacity = .7; return esperar(.8).then(() => { raiz.remove(m); mat.dispose(); }); }
     return anim(p, { u: 1, duration: dur, ease: 'power2.out', repeat: vezes - 1, onUpdate: poe }).then(() => { raiz.remove(m); mat.dispose(); });
   }
@@ -2075,11 +2245,18 @@ const Mapa3D = (() => {
       if (!REDUZ) for (let i = 0; i < 4; i++) gsap.delayedCall(i * .3 * VEL, () => fumaca.soltar({ x: x + (Math.random() - .5) * 8, y: y + .3, z: z + (Math.random() - .5) * 6, cor: '#E8D2A0', n: 2, tam: 1.1, sobe: .8, vida: 1.8 }));
       return Promise.all([ondaDeCor(t, () => secar(t, 1), { duracao: 1.1 }), anelExpande(x, y, z, { cor: C.seca, ate: raioDe(id), dur: 1.2 })]);
     },
-    enchente(id) { som('whoosh'); return aguaSobre(sortearPinos(id, Math.min(160, (pinosDe[idx(id)]?.length || 0) * .7 | 0), 3), { cor: '#7FC4F0', op: .62 }); },
+    enchente(id) {
+      som('whoosh');
+      const [x, y, z] = baseTorres(id), n = pinosDe[idx(id)]?.length || 0;
+      return Promise.all([aguaSobre(sortearPinos(id, Math.min(160, Math.max(6, n * .7 | 0)), 3), { cor: '#7FC4F0', op: .62 }),
+        anelExpande(x, y, z, { cor: '#7FC4F0', ate: raioDe(id) + 2, dur: 1.2, vezes: 2, largura: .5 }), chuva(x, z, 2.6)]);
+    },
     mar(id) {
-      const costa = (pinosDe[idx(id)] || []).filter(ehCosta); som('whoosh');
+      const costa = (pinosDe[idx(id)] || []).filter(ehCosta), [x, y, z] = baseTorres(id); som('whoosh');
       const novos = costa.filter(k => !marMemoria.has(k));
-      return aguaSobre(novos, { dur: .2 }).then(() => { novos.forEach(k => marMemoria.add(k)); desenharAgua(); });
+      // a água avança em ondas concêntricas e fica (o mapa guarda a memória)
+      return Promise.all([anelExpande(x, ALT_MAR, z, { cor: C.espuma, de: raioDe(id) + 6, ate: 1, dur: 1.2, vezes: 2, largura: .7 }),
+        aguaSobre(novos, { dur: .2 }).then(() => { novos.forEach(k => marMemoria.add(k)); desenharAgua(); })]);
     },
     fogo(id) {
       const t = idx(id); if (t < 0) return Promise.resolve();
@@ -2205,9 +2382,9 @@ const Mapa3D = (() => {
       return Promise.all(caixas);
     },
     influencia(id, o = {}) {
-      const [x, y, z] = baseTorres(id), c = eq(o.pid || ultimoEstado?.territorios?.[id]?.parceiro || null).cor; som('tijolo');
-      particulas.chuva({ x, z, y, cor: c, n: 12, raio: 1.6 });
-      return esperar(1.4);
+      const pid = o.pid || ultimoEstado?.territorios?.[id]?.parceiro || null, [x, y, z] = baseTorres(id), c = eq(pid).cor; som('tijolo');
+      if (!REDUZ) particulas.chuva({ x, z, y, cor: [c, eq(pid).clara], n: 14, raio: 2 });
+      return Promise.all([anelExpande(x, y, z, { cor: c, ate: 7, dur: 1, largura: .45 }), esperar(1.4)]);
     },
     parceria(id, o = {}) {
       const t = idx(id), pid = o.pid || ultimoEstado?.territorios?.[id]?.parceiro; if (t < 0 || !pid) return Promise.resolve();
@@ -2218,6 +2395,7 @@ const Mapa3D = (() => {
     golpe(id) {
       const t = idx(id), [x, y, z] = baseTorres(id); som('trovao');
       const n = nuvem(C.tempestade, 1.6); n.position.set(x, y + 7, z); raiz.add(n);
+      anelExpande(x, y, z, { cor: C.laranja, ate: raioDe(id) + 2, dur: 1.1, vezes: 2, largura: .5 });
       const bl = new THREE.Mesh(geoBloco(), matFoco()); bl.position.set(x + 2, y + 1.6, z + 2); raiz.add(bl);
       const b = bandeiras[id], p = { t: 0 };
       if (b && !REDUZ) gsap.to(b.rotation, { z: -.5, duration: .4 * VEL, yoyo: true, repeat: 1, ease: 'power2.inOut' });
@@ -2251,15 +2429,15 @@ const Mapa3D = (() => {
     if (!f || !renderer) return Promise.resolve();
     const ev = id && idx(id) >= 0 ? [id] : [];
     rotulosPor('evento', [...(porMotivo.evento || []), ...ev]);
-    return modelosProntos.then(() => f(id, opcoes)).catch(() => {}).then(() => { setTimeout(() => rotulosPor('evento', (porMotivo.evento || []).filter(x => !ev.includes(x))), 2000); });
+    return acompanhar(modelosProntos.then(() => f(id, opcoes))).catch(() => {}).then(() => { setTimeout(() => rotulosPor('evento', (porMotivo.evento || []).filter(x => !ev.includes(x))), 2000); });
   }
   const memoria = new Map();   // marcas de eventos no mapa (seca, cinzas): somem depois de 1 mandato
 
   // ============================== ATUALIZAR O MUNDO A PARTIR DO ESTADO DO MOTOR ==============================
   function atualizarMundo(e, op = {}) {
-    if (!renderer || !e) return Promise.resolve();
-    ultimoEstado = ultimoEstado || null;
-    return modelosProntos.then(() => atualizarAgora(e, op));
+    if (!e) return Promise.resolve();
+    if (!renderer) return pronto.then(() => atualizarMundo(e, op));
+    return acompanhar(modelosProntos.then(() => atualizarAgora(e, op)));
   }
   function atualizarAgora(e, { animar = false } = {}) {
     const primeira = !ultimoEstado;
@@ -2281,6 +2459,7 @@ const Mapa3D = (() => {
       const res = typeof Simulacao !== 'undefined' ? Simulacao.resistencia(t) : P2.resistenciaBase + Math.floor((t.estabilidade || 50) / 25);
       const precisa = parceiro || t.protegido || !ord[0]?.n ? 0 : Math.min(10, Math.max(res, (ord[1]?.n || 0) + P2.margemParceria));
       prom.push(influencia(t.id, lista, { animar: anima, precisa, resistencia: res }));
+      if (torres[t.id]) torres[t.id].pressao = t.pressao || 0;
       const antes = estadoT[ti].conflito || 0;
       prom.push(conflito(t.id, t.conflito || 0, { animar: anima }));
       foco(t.id, FOCOS.includes(t.id) && !(t.conflito > 0));
@@ -2324,7 +2503,7 @@ const Mapa3D = (() => {
   const tiquePetroleo = { tique() {
     if (!crisePetroleo || relogio < proxPetroleo) return;
     proxPetroleo = relogio + 2.6;
-    ['golfo', 'ira'].forEach(id => { if (idx(id) >= 0) { const [x, y, z] = baseTorres(id); anelExpande(x, y, z, { cor: C.laranja, de: 2, ate: 9, dur: 2.2, largura: .5 }); } });
+    ['golfo', 'ira'].forEach(id => { if (idx(id) >= 0) { const [x, y, z] = baseTorres(id); anelExpande(x, y, z, { cor: C.laranja, de: 2, ate: 9, dur: 2.2, largura: .5, ambiente: true }); } });
   } };
   const tiqueMesa = { tique(dt) {
     if (Math.abs(crise - criseAlvo) < .001) return;
@@ -2335,7 +2514,7 @@ const Mapa3D = (() => {
 
   // ============================== COMPATIBILIDADE (contrato antigo) ==============================
   function colorir(id, novaCor, { animar = true } = {}) {
-    const t = idx(id); if (t < 0) return Promise.resolve();
+    const t = idx(id); if (t < 0 || !terra) return Promise.resolve();
     const aplicar = () => { estadoT[t].tipo = 'livre'; estadoT[t].corLivre = novaCor; };
     if (animar && !REDUZ) return ondaDeCor(t, aplicar);
     aplicar(); pintarTerritorio(t); return Promise.resolve();
@@ -2352,6 +2531,8 @@ const Mapa3D = (() => {
 
   const api = {
     iniciar, pronto, atualizarMundo, construir, destacarAlvos, efeito, numeroFlutuante, bonecos, acaoBoneco, vez, modo, pausar, graficos,
+    // posição na tela da âncora de um território (para o HUD fazer o voo causa → efeito): { x, y, visivel }
+    posicaoNaTela: id => { if (!renderer || idx(id) < 0) return null; const [x, y, z] = baseTorres(id), [px, py, ok] = naTela(x, y + 1, z), b = renderer.domElement.getBoundingClientRect(); return { x: b.left + px, y: b.top + py, visivel: ok }; },
     colorir, corBaseDe, focar, visaoGeral, influencia, criarBoneco, colocarBoneco, rotulo, lonLatParaXZ, territorioEm,
     territorios: TERR, vizinhos: M.vizinhos, pinos: id => pinosDe[idx(id)]?.length || 0,
     aoClicar: fn => (aoClicarFn = fn), aoPassar: fn => (aoPassarFn = fn),

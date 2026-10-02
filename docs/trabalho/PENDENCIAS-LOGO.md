@@ -1,0 +1,11 @@
+# Logo oficial: trocas que a integração aplica
+- js/telas.js:98 — querySelector('svg.logo') → querySelector('.logo') (senão a logo da tela inicial perde a animação de entrada).
+- css/telas.css:14 — tirar width: 64u do .ini-logo (manter só a sombra).
+- css/manual.css:300 — .mn-barra .mn-logo usar height com width:auto (ou logo('horizontal','mn-logo')).
+- css/manual.css:314 — capa de impressão: logo com ~60 mm, não 95 mm.
+- js/manual.js:550 — usar logo('completa','mn-logo').
+- index.html:9 e manual.html:9 — acrescentar favicon 32 px e apple-touch-icon 180 px (img/marca/).
+- js/jogo.js:581 — menu de pausa: logo('horizontal','pequeno').
+- js/telas.js:864 (créditos) — logo('completa','medio') ou .marca-titulo.
+- ferramentas/vitrine-arte.html:15, 1166, 1176–1180 — seletor svg.logo e variantes antigas.
+- Conferir com captura a logo da tela inicial em 31u (o selo "Missão 2050" não pode tocar o botão Jogar).

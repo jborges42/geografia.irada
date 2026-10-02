@@ -1,1 +1,222 @@
-/* ESQUELETO da Fundação: o dono da frente substitui. */
+/* Geografia Irada — Plantão Global (guia de arte §4.5, §5.10): telejornal de brinquedo sobre o mapa.
+   Estúdio (janela do estúdio + âncora + bancada de tijolos) à esquerda e a tarja (lower third) à direita, ancorados
+   embaixo: a metade de cima da tela fica livre para o lugar do evento. Reaproveita a tarja e a vinheta do kit
+   (css/arte.css: .tarja-topo, .tarja-marca, .tarja-vivo, .tarja-lugar, .tarja-ano, .tarja-corpo, .vinheta-plantao).
+   Decisão de todas as potências: painel G com os cartões dos conselheiros e a revelação em tijolinhos. Medidas em u. */
+
+/* =====================================================================================================
+   PALCO DA REPORTAGEM
+   ===================================================================================================== */
+.plantao { position: absolute; inset: 0; pointer-events: auto; outline: none; }
+.pl-palco { position: absolute; left: 50%; bottom: calc(2.2 * var(--u)); translate: -50% 0; width: calc(177.78 * var(--u)); max-width: 100vw;
+  display: grid; grid-template-columns: calc(37 * var(--u)) minmax(0, 1fr); column-gap: calc(1.4 * var(--u)); align-items: end;
+  padding: 0 calc(1.8 * var(--u)); }
+
+/* ---------- Estúdio: janela com o fundo do estúdio, âncora e bancada de tijolos ---------- */
+.pl-estudio { position: relative; height: calc(40 * var(--u)); }
+.pl-janela { position: absolute; left: calc(1.6 * var(--u)); right: calc(1.6 * var(--u)); top: calc(4.6 * var(--u)); bottom: calc(8 * var(--u));
+  background: linear-gradient(color-mix(in oklab, var(--vermelho-alerta), #fff 22%), var(--vermelho-alerta) 40%);
+  border: var(--b) solid var(--tinta); border-radius: calc(2.4 * var(--u));
+  box-shadow: inset 0 calc(.4 * var(--u)) 0 rgb(255 255 255 / .45), inset 0 calc(-.35 * var(--u)) 0 rgb(0 0 0 / .1),
+    0 calc(1.1 * var(--u)) 0 calc(-1 * var(--b)) var(--vermelho-alerta-lado), 0 calc(1.1 * var(--u)) 0 0 var(--tinta), var(--sombra-solta); }
+.pl-tela { position: absolute; inset: calc(1.1 * var(--u)); overflow: hidden; border: calc(.35 * var(--u)) solid var(--tinta); border-radius: calc(1.4 * var(--u));
+  background: radial-gradient(62% 56% at 50% 40%, #A9BCFF, #6A87F0 46%, transparent 78%), linear-gradient(#4A66D8, var(--mesa-meio) 70%, var(--mesa-base));
+  box-shadow: inset 0 calc(.5 * var(--u)) 0 rgb(0 0 0 / .28); }
+/* pinos da mesa bem fracos no fundo do estúdio */
+.pl-tela::before { content: ''; position: absolute; inset: 0; background: var(--pinos-mesa) 0 0 / calc(3 * var(--u)) calc(3 * var(--u)); opacity: .7; }
+.pl-globo-linhas { position: absolute; left: 50%; top: 46%; width: 118%; height: auto; translate: -50% -50%; opacity: .9; }
+.pl-luz { position: absolute; left: 50%; top: 40%; width: 86%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%;
+  background: radial-gradient(circle, rgb(255 255 255 / .42), rgb(255 255 255 / .12) 42%, transparent 68%); }
+.pl-ancora { position: absolute; left: 44%; bottom: calc(9.4 * var(--u)); width: calc(34 * var(--u)); aspect-ratio: 1; translate: -50% 0; }
+.pl-quadro { position: absolute; inset: 0; width: 100%; height: 100%; user-select: none; }
+.pl-quadro:not([src]) { visibility: hidden; }
+.pl-quadro:is(.b, .c) { opacity: 0; }
+/* sem retrato (Cenas3D indisponível ou lento): o mascote Globo Irado apresenta a notícia */
+.pl-ancora.sem-retrato .pl-quadro.a { inset: auto 10% 6% 10%; width: 80%; height: auto; }
+/* Quadro sobre o ombro (o gráfico do telejornal): monitor de moldura índigo com as listras do Plantão e o ícone do evento */
+.pl-ots { position: absolute; z-index: 1; right: calc(-.2 * var(--u)); top: calc(2.4 * var(--u)); width: calc(13.4 * var(--u)); aspect-ratio: 5 / 4; rotate: 5deg;
+  padding: calc(.6 * var(--u)); background: linear-gradient(#4A4380, var(--placa-escura) 60%); border: var(--b) solid var(--tinta); border-radius: calc(1.3 * var(--u));
+  box-shadow: inset 0 calc(.3 * var(--u)) 0 rgb(255 255 255 / .22), 0 calc(.8 * var(--u)) 0 calc(-1 * var(--b)) #15102E, 0 calc(.8 * var(--u)) 0 0 var(--tinta),
+    0 calc(1.2 * var(--u)) calc(1.6 * var(--u)) rgb(14 20 64 / .35); }
+.pl-ots-tela { position: relative; height: 100%; display: grid; place-items: center; overflow: hidden; border-radius: calc(.7 * var(--u));
+  border: calc(.25 * var(--u)) solid var(--tinta);
+  background: radial-gradient(70% 70% at 50% 45%, rgb(255 255 255 / .28), transparent 72%),
+    repeating-linear-gradient(-20deg, var(--vermelho-alerta) 0 calc(1.3 * var(--u)), #C81E2A calc(1.3 * var(--u)) calc(2.6 * var(--u))); }
+/* reflexo de vidro no canto do monitor */
+.pl-ots-tela::after { content: ''; position: absolute; left: -10%; top: -30%; width: 60%; height: 70%; rotate: -24deg; background: rgb(255 255 255 / .16); pointer-events: none; }
+.pl-ots-ico { --soquete: #fff; width: 62%; border-width: var(--b); box-shadow: 0 calc(.4 * var(--u)) 0 var(--tinta); }
+.pl-ots-ico > img { width: 78%; }
+
+/* bancada: tampo vermelho com pinos sobre uma frente de 3 tijolos creme cortada por uma faixa vermelha, com o adesivo "PG" */
+.pl-bancada { position: absolute; left: 0; right: 0; bottom: calc(1 * var(--u)); height: calc(10.6 * var(--u)); }
+.pl-tampo { --cor: var(--vermelho-alerta); --cor-lado: var(--vermelho-alerta-lado); --lado: calc(.9 * var(--u)); --raio: calc(1 * var(--u));
+  position: absolute; z-index: 1; left: 0; right: 0; top: 0; height: calc(3.2 * var(--u)); }
+.pl-tampo.pinos::before { --pino: calc(2.6 * var(--u)); }
+.pl-frente { --cor: var(--ladrilho); --cor-lado: var(--ladrilho-lado); --lado: calc(1.1 * var(--u)); --raio: 0 0 calc(1.4 * var(--u)) calc(1.4 * var(--u));
+  position: absolute; left: calc(1.2 * var(--u)); right: calc(1.2 * var(--u)); top: calc(2.6 * var(--u)); bottom: 0; border-top: 0;
+  background-image: linear-gradient(90deg, transparent calc(33.3% - .12 * var(--u)), rgb(26 20 51 / .3) calc(33.3% - .12 * var(--u)) calc(33.3% + .12 * var(--u)), transparent calc(33.3% + .12 * var(--u)),
+      transparent calc(66.6% - .12 * var(--u)), rgb(26 20 51 / .3) calc(66.6% - .12 * var(--u)) calc(66.6% + .12 * var(--u)), transparent calc(66.6% + .12 * var(--u))),
+    linear-gradient(rgb(26 20 51 / .16), transparent calc(1.2 * var(--u))), linear-gradient(color-mix(in oklab, var(--face), #fff 24%), var(--face) 58%);
+  box-shadow: inset 0 calc(-.35 * var(--u)) 0 rgb(0 0 0 / .08), 0 var(--lado) 0 calc(-1 * var(--b)) var(--cor-lado), 0 var(--lado) 0 0 var(--tinta), var(--sombra-solta); }
+.pl-faixa { position: absolute; left: calc(-.1 * var(--u)); right: calc(-.1 * var(--u)); top: 34%; height: calc(2.4 * var(--u));
+  background: linear-gradient(color-mix(in oklab, var(--vermelho-alerta), #fff 18%), var(--vermelho-alerta) 60%);
+  border-block: calc(.3 * var(--u)) solid var(--tinta); box-shadow: 0 calc(.35 * var(--u)) 0 rgb(26 20 51 / .16); }
+.pl-faixa::after { content: ''; position: absolute; left: 0; right: 0; top: 30%; height: calc(.32 * var(--u)); background: var(--amarelo); border-radius: 99px; opacity: .9; }
+/* adesivo "PG" (Plantão Global): peça redonda amarela colada na bancada, torta */
+.pl-adesivo { position: absolute; z-index: 1; left: 50%; top: 50%; translate: -50% -42%; width: calc(7.4 * var(--u)); aspect-ratio: 1; rotate: -9deg;
+  display: grid; place-items: center; border-radius: 50%; border: var(--b) solid var(--tinta);
+  background: radial-gradient(circle at 36% 30%, #FFF6C4 0 14%, transparent 15%), radial-gradient(circle, var(--amarelo) 0 57%, #F2B800 58% 63%, var(--amarelo) 64%);
+  box-shadow: 0 calc(.55 * var(--u)) 0 var(--amarelo-lado), 0 calc(.55 * var(--u)) 0 var(--b) var(--tinta); }
+.pl-adesivo > span { font: 400 calc(2.9 * var(--u)) / 1 var(--f-marca); color: #fff; -webkit-text-stroke: .2em var(--tinta); paint-order: stroke fill;
+  letter-spacing: .02em; translate: 0 calc(-.1 * var(--u)); }
+
+/* ---------- Tarja (lower third) ---------- */
+.pl-tarja { display: grid; min-width: 0; }
+.plantao .tarja-topo { flex-wrap: nowrap; min-width: 0; }
+.plantao .tarja-lugar { overflow: hidden; text-overflow: ellipsis; max-width: calc(46 * var(--u)); }
+.pl-pular { flex: none; margin-bottom: calc(.9 * var(--u)); }
+.plantao .tarja-ano + .pl-pular { margin-left: calc(.4 * var(--u)); }
+.plantao .tarja-corpo { gap: calc(.9 * var(--u)); padding: calc(1.9 * var(--u)) calc(2.4 * var(--u)) calc(1.6 * var(--u));
+  box-shadow: inset 0 calc(.4 * var(--u)) 0 rgb(255 255 255 / .5), inset 0 calc(-.35 * var(--u)) 0 rgb(0 0 0 / .08),
+    0 var(--lado) 0 calc(-1 * var(--b)) var(--cor-lado), 0 var(--lado) 0 0 var(--tinta), var(--sombra-solta); }
+.pl-linha { display: flex; align-items: center; gap: calc(1.6 * var(--u)); }
+.pl-icone { --soquete: #fff; width: calc(7.6 * var(--u)); border-width: var(--b); box-shadow: 0 calc(.45 * var(--u)) 0 var(--tinta); }
+.pl-icone > img { width: 74%; }
+.pl-chapeu { display: inline-block; margin: 0 0 calc(.35 * var(--u)); padding: calc(.2 * var(--u)) calc(1 * var(--u)) calc(.25 * var(--u));
+  background: var(--tinta); color: var(--amarelo); border-radius: calc(.6 * var(--u)); font: 700 var(--fs-min) / 1.1 var(--f-titulo); letter-spacing: .01em; }
+.plantao .tarja-manchete { text-wrap: balance; }
+.pl-palavra { display: inline-block; }
+.plantao .tarja-texto { color: var(--tinta); text-wrap: pretty; max-width: 72em; }
+
+/* ---------- Efeito no mundo: chips de número com seta e diferença ---------- */
+.pl-efeitos { display: flex; flex-wrap: wrap; align-items: center; gap: calc(.8 * var(--u)) calc(1.2 * var(--u)); padding-top: calc(1.1 * var(--u));
+  border-top: calc(.3 * var(--u)) dashed rgb(26 20 51 / .22); }
+.pl-efeitos-rot { display: inline-flex; align-items: center; font: 700 var(--fs-min) / 1 var(--f-titulo); color: var(--tinta-suave); white-space: nowrap; }
+.pl-chips { display: contents; }   /* os chips correm na mesma linha do rótulo */
+.pl-chip { display: inline-flex; align-items: center; gap: calc(.6 * var(--u)); min-height: calc(4.4 * var(--u)); padding: calc(.3 * var(--u)) calc(.35 * var(--u)) calc(.3 * var(--u)) calc(.35 * var(--u));
+  background: #fff; border: var(--b-fino) solid var(--tinta); border-radius: 99px; box-shadow: var(--sombra-chip); white-space: nowrap;
+  font: 800 var(--fs-min) / 1 var(--f-texto); color: var(--tinta); }
+.pl-chip-ico { --soquete: var(--ladrilho-2); width: calc(3.7 * var(--u)); box-shadow: none; }
+.pl-chip-ico > img { width: 82%; }
+.pl-chip-ico > .pl-chip-arte { width: 112%; max-width: none; }
+.pl-chip-txt { display: inline-flex; align-items: baseline; gap: .3em; }
+.pl-chip-nome { font: 700 var(--fs-min) / 1 var(--f-titulo); }
+.pl-chip-onde { font: 800 var(--fs-min) / 1 var(--f-texto); color: var(--tinta-suave); }
+.pl-chip-valor { font: 900 var(--fs-min) / 1 var(--f-texto); font-variant-numeric: tabular-nums; display: inline-block; }
+.pl-chip-dif { display: inline-flex; align-items: center; gap: calc(.25 * var(--u)); min-height: calc(3.3 * var(--u)); padding: 0 calc(.9 * var(--u)) 0 calc(.5 * var(--u));
+  border: var(--b-fino) solid var(--tinta); border-radius: 99px; background: var(--ladrilho-2); color: var(--tinta);
+  font: 900 var(--fs-min) / 1 var(--f-texto); font-variant-numeric: tabular-nums; }
+.pl-seta { width: .95em; height: .95em; flex: none; color: #fff; overflow: visible; }
+.pl-chip[data-efeito="ganho"] .pl-chip-dif { background: var(--ganho); }
+.pl-chip[data-efeito="perda"] .pl-chip-dif { background: var(--perda); }
+.pl-chip[data-efeito="ganho"] .pl-seta { color: var(--verde-ok-lado); }
+.pl-chip[data-efeito="perda"] .pl-seta { color: var(--vermelho-alerta-lado); }
+.pl-chip[data-efeito="neutro"] .pl-seta { color: var(--tinta-suave); }
+
+/* ---------- Páginas da tarja: a notícia e o "Você sabia?" no mesmo lugar (a caixa tem a altura da maior) ---------- */
+.pl-paginas { display: grid; }
+.pl-pagina { grid-area: 1 / 1; display: grid; align-content: start; gap: calc(.9 * var(--u)); min-width: 0; }
+.pl-pagina.inativa { visibility: hidden; }
+.pl-saber { position: relative; grid-template-columns: auto minmax(0, 1fr); align-items: center; column-gap: calc(1.6 * var(--u)); align-content: center;
+  padding: calc(1 * var(--u)) calc(2 * var(--u)) calc(1.1 * var(--u)) calc(1.2 * var(--u));
+  background: var(--ladrilho-2); border: var(--b-fino) solid var(--tinta); border-radius: var(--raio-balao); box-shadow: var(--rebaixo); }
+.pl-lampada { width: calc(16 * var(--u)); max-width: none; height: auto; margin: calc(-4 * var(--u)) calc(-3 * var(--u)) calc(-3.4 * var(--u)) calc(-3.4 * var(--u)); pointer-events: none;
+  filter: drop-shadow(0 calc(.5 * var(--u)) 0 rgb(26 20 51 / .25)); }
+.pl-saber-txt { min-width: 0; }
+.pl-saber-tit { margin: 0 0 calc(.4 * var(--u)); font: 700 var(--fs-cartao) / 1 var(--f-titulo); color: var(--vermelho-texto); }
+.pl-saber p { margin: 0; font: 800 var(--fs-corpo) / 1.26 var(--f-texto); color: var(--tinta); text-wrap: pretty; }
+.pl-saber.longo p { font-size: var(--fs-min); line-height: 1.3; }
+/* botões da tarja: Pular / Notícia e o Continuar (que vira a página e depois segue) no fim da fileira de chips */
+.pl-voltar { flex: none; margin-bottom: calc(.9 * var(--u)); }
+.pl-continuar { flex: none; white-space: nowrap; margin-bottom: calc(.5 * var(--u)); }
+.plantao .tarja-ano { margin-left: auto; }
+
+/* =====================================================================================================
+   DECISÃO DE TODAS AS POTÊNCIAS (painel G): conselheiros, carimbo DECIDIDO e revelação em tijolinhos
+   ===================================================================================================== */
+.pl-decisao { --larg: min(calc(150 * var(--u)), 96vw); max-height: calc(94 * var(--u)); display: flex; flex-direction: column; }
+.pl-decisao > .painel-cab { min-height: calc(7 * var(--u)); padding-left: calc(13.4 * var(--u)); }
+.pl-decisao > .painel-cab > .pl-objeto { left: calc(-5.4 * var(--u)); top: calc(-9.2 * var(--u)); width: calc(21 * var(--u)); max-width: none; }
+.pl-quem.retrato { position: absolute; left: calc(-2.4 * var(--u)); top: calc(-5.6 * var(--u)); }
+.pl-quem > svg.forma { z-index: 2; }
+.pl-passo { margin-left: auto; flex: none; }
+.pl-decisao > .tela { overflow: visible; }
+.pl-decisao > .painel-rodape .dica { display: inline-flex; align-items: center; gap: calc(.6 * var(--u)); }
+.pl-decisao > .painel-rodape .dica .ico { width: 1.4em; }
+.pl-teclas { display: inline-flex; align-items: center; gap: calc(.4 * var(--u)); font: 800 var(--fs-min) / 1 var(--f-texto); color: #fff;
+  -webkit-text-stroke: .2em var(--tinta); paint-order: stroke fill; }
+.pl-teclas .pl-tecla { -webkit-text-stroke: 0; font-size: 1em; }
+.pl-tecla { display: inline-grid; place-items: center; min-width: 1.5em; height: 1.5em; padding: 0 .25em; border-radius: .35em;
+  background: var(--ladrilho); color: var(--tinta); border: calc(.25 * var(--u)) solid var(--tinta); box-shadow: 0 calc(.25 * var(--u)) 0 var(--tinta);
+  font: 900 .78em / 1 var(--f-texto); font-variant-numeric: tabular-nums; }
+.pl-situacao { display: flex; align-items: center; gap: calc(1.4 * var(--u)); }
+.pl-situacao > .soquete { --soquete: #fff; width: calc(6.6 * var(--u)); border-width: var(--b); }
+.pl-situacao p { margin: 0; }
+.pl-situacao-tit { font: 700 var(--fs-cartao) / 1.05 var(--f-titulo); }
+.pl-situacao-perg { font: 800 var(--fs-corpo) / 1.2 var(--f-texto); color: var(--tinta-suave); }
+.pl-opcoes { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: calc(2.2 * var(--u)); padding-top: calc(9.4 * var(--u)); }
+.pl-opcao { --lado: calc(1 * var(--u)); --raio: calc(1.8 * var(--u)); display: flex; flex-direction: column; align-items: center; gap: calc(.8 * var(--u));
+  padding: calc(9.6 * var(--u)) calc(1.6 * var(--u)) calc(1.6 * var(--u)); text-align: center; }
+/* o retrato do conselheiro sai pela borda de cima do cartão (o enquadramento "busto" tem folga em cima) */
+.pl-conselho { position: absolute; left: 50%; top: calc(-13.2 * var(--u)); width: calc(22 * var(--u)); aspect-ratio: 1; translate: -50% 0; display: grid; place-items: end center; pointer-events: none; }
+.pl-conselho-vazio { align-self: center; }
+.pl-conselho > img { width: 100%; height: 100%; max-width: none; }
+.pl-conselho-vazio { --soquete: #fff; width: calc(9 * var(--u)); border-width: var(--b); }
+.pl-cargo { display: inline-flex; align-items: center; gap: calc(.5 * var(--u)); font: 700 var(--fs-min) / 1.1 var(--f-titulo); color: var(--tinta); }
+.pl-cargo .ico { width: 1.3em; }
+.pl-opcao-tit { margin: 0; font: 700 var(--fs-cartao) / 1.05 var(--f-titulo); text-wrap: balance; }
+.pl-opcao-texto.balao { flex: 1; width: 100%; margin: calc(.4 * var(--u)) 0 calc(.8 * var(--u)); text-align: left; font: 900 var(--fs-min) / 1.25 var(--f-texto); text-wrap: pretty; }
+.pl-escolher { width: 100%; }
+.pl-escolher .pl-tecla { margin-right: calc(.4 * var(--u)); }
+.pl-carimbo { position: absolute; z-index: 5; left: 50%; top: 52%; translate: -50% -50%; pointer-events: none; }
+
+/* ---------- Revelação ---------- */
+.pl-colunas { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: calc(2.4 * var(--u)); }
+.pl-coluna { display: flex; flex-direction: column; gap: calc(.8 * var(--u)); min-width: 0; }
+.pl-coluna-cab { --lado: calc(.8 * var(--u)); display: flex; align-items: center; gap: calc(1 * var(--u)); min-height: calc(6 * var(--u));
+  padding: calc(.5 * var(--u)) calc(1.4 * var(--u)) calc(.5 * var(--u)) calc(.6 * var(--u)); font: 700 var(--fs-corpo) / 1.05 var(--f-titulo); }
+.pl-coluna-cab > .soquete { --soquete: #fff; width: calc(4.6 * var(--u)); }
+.pl-pilha { display: flex; flex-wrap: wrap-reverse; justify-content: center; align-content: flex-start; gap: calc(1.5 * var(--u)) calc(.8 * var(--u));
+  min-height: calc(13.6 * var(--u)); padding: calc(1.8 * var(--u)) calc(.4 * var(--u)) calc(.2 * var(--u)); }
+.pl-tijolinho { --lado: calc(.8 * var(--u)); --raio: calc(.9 * var(--u)); display: inline-flex; align-items: center; gap: calc(.6 * var(--u));
+  min-width: calc(15 * var(--u)); height: calc(5 * var(--u)); padding: 0 calc(1.2 * var(--u)) 0 calc(.8 * var(--u));
+  color: #fff; -webkit-text-stroke: .2em var(--tinta); paint-order: stroke fill; font: 700 var(--fs-min) / 1 var(--f-titulo); letter-spacing: .02em; }
+.pl-tijolinho.pinos::before, .pl-tijolinho::before { --pino: calc(2.2 * var(--u)); }
+.pl-tijolinho > svg.forma { width: calc(3 * var(--u)); height: calc(3 * var(--u)); flex: none; }
+.pl-base { --cor: var(--cinza-peca); --cor-lado: var(--cinza-peca-lado); --lado: calc(1.2 * var(--u)); display: grid; place-items: center; height: calc(5.4 * var(--u)); }
+.pl-base.pinos::before { --pino: calc(2.6 * var(--u)); }
+.pl-conta { font: 900 calc(3.4 * var(--u)) / 1 var(--f-texto); font-variant-numeric: tabular-nums; display: inline-block; }
+.pl-porque { margin: calc(.6 * var(--u)) 0 0; font: 800 var(--fs-min) / 1.28 var(--f-texto); color: var(--tinta-suave); text-wrap: pretty; }
+.pl-porque > b { color: var(--tinta); font-family: var(--f-titulo); font-weight: 700; }
+.pl-coletivo { display: flex; align-items: center; gap: calc(3 * var(--u)); margin-top: calc(1.4 * var(--u)); padding: calc(1 * var(--u)) calc(2.4 * var(--u)) calc(1 * var(--u)) calc(2 * var(--u));
+  background: var(--ladrilho-2); border: var(--b-fino) solid var(--tinta); border-radius: var(--raio); box-shadow: var(--rebaixo); }
+.pl-coletivo > .carimbo { flex: none; --tam: calc(3.6 * var(--u)); }
+.pl-coletivo p { margin: 0; }
+.pl-coletivo-manchete { font: 700 var(--fs-cartao) / 1.1 var(--f-titulo); }
+.pl-coletivo-regra { margin-top: calc(.4 * var(--u)) !important; font: 800 var(--fs-min) / 1.25 var(--f-texto); color: var(--tinta-suave); }
+.pl-decisao .pl-efeitos { margin-top: calc(1.2 * var(--u)); padding-top: calc(.9 * var(--u)); }
+.pl-decisao > .tela { padding-block: calc(1.6 * var(--u)); }
+
+/* =====================================================================================================
+   REPÓRTER DE CAMPO: placa "Direto do Caribe" presa ao lugar do evento no mapa, com retrato e microfone do kit
+   ===================================================================================================== */
+.pl-reporter { position: absolute; z-index: 2; display: flex; align-items: flex-end; pointer-events: none; }
+.pl-reporter[hidden] { display: none; }
+.pl-reporter.esq { flex-direction: row-reverse; }
+.pl-rep-placa { --cor: var(--ladrilho); --cor-lado: var(--ladrilho-lado); --lado: calc(.8 * var(--u)); --raio: var(--raio-balao); --ponta-y: 50%;
+  display: grid; padding: calc(.9 * var(--u)) calc(7.6 * var(--u)) calc(1 * var(--u)) calc(1.8 * var(--u)); white-space: nowrap; }
+.pl-reporter.esq .pl-rep-placa { padding: calc(.9 * var(--u)) calc(1.8 * var(--u)) calc(1 * var(--u)) calc(7.6 * var(--u)); }
+/* ponta do balão apontando para o lugar */
+.pl-rep-placa::after { content: ''; position: absolute; left: calc(-1.6 * var(--u)); top: var(--ponta-y); width: calc(2.8 * var(--u)); height: calc(2.8 * var(--u));
+  translate: 0 -50%; rotate: 45deg; background: color-mix(in oklab, var(--face), #fff 12%); border: solid var(--tinta); border-width: 0 0 var(--b) var(--b);
+  border-bottom-left-radius: calc(.5 * var(--u)); }
+.pl-reporter.esq .pl-rep-placa::after { left: auto; right: calc(-1.6 * var(--u)); border-width: var(--b) var(--b) 0 0; border-radius: 0 calc(.5 * var(--u)) 0 0; }
+.pl-rep-pre { font: 700 var(--fs-min) / 1.1 var(--f-titulo); color: var(--vermelho-texto); }
+.pl-rep-lugar { font: 700 var(--fs-cartao) / 1.05 var(--f-titulo); color: var(--tinta); }
+/* retrato do repórter saindo pela borda da placa, com o microfone do kit na mão */
+.pl-rep-foto { position: relative; flex: none; width: calc(13 * var(--u)); aspect-ratio: 1; margin-left: calc(-8.4 * var(--u)); margin-bottom: calc(-.2 * var(--u)); }
+.pl-reporter.esq .pl-rep-foto { margin-left: 0; margin-right: calc(-8.4 * var(--u)); }
+.pl-rep-boneco { position: absolute; inset: 0; width: 100%; height: 100%; }
+.pl-rep-mic { position: absolute; left: -6%; bottom: -10%; width: 66%; max-width: none; height: auto; transform-origin: 40% 70%;
+  clip-path: polygon(28% 10%, 68% 10%, 68% 52%, 47% 58%, 46% 76%, 30% 76%); }
+.pl-reporter.sem-foto .pl-rep-mic { left: 10%; bottom: 0; width: 86%; }

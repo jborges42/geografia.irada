@@ -1,8 +1,7 @@
 // Kit de ilustração (guia de arte §4.2): fotografa os objetos de peças no estúdio da vitrine
 // (ferramentas/vitrine-arte.html?render=<nomes>) no Chrome sem janela, grava img/arte/<nome>.webp (512 px, ≤ 25 KB),
-// embute tudo em js/arte.js (bloco ARTE_IMG) e gera o logotipo em arquivo (img/logo*.svg, img/favicon.svg) a partir de
-// logo() de js/icones.js.
-// Uso: node ferramentas/renderizar-arte.mjs [todos | nome,nome,…] [--sem-logo] [--sem-render]
+// embute tudo em js/arte.js (bloco ARTE_IMG). A logo oficial é recortada por ferramentas/recortar-logo.mjs.
+// Uso: node ferramentas/renderizar-arte.mjs [todos | nome,nome,…] [--sem-render]
 import { abrirJogo } from './navegador.mjs';
 import { readFileSync, writeFileSync, readdirSync, mkdirSync, statSync } from 'node:fs';
 
@@ -43,16 +42,4 @@ const faltam = ordem.filter(n => !feitos.includes(n));
 console.log(`js/arte.js: ${feitos.length} objetos embutidos (${(total / 1024).toFixed(0)} KB em WebP; orçamento do kit: 1.536 KB)` +
   (faltam.length ? `\nainda provisórios: ${faltam.join(', ')}` : ''));
 
-// 3. Logotipo em arquivo (mesmo desenho de logo())
-if (!args.includes('--sem-logo')) {
-  const ctx = {};
-  new Function('ctx', readFileSync(RAIZ + 'js/icones.js', 'utf8') + '\nctx.logo = logo;')(ctx);
-  const xml = s => '<?xml version="1.0" encoding="UTF-8"?>\n' + s.replace(/^<svg class="[^"]*"/, '<svg') + '\n';
-  const arquivos = {
-    'logo.svg': ctx.logo('', { variante: 'cor' }), 'logo-claro.svg': ctx.logo('', { variante: 'claro' }),
-    'logo-mono.svg': ctx.logo('', { variante: 'mono' }), 'logo-globo.svg': ctx.logo('', { variante: 'globo' }),
-    'favicon.svg': ctx.logo('', { variante: 'globo', simples: true }),
-  };
-  for (const [nome, svg] of Object.entries(arquivos)) writeFileSync(RAIZ + 'img/' + nome, xml(svg));
-  console.log('logotipo:', Object.keys(arquivos).map(n => `img/${n} (${(statSync(RAIZ + 'img/' + n).size / 1024).toFixed(1)} KB)`).join(', '));
-}
+// (O logotipo não sai mais daqui: a logo oficial e os img/logo*.svg saem de ferramentas/recortar-logo.mjs.)

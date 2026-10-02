@@ -1,0 +1,102 @@
+<!doctype html>
+<!-- Vitrine da frente ONU (não faz parte do jogo): cada cena com um estado de exemplo.
+     ?cena=convocacao|votacao|conselho|veto|proposta|cop|doacao|reuniao|negociar (com a China, que é equipe: a outra equipe aceita na tela)
+     ?humanos=brasil,china (equipes; o resto é computador; "nenhum" = só computador) · ?rm = movimento reduzido pelo ajuste -->
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<base href="../">
+<title>Vitrine da ONU</title>
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/arte.css">
+<link rel="stylesheet" href="css/onu.css">
+<style>
+  #vitrine-barra { position: fixed; z-index: 15; left: 0; right: 0; bottom: 0; display: flex; flex-wrap: wrap; gap: calc(.8 * var(--u)); align-items: center; justify-content: center;
+    padding: calc(1.2 * var(--u)); background: rgb(14 20 64 / .55); }
+  #vitrine-barra .titulo { font: 400 calc(3 * var(--u)) / 1 var(--f-marca); margin-right: calc(1 * var(--u)); }
+  #vitrine-barra .btn[aria-pressed="true"] { --cor: var(--amarelo); --cor-lado: var(--amarelo-lado); }
+  #vitrine-saida { position: fixed; z-index: 15; left: calc(2 * var(--u)); top: calc(2 * var(--u)); max-width: 60%; font: 800 var(--fs-min) / 1.3 var(--f-texto); }
+  #vitrine-saida:empty { display: none; }
+</style></head>
+<body class="jogo">
+<div id="mundo" aria-hidden="true"></div>
+<div id="rotulos-mapa"></div>
+<div id="cena" hidden></div>
+<main id="telas"><section id="tela-partida" class="tela"></section></main>
+<div id="camada"></div>
+<div id="splash" aria-hidden="true" hidden>
+  <div class="splash-faixa faixa peca pinos cor-herdada">
+    <span id="splash-icone" class="faixa-icone soquete"></span>
+    <div class="faixa-textos"><div id="splash-pre" class="letra-bolha"></div><div id="splash-titulo" class="letra-bolha"></div><div id="splash-sub" class="letra-bolha"></div></div>
+  </div>
+</div>
+<div id="aviso" role="status" hidden></div>
+<div id="anuncio" class="so-leitor" aria-live="polite"></div>
+<nav id="vitrine-barra" aria-label="Cenas da vitrine"><span class="titulo letra-bolha relevo">ONU</span></nav>
+<p id="vitrine-saida" class="pilula" role="status"></p>
+
+<script src="lib/three.min.js"></script>
+<script src="lib/gsap.min.js"></script>
+<script src="lib/confetti.min.js"></script>
+<script src="dados/mapa.js"></script>
+<script src="dados/modelos.js"></script>
+<script src="conteudo/potencias.js"></script>
+<script src="conteudo/territorios.js"></script>
+<script src="conteudo/politicas.js"></script>
+<script src="conteudo/eventos.js"></script>
+<script src="conteudo/resolucoes.js"></script>
+<script src="conteudo/dilemas.js"></script>
+<script src="js/icones.js"></script>
+<script src="js/arte.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/simulacao.js"></script>
+<script src="js/bonecos.js"></script>
+<script src="js/cenas3d.js"></script>
+<script src="js/onu.js"></script>
+<script>
+'use strict';
+const q = new URLSearchParams(location.search);
+if (q.has('rm')) document.documentElement.classList.add('rm');
+const PIDS = ['brasil', 'eua', 'china', 'ue', 'india', 'russia'];
+const humanos = q.get('humanos') === 'nenhum' ? [] : (q.get('humanos') || 'brasil,china,ue').split(',');
+// Estado de exemplo: 2030, mandato 2, com um pouco de tudo (conflitos, estoques variados, uma sanção)
+function estado() {
+  const e = Simulacao.criarEstado({ modo: q.get('modo') || 'competitivo', rodadas: 6, semente: 11, infiltrado: q.has('infiltrado'),
+    jogadores: humanos.map(p => ({ potencia: p, nome: 'Equipe' })) });
+  e.rodada = 2; e.ano = 2030;
+  Object.assign(e.potencias.brasil.recursos, { alimentos: 6, energia: 2, minerais: 3, tecnologia: 1 });
+  Object.assign(e.potencias.china.recursos, { alimentos: 1, energia: 3, minerais: 7, tecnologia: 5 });
+  Object.assign(e.potencias.ue.recursos, { alimentos: 3, energia: 0, minerais: 1, tecnologia: 4 });
+  e.sancoes.push({ de: 'eua', contra: 'russia', ate: 4 });
+  if (q.has('infiltrado')) { Object.values(e.potencias).forEach(p => (p.papel = 'diplomata')); e.potencias[humanos.at(-1)].papel = 'infiltrado'; }
+  return e;
+}
+const saida = document.getElementById('vitrine-saida');
+const mostrar = r => (saida.textContent = 'Resultado: ' + JSON.stringify(r, (k, v) => (k === 'mudancas' || k === 'votos' ? undefined : v)));
+const CENAS = {
+  convocacao: () => ONU._convocacao({ cs: true, pre: 'Conselho de Segurança · convocado pelo Brasil', sub: 'Missão de paz no Sahel' }),
+  votacao: e => ONU.votacao(e, { id: 'acordo_climatico', alvo: null, proponente: 'brasil' }),
+  conselho: e => ONU.votacao(e, { id: 'missao_paz', alvo: 'sahel', proponente: 'brasil' }),
+  veto: e => ONU.votacao(e, { id: 'sancoes_onu', alvo: 'russia', proponente: 'ue' }),
+  proposta: e => ONU.proporResolucao(e, 'brasil'),
+  cop: e => ONU.cop(e),
+  doacao: e => ONU.doacao(e, { id: 'furacao' }, 'caribe'),
+  reuniao: e => ONU.reuniaoEmergencia(e, humanos[0] || 'brasil'),
+  negociar: e => ONU.negociar(e, humanos[0] || 'brasil'),
+};
+let rodando = false;
+async function rodar(nome) {
+  if (rodando) return;
+  rodando = true; saida.textContent = '';
+  document.querySelectorAll('#vitrine-barra .btn').forEach(b => b.setAttribute('aria-pressed', b.dataset.cena === nome));
+  try { mostrar(await CENAS[nome](estado())); } catch (erro) { if (erro !== CANCELADA) throw erro; } finally { rodando = false; }
+}
+const barra = document.getElementById('vitrine-barra');
+Object.keys(CENAS).forEach(nome => {
+  const b = document.createElement('button');
+  b.className = 'btn btn-mini btn-neutro peca'; b.type = 'button'; b.dataset.cena = nome; b.textContent = nome;
+  b.addEventListener('click', () => rodar(nome));
+  barra.appendChild(b);
+});
+fontesProntas.then(() => { if (q.get('cena') && CENAS[q.get('cena')]) rodar(q.get('cena')); });
+</script>
+</body></html>

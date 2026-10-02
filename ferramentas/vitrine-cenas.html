@@ -83,7 +83,7 @@ function botao(onde, texto, fn, classe = 'btn btn-mini peca btn-neutro') {
   b.addEventListener('click', fn); onde.appendChild(b); return b;
 }
 function limpar() {
-  painel.className = ''; painel.innerHTML = ''; galeria.className = ''; galeria.innerHTML = ''; extras.innerHTML = '';
+  painel.className = ''; painel.innerHTML = ''; galeria.className = ''; galeria.innerHTML = ''; galeria.style.left = ''; extras.innerHTML = '';
   fotoFinal.style.display = 'none'; fotoFinal.innerHTML = ''; document.getElementById('rotulos').innerHTML = '';
   document.getElementById('mascoteArea').style.display = 'none'; Mascote.parar();
 }

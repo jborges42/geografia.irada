@@ -34,6 +34,46 @@
   .v-botoes { display: flex; flex-wrap: wrap; gap: calc(1 * var(--u)); }
   .v-btn-ic { display: grid; place-items: center; width: calc(6.4 * var(--u)); height: calc(6.4 * var(--u)); border-radius: 50%; }
   .v-btn-ic > img { width: calc(3.4 * var(--u)); }
+  /* composições de exemplo */
+  .v-jornal { padding-bottom: calc(1.6 * var(--u)); }
+  .v-jornal .jornal-cab { padding-top: calc(3 * var(--u)); }
+  .v-noticias { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: calc(2 * var(--u)); padding: calc(1.6 * var(--u)) calc(2.4 * var(--u)) 0; }
+  .v-noticias article { display: grid; align-content: start; gap: calc(.8 * var(--u)); }
+  .v-noticias article + article { border-left: calc(.15 * var(--u)) solid rgb(26 20 51 / .25); padding-left: calc(2 * var(--u)); }
+  .v-noticias h3 { font: 700 var(--fs-cartao) / 1.08 var(--f-titulo); text-wrap: balance; }
+  .v-noticias article:first-child h3 { font-size: var(--fs-h2); }
+  .v-noticias p { font: 800 var(--fs-min) / 1.3 var(--f-texto); color: var(--tinta-suave); }
+  .v-noticias .v-foto { display: grid; place-items: center; height: calc(15 * var(--u)); border-radius: calc(1 * var(--u)); border: var(--b-fino) solid var(--tinta);
+    background: radial-gradient(circle at 50% 120%, var(--cat, var(--cat-natureza)) 0 55%, color-mix(in oklab, var(--cat, var(--cat-natureza)), #fff 55%) 56%); box-shadow: var(--rebaixo); }
+  .v-noticias .v-foto { overflow: hidden; }
+  .v-noticias .v-foto .arte { width: calc(21 * var(--u)); max-width: none; margin: calc(-1 * var(--u)) 0 calc(-3 * var(--u)); }
+  .v-chip-cat { display: inline-flex; align-items: center; gap: calc(.5 * var(--u)); width: fit-content; padding: calc(.25 * var(--u)) calc(1 * var(--u)) calc(.25 * var(--u)) calc(.3 * var(--u));
+    background: var(--cor); border: var(--b-fino) solid var(--tinta); border-radius: 99px; font: 700 var(--fs-min) / 1 var(--f-titulo); box-shadow: var(--sombra-chip); }
+  .v-chip-cat .ico { width: calc(2.6 * var(--u)); }
+  .v-critico { position: relative; display: flex; align-items: center; gap: calc(1.2 * var(--u)); margin: calc(1.8 * var(--u)) calc(2.4 * var(--u)) 0; padding: calc(.8 * var(--u)) calc(1.6 * var(--u)) calc(1.4 * var(--u));
+    background: var(--pessego-alerta); border: var(--b-fino) solid var(--tinta); border-radius: calc(1 * var(--u)); font: 800 var(--fs-corpo) / 1.2 var(--f-texto); overflow: hidden; }
+  .v-critico .zebra { left: 0; right: 0; }
+  .v-tv { position: relative; display: grid; grid-template-columns: auto 1fr; align-items: end; gap: calc(2 * var(--u)); padding: calc(10 * var(--u)) calc(2 * var(--u)) calc(2 * var(--u)); }
+  .v-bancada { position: relative; display: grid; justify-items: center; }
+  .v-bancada .arte { width: calc(14 * var(--u)); margin-bottom: calc(-3.4 * var(--u)); position: relative; z-index: 1; rotate: 8deg; }
+  .v-bancada .v-mesa { --cor: var(--ladrilho); --lado: calc(1.2 * var(--u)); width: calc(24 * var(--u)); height: calc(9 * var(--u)); border-radius: calc(1.4 * var(--u)) calc(1.4 * var(--u)) calc(.6 * var(--u)) calc(.6 * var(--u));
+    background: linear-gradient(transparent 46%, var(--vermelho-alerta) 46% 64%, transparent 64%), linear-gradient(#fff, var(--ladrilho) 50%); display: grid; place-items: center; }
+  .v-bancada .v-pg { padding: calc(.3 * var(--u)) calc(1.2 * var(--u)); background: var(--amarelo); border: var(--b-fino) solid var(--tinta); border-radius: calc(.8 * var(--u)); font: 400 calc(3 * var(--u)) / 1 var(--f-marca); color: #fff; -webkit-text-stroke: .17em var(--tinta); paint-order: stroke fill; rotate: -6deg; }
+  .v-sabia { display: flex; align-items: center; gap: calc(1.2 * var(--u)); margin-top: calc(1.4 * var(--u)); padding: calc(1 * var(--u)) calc(1.6 * var(--u)); background: var(--ladrilho-2); border: var(--b-fino) solid var(--tinta); border-radius: calc(1.2 * var(--u));
+    box-shadow: var(--rebaixo); font: 800 var(--fs-min) / 1.3 var(--f-texto); }
+  .v-sabia .arte { width: calc(8 * var(--u)); flex: none; margin: calc(-2 * var(--u)) 0; }
+  .v-sabia b { display: block; font: 700 var(--fs-cartao) / 1 var(--f-titulo); }
+  .v-painel { --larg: auto; max-width: none; }
+  .v-opcoes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: calc(1.6 * var(--u)); margin-top: calc(1.4 * var(--u)); }
+  .v-opcao { --lado: calc(1 * var(--u)); display: grid; justify-items: center; gap: calc(.8 * var(--u)); padding: calc(1.2 * var(--u)) calc(1.4 * var(--u)) calc(1.6 * var(--u)); text-align: center; border-radius: calc(1.8 * var(--u)); }
+  .v-opcao .arte { width: calc(12 * var(--u)); margin-top: calc(-5 * var(--u)); }
+  .v-opcao .v-cargo { font: 700 var(--fs-min) / 1 var(--f-titulo); }
+  .v-opcao .balao { width: 100%; font-size: var(--fs-min); }
+  .v-opcao .carimbo { --tam: calc(3.6 * var(--u)); position: absolute; top: 44%; left: 50%; translate: -50% 0; }
+  .v-balanco { display: grid; grid-template-columns: 1fr 1fr; gap: calc(1.6 * var(--u)); }
+  .v-indic { --lado: calc(.8 * var(--u)); display: grid; gap: calc(.6 * var(--u)); padding: calc(1.2 * var(--u)) calc(1.6 * var(--u)); border-radius: calc(1.6 * var(--u)); }
+  .v-indic h4 { display: flex; align-items: center; gap: calc(.6 * var(--u)); font: 700 var(--fs-cartao) / 1 var(--f-titulo); margin: 0; }
+  .v-indic .num { font-size: calc(5.2 * var(--u)); line-height: 1; }
   [hidden] { display: none !important; }
 </style>
 </head>
@@ -490,11 +530,19 @@ const KIT = (() => {
     g.add(malha(redonda(1.9, .6, { pino: false, c: .12 }), plastico(PRETA, .35)));
     g.add(malha(redonda(.5, 1.3, { pino: false, r2: .38 }), plastico(PRETA, .35), 0, .6, 0));
     const eixo = new THREE.Group(); eixo.position.set(0, 4.15, 0); eixo.rotation.z = rad(-23); g.add(eixo);
-    eixo.add(esferaDePecas(2.3, 330, { lonCentro: -30 }));
+    eixo.add(esferaDePecas(2.3, 250, { lonCentro: -30 }));
     // meio-arco dourado (meridiano) com pinos nas pontas
     eixo.add(malha(new THREE.TorusGeometry(2.78, .24, 16, 64, Math.PI), ouro(), 0, 0, 0, 0, Math.PI / 2, Math.PI / 2));
     eixo.add(malha(redonda(.26, .5, { pino: false }), ouro(), 0, 2.4, 0));
     eixo.add(malha(redonda(.26, .5, { pino: false }), ouro(), 0, -2.9, 0));
+    return g;
+  }
+
+  // Planeta de peças solto (sem base nem arco): vinheta do Plantão, selos, "o mundo"
+  function planeta() {
+    const g = grupo(), eixo = new THREE.Group(); eixo.position.y = 2.6; eixo.rotation.z = rad(-23); g.add(eixo);
+    eixo.add(esferaDePecas(2.4, 340, { lonCentro: -20 }));
+    g.add(em(brilho(.5), 2.1, 4.6, 1.2));
     return g;
   }
 
@@ -512,17 +560,23 @@ const KIT = (() => {
   // ---------- APERTO DE MÃOS ----------
   function apertoMaos() {
     const g = grupo(), CLARA = '#F2C08E', ESCURA = '#8D5A35';
-    // antebraços vindos de baixo (manga lavanda e menta, punho branco)
-    g.add(barraEntre([-3.0, 0, 0], [-1.05, 2.45, 0], .8, plastico('#DCCFFF', .3)), barraEntre([3.0, 0, 0], [1.05, 2.45, 0], .8, plastico('#B3EFC6', .3)));
-    g.add(barraEntre([-1.45, 1.95, 0], [-1.05, 2.45, 0], .9, plastico(BRANCO, .3)), barraEntre([1.45, 1.95, 0], [1.05, 2.45, 0], .9, plastico(BRANCO, .3)));
-    // palmas que se encontram
-    g.add(malha(bloco(1.9, 1.45, 1.3, { pinos: false, r: .5 }), plastico(CLARA, .28), -.45, 2.4, .05, 0, 0, rad(-14)));
-    g.add(malha(bloco(1.9, 1.45, 1.3, { pinos: false, r: .5 }), plastico(ESCURA, .28), .45, 2.3, -.15, 0, 0, rad(14)));
-    // dedos da mão escura abraçando a clara pela frente; polegares por cima
-    for (let i = 0; i < 4; i++) g.add(barraEntre([.55, 3.42 - i * .34, .62], [-.85, 3.32 - i * .34, .72], .19, plastico(ESCURA, .28)));
-    g.add(barraEntre([-.95, 3.75, .25], [.2, 4.05, .35], .26, plastico(CLARA, .28)));
-    g.add(barraEntre([1.0, 3.55, -.5], [.05, 3.9, -.45], .24, plastico(ESCURA, .28)));
-    g.add(em(brilho(.5, AMARELO), 0, 5.35, .5), em(brilho(.34, AMARELO), -1.65, 4.75, .5), em(brilho(.34, AMARELO), 1.7, 4.8, .5));
+    // braços de boneco: manga (bloco arredondado) + punho branco + mão-luvinha com polegar; apertando no centro
+    const braco = (s, manga, pele) => {
+      const b = new THREE.Group(); b.position.set(0, 1.7, 0); b.rotation.z = s * rad(-16);
+      const caixa = (w, h, d, r, cor, x, y = 0, z = 0) => malha(bloco(w, h, d, { pinos: false, r }), plastico(cor, .3), x, y - h / 2, z);
+      b.add(caixa(2.0, 1.45, 1.45, .4, manga, s * -2.25));
+      b.add(caixa(.46, 1.62, 1.62, .16, BRANCO, s * -1.1));
+      b.add(caixa(1.3, 1.2, 1.15, .42, pele, s * -.4, 0, s * .28));
+      b.add(caixa(.42, .7, .46, .19, pele, s * -.36, .88, s * .32));
+      return b;
+    };
+    g.add(braco(-1, '#DCCFFF', CLARA), braco(1, '#B3EFC6', ESCURA));
+    // dedos da mão escura por cima da clara (vincos impressos)
+    const vincos = impresso((c, W, H) => { c.fillStyle = ESCURA; c.fillRect(0, 0, W, H); c.strokeStyle = 'rgba(26,20,51,.45)'; c.lineWidth = 8; c.lineCap = 'round';
+      for (let i = 1; i < 4; i++) { c.beginPath(); c.moveTo(W * i / 4, H * .15); c.lineTo(W * i / 4, H * .85); c.stroke(); } }, 128, 96, null, .3);
+    const dedos = malha(bloco(1.0, .7, .38, { pinos: false, r: .17 }), plastico(ESCURA, .28), -.34, 1.36, .7, 0, 0, rad(12)); g.add(dedos);
+    g.add(decal(.86, .56, vincos, -.34, 1.71, .9, 0, 0, rad(12)));
+    g.add(em(brilho(.46, AMARELO), 0, 3.6, .4), em(brilho(.3, AMARELO), -1.4, 3.15, .4), em(brilho(.3, AMARELO), 1.45, 3.2, .4));
     return g;
   }
 
@@ -640,10 +694,12 @@ const KIT = (() => {
   }, (c, x, y, s) => { const p = new Path2D(`M${x} ${y - s * .38} L${x + s * .36} ${y - s * .08} L${x} ${y + s * .4} L${x - s * .36} ${y - s * .08} Z`); c.lineJoin = 'round'; c.fillStyle = '#B48CF0'; c.fill(p); c.lineWidth = s * .08; c.strokeStyle = T; c.stroke(p);
     c.fillStyle = 'rgba(255,255,255,.6)'; c.beginPath(); c.moveTo(x - s * .2, y - s * .1); c.lineTo(x, y - s * .28); c.lineTo(x + s * .05, y - s * .1); c.fill(); });
   const caixaTecnologia = () => caixote(g => {
-    const chip = (x, z, rx, rz) => { const c = grupo(malha(ladrilho(1.9, 1.9), plastico('#2FAA5E', .3)), malha(bloco(.8, .25, .8, { pinos: false, r: .05 }), plastico(PRETA, .3), 0, .4, 0));
-      for (let i = 0; i < 3; i++) for (const s of [-1, 1]) { c.add(malha(bloco(.16, .12, .3, { pinos: false, r: .03 }), ouro(), -.4 + i * .4, .4, s * .55)); c.add(malha(bloco(.3, .12, .16, { pinos: false, r: .03 }), ouro(), s * .55, .4, -.4 + i * .4)); }
-      c.position.set(x, 2.0, z); c.rotation.set(rx, 0, rz); return c; };
-    g.add(chip(-.45, .2, .75, .35), chip(.5, -.15, .55, -.4), chip(0, -.75, 1.1, .05));
+    const chip = (x, y, z, rx, ry, rz) => { const c = grupo(malha(ladrilho(2.0, 2.0), plastico('#2FAA5E', .3)), malha(bloco(1.0, .3, 1.0, { pinos: false, r: .06 }), plastico(PRETA, .3), 0, .4, 0));
+      for (let i = 0; i < 3; i++) for (const s of [-1, 1]) { c.add(malha(bloco(.18, .14, .34, { pinos: false, r: .03 }), ouro(), -.38 + i * .38, .4, s * .67)); c.add(malha(bloco(.34, .14, .18, { pinos: false, r: .03 }), ouro(), s * .67, .4, -.38 + i * .38)); }
+      c.add(malha(bloco(.5, .06, .5, { pinos: false, r: .02 }), plastico('#3C3863', .3), 0, .7, 0));
+      for (const [px, pz] of [[-.75, -.75], [.75, .75]]) c.add(malha(geoPino(0, 0, 0, .55), ouro(), px, .4, pz));
+      c.position.set(x, y, z); c.rotation.set(rx, ry, rz); return c; };
+    g.add(chip(-.55, 2.55, -.55, rad(62), rad(-10), rad(18)), chip(.6, 2.7, -.35, rad(52), rad(15), rad(-20)), chip(.05, 2.45, .35, rad(38), 0, rad(4)));
   }, (c, x, y, s) => { c.fillStyle = '#2FAA5E'; c.strokeStyle = T; c.lineWidth = s * .07; c.beginPath(); c.roundRect(x - s * .3, y - s * .3, s * .6, s * .6, s * .06); c.fill(); c.stroke();
     c.fillStyle = PRETA; c.fillRect(x - s * .15, y - s * .15, s * .3, s * .3); c.fillStyle = '#FFC93C'; for (let i = 0; i < 3; i++) for (const d of [-1, 1]) { c.fillRect(x - s * .19 + i * s * .14, y + d * s * .36 - s * .04, s * .08, s * .08); c.fillRect(x + d * s * .36 - s * .04, y - s * .19 + i * s * .14, s * .08, s * .08); } });
 
@@ -691,7 +747,7 @@ const KIT = (() => {
     g.add(malha(bloco(3.6, .05, 2.2, { pinos: false, r: .02 }), plastico(BRANCO, .4), .6, .25, -1.0, 0, rad(12), 0));
     const aba = impresso((c, W, H) => { c.strokeStyle = 'rgba(26,20,51,.35)'; c.lineWidth = 7; c.beginPath(); c.moveTo(8, 8); c.lineTo(W / 2, H * .62); c.lineTo(W - 8, 8); c.stroke();
       c.beginPath(); c.moveTo(8, H - 8); c.lineTo(W * .38, H * .55); c.moveTo(W - 8, H - 8); c.lineTo(W * .62, H * .55); c.stroke();
-      c.save(); c.translate(W * .3, H * .76); c.rotate(-.14); c.strokeStyle = '#F0303A'; c.lineWidth = 9; c.strokeRect(-W * .2, -H * .1, W * .4, H * .2); c.font = `${H * .1}px "Titan One"`; c.fillStyle = '#F0303A'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('CONFIDENCIAL', 0, 4); c.restore();
+      c.save(); c.translate(W * .3, H * .8); c.rotate(-.12); c.strokeStyle = '#F0303A'; c.lineWidth = 8; c.beginPath(); c.roundRect(-W * .24, -H * .08, W * .48, H * .16, 10); c.stroke(); c.font = `${H * .066}px "Titan One"`; c.fillStyle = '#F0303A'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('CONFIDENCIAL', 0, 3); c.restore();
     }, 512, 360, '#FFF4DC', .45);
     g.add(decal(5.1, 3.6, aba, 0, .36, 0, -Math.PI / 2, 0, 0));
     const lacre = impresso((c, W, H) => { c.fillStyle = '#D7263D'; c.fillRect(0, 0, W, H); bolha(c, '?', W / 2, H * .55, H * .62); }, 128, 128, '#D7263D', .3);
@@ -835,16 +891,26 @@ const KIT = (() => {
   // ---------- MAPA ENROLADO ----------
   function mapaEnrolado() {
     const g = grupo();
-    const mapa = impresso((c, W, H) => { c.fillStyle = '#7FD8EC'; c.fillRect(0, 0, W, H); c.fillStyle = 'rgba(255,255,255,.2)'; for (let i = 0; i < 12; i++) for (let k = 0; k < 6; k++) { c.beginPath(); c.arc(20 + i * 42, 20 + k * 42, 7, 0, 7); c.fill(); }
-      c.lineJoin = 'round'; c.strokeStyle = T; c.lineWidth = 6;
-      const terra = (pts, cor) => { c.beginPath(); pts.forEach(([x, y], i) => c[i ? 'lineTo' : 'moveTo'](x * W, y * H)); c.closePath(); c.fillStyle = cor; c.fill(); c.stroke(); };
-      terra([[.1, .2], [.3, .12], [.38, .35], [.3, .55], [.22, .9], [.14, .6]], '#7CCB4E'); terra([[.5, .18], [.68, .12], [.72, .4], [.62, .8], [.52, .55]], '#F2D58A'); terra([[.78, .2], [.95, .25], [.9, .5], [.8, .45]], '#7CCB4E');
-      c.strokeStyle = 'rgba(26,20,51,.3)'; c.setLineDash([10, 10]); c.lineWidth = 4; c.beginPath(); c.moveTo(W * .25, H * .4); c.quadraticCurveTo(W * .45, H * .1, W * .62, H * .35); c.stroke(); }, 512, 256, null, .45);
+    const mapa = impresso((c, W, H) => {
+      c.fillStyle = '#7FD8EC'; c.fillRect(0, 0, W, H); c.fillStyle = 'rgba(255,255,255,.22)';
+      for (let i = 0; i < 14; i++) for (let k = 0; k < 7; k++) { c.beginPath(); c.arc(18 + i * 37, 18 + k * 37, 6, 0, 7); c.fill(); }
+      const blob = (pts, cor) => { c.beginPath(); const n = pts.length; for (let i = 0; i < n; i++) { const [x0, y0] = pts[i], [x1, y1] = pts[(i + 1) % n], mx = (x0 + x1) / 2, my = (y0 + y1) / 2; if (!i) c.moveTo(mx * W, my * H); else c.quadraticCurveTo(x0 * W, y0 * H, mx * W, my * H); }
+        const [x0, y0] = pts[0], [x1, y1] = pts[1]; c.quadraticCurveTo(x0 * W, y0 * H, (x0 + x1) / 2 * W, (y0 + y1) / 2 * H); c.closePath(); c.fillStyle = cor; c.fill(); c.lineJoin = 'round'; c.strokeStyle = T; c.lineWidth = 6; c.stroke(); };
+      blob([[.08, .2], [.24, .1], [.33, .24], [.29, .42], [.21, .5], [.24, .78], [.17, .9], [.12, .6], [.06, .4]], '#7CCB4E');
+      blob([[.47, .16], [.6, .12], [.66, .3], [.62, .52], [.55, .82], [.48, .55], [.44, .32]], '#F2D58A');
+      blob([[.7, .14], [.92, .18], [.95, .38], [.84, .5], [.74, .4]], '#7CCB4E');
+      blob([[.82, .66], [.93, .7], [.9, .86], [.8, .8]], '#B3EFC6');
+      c.strokeStyle = '#F0303A'; c.lineWidth = 6; c.setLineDash([12, 10]); c.lineCap = 'round'; c.beginPath(); c.moveTo(W * .2, H * .33); c.bezierCurveTo(W * .35, H * .05, W * .5, H * .7, W * .58, H * .42); c.stroke(); c.setLineDash([]);
+      c.lineWidth = 9; c.beginPath(); c.moveTo(W * .56, H * .37); c.lineTo(W * .61, H * .47); c.moveTo(W * .61, H * .37); c.lineTo(W * .56, H * .47); c.stroke();
+      c.save(); c.translate(W * .38, H * .76); c.fillStyle = AMARELO; c.strokeStyle = T; c.lineWidth = 4; c.beginPath(); for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4 - Math.PI / 2, r = i % 2 ? 9 : 26; c[i ? 'lineTo' : 'moveTo'](Math.cos(a) * r, Math.sin(a) * r); } c.closePath(); c.fill(); c.stroke(); c.restore();
+    }, 512, 256, null, .45);
     g.add(malha(bloco(4.8, .12, 2.6, { pinos: false, r: .05 }), plastico('#FFF4DC', .45), .4, 0, .3), decal(4.6, 2.4, mapa, .4, .13, .3, -Math.PI / 2, 0, 0));
-    g.add(malha(redonda(.75, 3.2, { pino: false, c: .2 }), plastico('#FFF4DC', .4), -2.3, .75, -1.3, Math.PI / 2, 0, 0));
-    g.add(malha(new THREE.CircleGeometry(.55, 32), plastico('#E2D6BC', .45), -2.3, .75, 1.92));
-    g.add(malha(new THREE.TorusGeometry(.78, .16, 10, 32), plastico('#F0303A', .3), -2.3, .75, .2), malha(bloco(.35, .9, .12, { pinos: false, r: .05 }), plastico('#F0303A', .3), -1.75, -.05, .45, 0, 0, rad(30)));
-    g.add(malha(redonda(.42, 2.4, { pino: false, c: .12 }), plastico('#FFF4DC', .4), 2.85, .45, -.95, Math.PI / 2, 0, 0));
+    const ponta = impresso((c, W, H) => { c.fillStyle = '#F3EAD6'; c.fillRect(0, 0, W, H); c.strokeStyle = '#C9BFA6'; c.lineWidth = 6; for (let r = 10; r < W / 2; r += 14) { c.beginPath(); c.arc(W / 2 + r * .08, H / 2, r, 0, 7); c.stroke(); } }, 128, 128, null, .45);
+    g.add(malha(redonda(.8, 3.2, { pino: false, c: .2 }), plastico('#FFF4DC', .4), -2.3, .8, -1.3, Math.PI / 2, 0, 0));
+    g.add(malha(new THREE.CircleGeometry(.62, 32), ponta, -2.3, .8, 1.93));
+    g.add(malha(new THREE.TorusGeometry(.84, .17, 10, 32), plastico('#F0303A', .3), -2.3, .8, .25), malha(bloco(.36, 1.0, .12, { pinos: false, r: .05 }), plastico('#F0303A', .3), -1.72, -.05, .5, 0, 0, rad(30)), malha(bloco(.36, .8, .12, { pinos: false, r: .05 }), plastico('#F0303A', .3), -1.95, -.1, .62, 0, 0, rad(-18)));
+    g.add(malha(redonda(.45, 2.5, { pino: false, c: .12 }), plastico('#FFF4DC', .4), 2.9, .48, -.98, Math.PI / 2, 0, 0));
+    g.add(malha(new THREE.CircleGeometry(.36, 24), ponta, 2.9, .48, 1.53));
     return g;
   }
 
@@ -866,26 +932,32 @@ const KIT = (() => {
     const g = grupo();
     g.add(malha(tijolo(2, 2), plastico('#FF6B6B', .28), -.5, 1.2, -.9, 0, .3, 0), malha(placa(3, 3), plastico('#E3E9F4', .3), -.4, 0, -1.0));
     const l = new THREE.Group(); l.position.set(-.3, 2.8, .4); l.rotation.set(rad(-10), rad(18), rad(-24)); g.add(l);
-    l.add(malha(new THREE.TorusGeometry(1.55, .3, 18, 56), plastico(PRETA, .33)));
-    const v = malha(new THREE.CircleGeometry(1.42, 48), vidro('#EAF8FF', .22)); v.castShadow = false; l.add(v);
+    l.add(malha(new THREE.TorusGeometry(1.55, .26, 18, 56), plastico('#3A3560', .3)));
+    const v = malha(new THREE.CircleGeometry(1.42, 48), vidro('#BFE8FF', .3)); v.castShadow = false; l.add(v);
+    l.add(decal(.3, .3, new THREE.MeshBasicMaterial({ color: BRANCO, transparent: true, opacity: .7 }), -.2, .95, .02));
     l.add(decal(.9, .22, new THREE.MeshBasicMaterial({ color: BRANCO, transparent: true, opacity: .7 }), -.5, .65, .02, 0, 0, .7));
-    l.add(malha(barra(.36, 2.9), plastico(MADEIRA, .38), 1.25, -1.2, 0, 0, 0, rad(45)));
-    l.add(malha(redonda(.42, .35, { pino: false }), plastico(PRETA, .33), 1.12, -1.07, 0, 0, 0, rad(45)));
+    l.add(malha(barra(.38, 3.0), plastico(MADEIRA, .38), 1.25, -1.25, 0, 0, 0, rad(135)));
+    l.add(malha(redonda(.44, .45, { pino: false }), plastico('#3A3560', .3), 1.12, -1.12, 0, 0, 0, rad(135)));
     return g;
   }
 
   // ---------- PÚLPITO (com o globo de peças do jogo, nunca o emblema da ONU) ----------
   function pulpito() {
     const g = grupo();
-    g.add(malha(placa(4.4, 3.4, { pinos: false }), plastico(PRETA, .35)));
-    for (let i = 0; i < 3; i++) g.add(malha(tijolo(3.6, 2.6, { pinos: i === 2 ? [] : false }), plastico(i === 1 ? ANIL : LADRILHO, .32), 0, .4 + i * 1.2, 0));
-    const topo = malha(bloco(4.2, .45, 3.0, { pinos: false, r: .1 }), plastico(LADRILHO, .32), 0, 4.0, -.1, rad(14), 0, 0); g.add(topo);
+    g.add(malha(placa(5, 4, { pinos: false }), plastico(ANIL, .3)));
+    g.add(malha(placa(4.4, 3.4, { pinos: false }), plastico('#2C45B6', .3), 0, .4, 0));
+    // corpo de tijolos creme (fiadas desencontradas) com faixa anil
+    const fiada = (y, cor, des) => { for (let i = 0; i < 2; i++) g.add(malha(bloco(1.9, 1.0, 2.8, { pinos: false, r: .06 }), plastico(cor, .32), -.97 + i * 1.94 + des, y, 0)); };
+    fiada(.8, LADRILHO, 0); fiada(1.8, ANIL, 0); fiada(2.8, LADRILHO, 0);
+    g.add(malha(bloco(4.3, .5, 3.4, { pinos: [[-1.5, -1.2], [-.5, -1.2], [.5, -1.2], [1.5, -1.2]], r: .12 }), plastico(LADRILHO, .32), 0, 3.85, -.15, rad(-12), 0, 0));
     const emblema = impresso((c, W, H) => { c.fillStyle = '#38B1DC'; c.beginPath(); c.arc(W / 2, H / 2, W * .42, 0, 7); c.fill(); c.fillStyle = '#7CCB4E'; c.strokeStyle = T; c.lineWidth = 8;
       c.beginPath(); c.ellipse(W * .4, H * .42, W * .13, W * .18, .5, 0, 7); c.fill(); c.stroke(); c.beginPath(); c.ellipse(W * .62, H * .6, W * .12, W * .1, -.4, 0, 7); c.fill(); c.stroke();
       c.lineWidth = 14; c.beginPath(); c.arc(W / 2, H / 2, W * .42, 0, 7); c.stroke(); c.strokeStyle = AMARELO; c.lineWidth = 10; c.beginPath(); c.arc(W / 2, H / 2, W * .48, Math.PI * .8, Math.PI * 2.2); c.stroke(); }, 256, 256, null, .32);
-    emblema.transparent = true; g.add(decal(1.9, 1.9, emblema, 0, 2.15, 1.32));
-    g.add(barraEntre([.9, 4.3, -.6], [.6, 5.6, .2], .09, plastico(PRETA, .33)));
-    g.add(malha(esfera(.32, 20, 14), plastico('#C9D0DE', .6), .55, 5.75, .3));
+    emblema.transparent = true; g.add(decal(1.7, 1.7, emblema, 0, 2.3, 1.43));
+    // microfone de pescoço (curva de 3 gomos) com globo de espuma
+    const preta = plastico(PRETA, .33);
+    g.add(barraEntre([1.2, 4.2, -.6], [1.1, 5.0, -.2], .11, preta), barraEntre([1.1, 5.0, -.2], [.75, 5.6, .35], .11, preta));
+    g.add(malha(esfera(.42, 24, 16), plastico('#C9D0DE', .6), .62, 5.88, .55), malha(redonda(.24, .26, { pino: false }), plastico(AMARELO, .3), .7, 5.5, .45, rad(25), 0, rad(-20)));
     return g;
   }
 
@@ -935,7 +1007,10 @@ const KIT = (() => {
   }
 
   // ---------- ESCUDO ----------
-  function escudo() {
+  let POMBA_IMG = null;
+  async function carregarPomba() { if (POMBA_IMG || typeof urlIcone !== 'function') return; const im = new Image(); im.src = urlIcone('🕊'); await im.decode(); POMBA_IMG = im; }
+  async function escudo() {
+    await carregarPomba();
     const forma = (k) => { const s = new THREE.Shape(); s.moveTo(0, 2.6 * k); s.bezierCurveTo(1.2 * k, 2.6 * k, 2.1 * k, 2.3 * k, 2.4 * k, 2.0 * k); s.lineTo(2.4 * k, .2 * k); s.bezierCurveTo(2.3 * k, -1.6 * k, 1.0 * k, -2.6 * k, 0, -3.0 * k);
       s.bezierCurveTo(-1.0 * k, -2.6 * k, -2.3 * k, -1.6 * k, -2.4 * k, .2 * k); s.lineTo(-2.4 * k, 2.0 * k); s.bezierCurveTo(-2.1 * k, 2.3 * k, -1.2 * k, 2.6 * k, 0, 2.6 * k); return s; };
     const g = grupo(), e = new THREE.Group(); e.position.y = 3.2; e.rotation.y = rad(-10); g.add(e);
@@ -943,9 +1018,8 @@ const KIT = (() => {
     e.add(malha(extrudar(forma(.84), .5, { chanfro: .06 }), plastico(PRATA_(), .3), 0, 0, .35));
     const frente = impresso((c, W, H) => { c.fillStyle = '#D5DEEA'; c.fillRect(0, 0, W, H); c.strokeStyle = 'rgba(26,20,51,.16)'; c.lineWidth = 5;
       for (let k = 0; k < 8; k++) { c.beginPath(); c.moveTo(0, k * H / 8); c.lineTo(W, k * H / 8); c.stroke(); for (let i = 0; i < 4; i++) { const x = (i + (k % 2) * .5) * W / 4; c.beginPath(); c.moveTo(x, k * H / 8); c.lineTo(x, (k + 1) * H / 8); c.stroke(); } }
-      c.fillStyle = BRANCO; c.strokeStyle = T; c.lineWidth = 9; c.lineJoin = 'round';
-      const p = new Path2D(`M${W * .3} ${H * .5} C${W * .35} ${H * .3} ${W * .55} ${H * .3} ${W * .62} ${H * .42} L${W * .78} ${H * .3} C${W * .76} ${H * .5} ${W * .7} ${H * .58} ${W * .6} ${H * .62} C${W * .5} ${H * .68} ${W * .38} ${H * .66} ${W * .3} ${H * .5} Z`);
-      c.fill(p); c.stroke(p); c.fillStyle = '#65BF82'; c.beginPath(); c.ellipse(W * .27, H * .55, W * .06, W * .03, .6, 0, 7); c.fill(); c.stroke(); c.fillStyle = T; c.beginPath(); c.arc(W * .6, H * .44, W * .018, 0, 7); c.fill(); }, 384, 448, null, .32);
+      c.fillStyle = 'rgba(255,255,255,.75)'; c.beginPath(); c.arc(W / 2, H * .46, W * .3, 0, 7); c.fill(); c.strokeStyle = 'rgba(26,20,51,.25)'; c.lineWidth = 6; c.stroke();
+      if (POMBA_IMG) c.drawImage(POMBA_IMG, W * .2, H * .2, W * .6, W * .6); }, 384, 448, null, .32);
     const recorte = extrudar(forma(.84), .02, { chanfro: 0 }); const uv = recorte.getAttribute('uv'), pos = recorte.getAttribute('position');
     for (let i = 0; i < uv.count; i++) uv.setXY(i, (pos.getX(i) + 2.1) / 4.2, (pos.getY(i) + 2.6) / 4.9);
     const f = malha(recorte, frente, 0, 0, .62); e.add(f);
@@ -987,12 +1061,22 @@ const KIT = (() => {
     [[-2.6, 2.0, -1.5, .62], [-3.7, 1.75, -2.2, .48], [-4.6, 1.55, -2.8, .34]].forEach(([x, y, z, r]) => g.add(malha(esfera(r, 20, 14), plastico(BRANCO, .3), x, y, z)));
     return g;
   }
-  async function tenda() {
-    return sobreBase('tenda', { escala: 2.0, placaCor: '#B3EFC6', w: 5, d: 5, regras: [{ de: [190, 260], para: '#A8DBFF', manterLuz: true }], extras: g => {
-      const c = impresso((cx, W, H) => desenharCoracao(cx, W / 2, H / 2, W * .8), 128, 128, null, .3); c.transparent = true;
-      g.add(decal(.9, .9, c, 0, 2.2, 1.55, rad(-20), 0, 0));
-      g.add(malha(barra(.08, 1.6), plastico(PRETA, .33), 1.9, .4, 1.6), malha(esfera(.3, 16, 12), luz('#FFD21F', 1.2), 1.9, 2.15, 1.6));
-    } });
+  function tenda() {
+    const g = grupo(malha(placa(5, 5), plastico('#B3EFC6', .3)));
+    const lona = plastico('#A8DBFF', .3), lonaEsc = plastico('#7FC2EE', .3);
+    const perfil = new THREE.Shape(); perfil.moveTo(-1.9, 0); perfil.lineTo(1.9, 0); perfil.lineTo(.06, 2.7); perfil.lineTo(-.06, 2.7); perfil.closePath();
+    const corpo = extrudar(perfil, 3.4, { chanfro: .1 }); const m = malha(corpo, lona, 0, .4, -.2); g.add(m);
+    // porta (triângulo escuro) com coração em cima e aba da lona enrolada
+    const porta = new THREE.Shape(); porta.moveTo(-.85, 0); porta.lineTo(.85, 0); porta.lineTo(0, 1.6); porta.closePath();
+    g.add(malha(extrudar(porta, .1, { chanfro: .02 }), plastico('#2E2752', .5), 0, .42, 1.52));
+    g.add(barraEntre([.1, .45, 1.6], [.75, 1.6, 1.6], .14, lonaEsc));
+    const cor = impresso((c, W, H) => desenharCoracao(c, W / 2, H / 2, W * .8), 128, 128, null, .3); cor.transparent = true;
+    g.add(decal(.75, .75, cor, 0, 2.35, 1.53));
+    g.add(malha(barra(.12, 3.6), plastico(AMARELO, .3), 0, 3.05, -1.9, Math.PI / 2, 0, 0));
+    for (const z of [1.5, -1.9]) g.add(malha(esfera(.2, 12, 10), plastico(AMARELO, .3), 0, 3.12, z));
+    // lampião aceso num poste
+    g.add(malha(barra(.09, 1.9), plastico(PRETA, .33), 1.9, .4, 1.7), malha(esfera(.32, 16, 12), luz('#FFD21F', 1.2), 1.9, 2.35, 1.7), malha(redonda(.3, .14, { pino: false }), plastico(PRETA, .33), 1.9, 2.62, 1.7));
+    return g;
   }
 
   // ---------- GLOBO IRADO (o mascote, com a receita do kit) ----------
@@ -1013,8 +1097,9 @@ const KIT = (() => {
     'martelo': { montar: martelo },
     'trofeu': { montar: trofeu },
     'globo': { montar: globo },
+    'planeta': { montar: planeta, cam: { giro: -20, elev: 12, chao: false } },
     'pomba': { montar: pomba },
-    'aperto-maos': { montar: apertoMaos, cam: { giro: -10, elev: 14 } },
+    'aperto-maos': { montar: apertoMaos, cam: { giro: -16, elev: 20 } },
     'camera-tv': { montar: cameraTV },
     'microfone': { montar: microfone, cam: { giro: -24, elev: 16 } },
     'medalha-ouro': { montar: () => medalha('#FFC93C', '#C98A00', '1'), cam: { giro: 0, elev: 8 } },
@@ -1057,7 +1142,7 @@ const KIT = (() => {
     'tenda': { montar: tenda },
     'satelite': { montar: async () => { const g = grupo(), m = await modelo('satelite', { escala: 2.3 }); m.position.y = 2.2; m.rotation.set(rad(12), rad(25), rad(-10)); g.add(m); g.add(em(brilho(.45), 2.2, 3.6, .4)); return g; } },
     'foguete': { montar: () => sobreBase('foguete', { escala: 1.35, placaCor: '#99CDF8' }), cam: { giro: -24, elev: 16 } },
-    'turbina': { montar: () => sobreBase('turbina-eolica', { escala: 1.3, placaCor: '#B3EFC6' }), cam: { giro: -24, elev: 14 } },
+    'turbina': { montar: () => sobreBase('turbina-eolica', { escala: 1.55, placaCor: '#B3EFC6', w: 3, d: 3 }), cam: { giro: -24, elev: 14, ocupa: .86 } },
     'painel-solar': { montar: () => sobreBase('painel-solar', { escala: 1.7, placaCor: '#B3EFC6', w: 5, d: 5 }) },
     'fabrica': { montar: () => sobreBase('fabrica', { escala: 1.0, placaCor: '#E3E9F4', w: 5, d: 4, extras: g => [[-1.05, 4.6, -.55, .42], [-.75, 5.25, -.75, .34], [.0, 4.75, -.6, .36], [.3, 5.4, -.8, .28]].forEach(([x, y, z, r]) => g.add(malha(esfera(r, 16, 12), plastico('#C9CED6', .5), x, y, z))) }) },
     'escola': { montar: () => sobreBase('escola', { escala: 1.25, placaCor: '#B3EFC6', w: 5, d: 3 }) },
@@ -1096,7 +1181,7 @@ const MONTAR = {
   },
   icones() {
     const lista = Object.keys(ICONES);
-    V.innerHTML = cartao(`Ícones Fluent 3D (${lista.length})`, `<div class="v-icones">${lista.map(e => `<figure>${imgIcone(e, 48)}<figcaption>${e}</figcaption></figure>`).join('')}</div>`) +
+    V.innerHTML = cartao(`Ícones Fluent 3D (${lista.length})`, `<div class="v-icones">${lista.map((e, i) => `<figure title="${e}">${imgIcone(e, 48)}<figcaption>${i + 1}</figcaption></figure>`).join('')}</div>`) +
       cartao('Botões (desenho próprio, índigo e letra-bolha)', `<div class="v-botoes">${Object.keys(ICONES_BOTAO).map(n => `<span class="v-btn-ic peca" title="${n}"><img src="${ICONES_BOTAO[n]}" alt=""></span>`).join('')}</div>` +
         `<div class="v-botoes" style="margin-top:calc(1.2 * var(--u))">${['check', 'fechar', 'som', 'pausa', 'tocar', 'trocar', 'dado'].map((n, i) => `<span class="v-btn-ic peca ${['verde', 'vermelha', 'amarela', 'anil', 'verde', 'escura', 'vermelha'][i]}"><img src="${iconeBotao(n, { bolha: true })}" alt=""></span>`).join('')}</div>`);
   },
@@ -1125,11 +1210,36 @@ const MONTAR = {
     V.innerHTML =
       cartao('Barras = pilhas de tijolos (IGI)', graficoTijolos(pids.map((pid, i) => ({ pid, valor: [62, 71, 68, 74, 55, 49][i] })), { max: 100 })) +
       cartao('Linhas com pinos (destaque: Índia)', graficoLinhas(pids.map((pid, i) => ({ pid, pontos: [[40, 46, 51, 55, 60, 62], [70, 69, 72, 71, 70, 71], [60, 64, 66, 69, 68, 68], [66, 68, 70, 72, 73, 74], [38, 42, 47, 50, 53, 55], [52, 50, 47, 49, 48, 49]][i] })), { anos: [2026, 2030, 2034, 2038, 2042, 2046], destaque: 'india' })) +
-      cartao('Cascata de causas', cascata([{ texto: 'Sanções: EUA → Rússia', valor: 6 }, { texto: 'Acordo de comércio', valor: 3 }, { texto: 'Tarifas da China', valor: -4 }, { texto: 'Conflito no Sahel', valor: -2 }])) +
-      cartao('Emissões (tijolos de CO₂) e matriz energética', tijolosCO2(pids.map((pid, i) => ({ pid, valor: [1.3, 4.9, 11.9, 2.6, 3.1, 1.8][i] }))) + `<div style="margin-top:calc(1.4*var(--u))">${matrizEnergia(4, 10)}</div>`) +
+      cartao('Cascata de causas', cascata([{ texto: 'Sanções dos EUA à Rússia', valor: 6 }, { texto: 'Acordo de comércio', valor: 3 }, { texto: 'Tarifas da China', valor: -4 }, { texto: 'Conflito no Sahel', valor: -2 }])) +
+      cartao('Emissões (tijolos de CO<sub>2</sub>) e matriz energética', tijolosCO2(pids.map((pid, i) => ({ pid, valor: [1.3, 4.9, 11.9, 2.6, 3.1, 1.8][i] }))) + `<div style="margin-top:calc(1.4*var(--u))">${matrizEnergia(4, 10)}</div>`) +
       cartao('Medidores', `<div class="v-linha" style="align-items:center">${termometroTijolos(1.62)}${relogioJuizo(84)}${relogioJuizo(42, { grande: true })}${ponteiroEnergia(55)}${anelProgresso(5)}${encaixes(['brasil', 'brasil', 'china', 'ue'], 7)}</div>`);
   },
-  composicoes() { V.innerHTML = '<p class="letra-bolha">Em montagem.</p>'; },
+  composicoes() {
+    V.style.gridTemplateColumns = '1.05fr 1fr';
+    const chip = (cat, ic, nome) => `<span class="v-chip-cat cat-${cat}">${imgIcone(ic, 40)}${nome}</span>`;
+    const noticia = (cat, ic, nomeCat, obj, titulo, texto) => `<article style="--cat:var(--cat-${cat})"><div class="v-foto">${arte(obj)}</div>${chip(cat, ic, nomeCat)}<h3>${titulo}</h3><p>${texto}</p></article>`;
+    const jornal = `<div class="jornal peca v-jornal">${cabecalhoJornal({ ano: 2034, mandato: 3, total: 6, extra: true })}<div class="v-noticias">` +
+      noticia('natureza', '🌱', 'Natureza e Energia', 'termometro', 'Acordo histórico na Cúpula do Clima', 'As seis potências prometem cortar emissões. A temperatura sobe mais devagar.') +
+      noticia('economia', '💰', 'Economia', 'navio', 'Rota pelo Ártico abre', 'O gelo derreteu e encurtou o caminho dos navios.') +
+      noticia('pessoas', '👥', 'Pessoas', 'tenda', 'Brasil acolhe 2 milhões', 'Tendas de acolhimento no Norte do país.') +
+      `</div><div class="v-critico">${imgIcone('⚠', 44)}<span>Situação crítica no Sahel: seca e conflito</span><i class="zebra"></i></div></div>`;
+    const tv = `<div class="v-tv"><div class="v-bancada">${arte('microfone')}<div class="v-mesa peca"><span class="v-pg">PG</span></div></div>` +
+      `<div>${tarjaPlantao({ manchete: 'Seca histórica atinge o Sahel', texto: 'Colheitas perdidas empurram milhões de pessoas para as cidades.', lugar: 'Sahel', ano: 2030 })}` +
+      `<div class="v-sabia">${arte('lampada')}<span><b>Você sabia?</b>O Sahel é a faixa de transição entre o deserto do Saara e as savanas mais úmidas do sul.</span></div></div></div>`;
+    const opcao = (cat, obj, cargo, fala, decidido) => `<div class="v-opcao peca cat-${cat}">${arte(obj)}<span class="v-cargo">${cargo}</span><div class="balao peca" data-ponta="nenhuma">${fala}</div>` +
+      `<button class="btn btn-principal btn-mini peca pinos">Escolher</button>${decidido ? '<span class="carimbo indigo">Decidido</span>' : ''}</div>`;
+    const painel = `<section class="painel peca pinos v-painel" data-equipe="brasil" style="position:relative">${ponteiroVez()}<header class="painel-cab">${arte('maleta', { classe: 'painel-objeto' })}<h2 class="painel-titulo">Gabinete do Brasil</h2></header>` +
+      `<div class="tela"><p style="font:800 var(--fs-corpo)/1.3 var(--f-texto)">A soja avança sobre o Cerrado. Proteger a vegetação ou ampliar as exportações?</p><div class="v-opcoes">` +
+      opcao('natureza', 'caixa-alimentos', 'Conselheira de Natureza', 'Proteger o Cerrado e pagar mais caro pela terra', true) +
+      opcao('economia', 'moedas', 'Conselheiro de Economia', 'Ampliar as exportações e a renda do campo') +
+      opcao('ciencia', 'lampada', 'Conselheira de Ciência', 'Investir em produtividade sem desmatar') + '</div></div></section>';
+    const pids = ['brasil', 'eua', 'china', 'ue', 'india', 'russia'];
+    const balanco = `<div class="v-balanco"><div class="v-indic peca">${'<h4>' + imgIcone('🌡', 40) + 'Temperatura</h4>'}<span class="num">1,45 ${GLIFOS.seta} 1,62 °C</span>${termometroTijolos(1.62, { valor: false })}</div>` +
+      `<div class="v-indic peca"><h4>Relógio do Juízo Final</h4><div style="display:flex;align-items:center;gap:calc(2*var(--u))">${relogioJuizo(84, { grande: true })}<span class="num">84 s</span></div></div>` +
+      `<div class="v-indic peca" style="grid-column:1/-1"><h4>${imgIcone('📊', 40)}Índice de Influência (IGI)</h4>${graficoTijolos(pids.map((pid, i) => ({ pid, valor: [62, 71, 68, 74, 55, 49][i] })), { max: 100 })}</div>` +
+      `<div class="v-indic peca" style="grid-column:1/-1"><h4>${imgIcone('🕊', 40)}Por que a cooperação mudou</h4>${cascata([{ texto: 'Acordo do clima', valor: 6 }, { texto: 'Sanções dos EUA à Rússia', valor: -4 }, { texto: 'Ajuda ao Sahel', valor: 3 }])}</div></div>`;
+    V.innerHTML = cartao('Página do Jornal Mundial', jornal) + cartao('Plantão Global sobre o mapa', tv, 'mapa') + cartao('Painel com moldura (decisão de gabinete)', painel, 'mesa') + cartao('Balanço do mandato', balanco);
+  },
   vinheta() {
     document.body.insertAdjacentHTML('beforeend', vinhetaPlantao({ crise: q.has('crise'), sub: 'Mundo em crise: 2 notícias neste mandato, porque a tensão passou de 80.' }));
     const el = document.querySelector('.vinheta-plantao'), tl = animarVinheta(el);

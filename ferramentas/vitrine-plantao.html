@@ -1,0 +1,187 @@
+<!doctype html>
+<!-- Vitrine do Plantão Global (não faz parte do jogo): toca o telejornal de qualquer evento de conteudo/eventos.js
+     sobre o mapa 3D, com o HUD da partida por trás. Escolha o evento pelo id.
+     Parâmetros: ?evento=<id> (padrão: furacao) &local=<id> (padrão: o lugar que o motor sortearia) &auto (toca ao abrir)
+     &humanos=brasil,china (equipes humanas, separadas por vírgula; "nenhum" = só o computador) &semente=N
+     &limpo (sem o painel de controle, para capturas) &rapido (animações 10× mais rápidas, como no teste automático)
+     &todos (toca os 40 eventos em sequência, escolhendo sozinho nas decisões: teste de fumaça)
+     &lento=N (animações N vezes mais lentas, para conferir quadro a quadro) &crise (tensão em 85: a vinheta avisa "Mundo em crise") &hud (mostra o HUD da partida por trás; o esqueleto da Partida ainda não tem a arte final) -->
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<base href="../">   <!-- os sons, fontes e imagens são lidos a partir da raiz do jogo -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vitrine do Plantão Global</title>
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/arte.css">
+<link rel="stylesheet" href="css/jogo.css">
+<link rel="stylesheet" href="css/plantao.css">
+<link rel="stylesheet" href="css/onu.css">
+<style>
+  /* painel de controle da vitrine (ferramenta de desenvolvimento) */
+  #vitrine { position: fixed; z-index: 70; right: calc(1.4 * var(--u)); top: calc(13 * var(--u)); width: calc(44 * var(--u)); display: grid; gap: calc(1 * var(--u));
+    padding: calc(1.4 * var(--u)) calc(1.6 * var(--u)) calc(1.8 * var(--u)); font: 800 max(14px, calc(1.7 * var(--u))) / 1.2 var(--f-texto); }
+  #vitrine[hidden] { display: none; }
+  #vitrine h1 { margin: 0; font: 700 calc(2.6 * var(--u)) / 1 var(--f-titulo); }
+  #vitrine label { display: grid; gap: calc(.4 * var(--u)); }
+  #vitrine select { font: 800 max(14px, calc(1.8 * var(--u))) var(--f-texto); color: var(--tinta); background: #fff; border: var(--b-fino) solid var(--tinta);
+    border-radius: calc(.8 * var(--u)); padding: calc(.5 * var(--u)) calc(.8 * var(--u)); max-width: 100%; }
+  #vitrine .linha { display: flex; flex-wrap: wrap; gap: calc(.6 * var(--u)); }
+  #vitrine .eq { display: inline-flex; align-items: center; gap: calc(.3 * var(--u)); }
+  #vitrine .eq svg.forma { width: 1.2em; height: 1.2em; }
+  #vitrine .btn { font-size: max(14px, calc(1.9 * var(--u))); min-height: calc(4.6 * var(--u)); }
+  #saida { margin: 0; max-height: calc(16 * var(--u)); overflow: auto; font: 800 max(12px, calc(1.4 * var(--u))) / 1.3 var(--f-texto); color: var(--tinta-suave); white-space: pre-wrap; }
+</style>
+</head>
+<body class="jogo">
+<div id="mundo" aria-hidden="true"></div>
+<div id="rotulos-mapa"></div>
+<div id="cena" hidden></div>
+<main id="telas">
+  <section id="tela-inicio" class="tela" hidden></section>
+  <section id="tela-lobby" class="tela" hidden></section>
+  <section id="tela-revelacao" class="tela" hidden></section>
+  <section id="tela-partida" class="tela" aria-label="Partida" hidden></section>
+  <section id="tela-fim" class="tela" hidden></section>
+</main>
+<div id="camada"></div>
+<div id="splash" aria-hidden="true" hidden>
+  <div class="splash-faixa faixa peca pinos cor-herdada">
+    <span id="splash-icone" class="faixa-icone soquete"></span>
+    <div class="faixa-textos"><div id="splash-pre" class="letra-bolha"></div><div id="splash-titulo" class="letra-bolha"></div><div id="splash-sub" class="letra-bolha"></div></div>
+  </div>
+</div>
+<div id="aviso" role="status" hidden></div>
+<div id="anuncio" class="so-leitor" aria-live="polite"></div>
+
+<aside id="vitrine" class="peca flutua" aria-label="Controles da vitrine">
+  <h1>Plantão Global</h1>
+  <label>Evento <select id="evento"></select></label>
+  <label>Lugar <select id="local"></select></label>
+  <div>Equipes humanas (decisões)</div>
+  <div class="linha" id="humanos"></div>
+  <div class="linha">
+    <button class="btn btn-principal btn-mini peca pinos" id="tocar">Tocar</button>
+    <button class="btn btn-neutro btn-mini peca" id="geral">Visão geral</button>
+    <button class="btn btn-neutro btn-mini peca" id="esconder">Esconder</button>
+  </div>
+  <pre id="saida"></pre>
+</aside>
+
+<script src="lib/three.min.js"></script>
+<script src="lib/gsap.min.js"></script>
+<script src="lib/confetti.min.js"></script>
+<script src="dados/mapa.js"></script>
+<script src="dados/modelos.js"></script>
+<script src="dados/creditos.js"></script>
+<script src="conteudo/potencias.js"></script>
+<script src="conteudo/territorios.js"></script>
+<script src="conteudo/politicas.js"></script>
+<script src="conteudo/eventos.js"></script>
+<script src="conteudo/resolucoes.js"></script>
+<script src="conteudo/dilemas.js"></script>
+<script src="js/icones.js"></script>
+<script src="js/arte.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/simulacao.js"></script>
+<script src="js/bonecos.js"></script>
+<script src="js/mapa3d.js"></script>
+<script src="js/cenas3d.js"></script>
+<script src="js/plantao.js"></script>
+<script src="js/onu.js"></script>
+<script src="js/hud.js"></script>
+<script src="js/jogo.js"></script>
+<script>
+'use strict';
+const Q = new URLSearchParams(location.search), S = Simulacao;
+const PIDS = POTENCIAS.map(p => p.id);
+const humanosPadrao = (Q.get('humanos') ?? 'brasil,china').split(',').filter(p => PIDS.includes(p));
+let e = null, tocando = false;
+
+// Estado da partida da vitrine: as equipes marcadas são humanas (decidem na tela), as outras são o computador
+function novoEstado(humanos) {
+  e = S.criarEstado({ semente: +(Q.get('semente') || 11), jogadores: humanos.map(p => ({ potencia: p, nome: nomeEquipe(p) })) });
+  const avatares = Bonecos.avataresIniciais(PIDS, (e.semente >>> 0) || 7).map(a => ({ ...a, humano: !!e.potencias[a.pid].humano }));
+  Mapa3D.bonecos(avatares);
+  Mapa3D.atualizarMundo(e);
+  if (Q.has('hud')) Hud.atualizar(e);
+  return e;
+}
+// O lugar que o motor sortearia (só a primeira opção válida, para a vitrine ser repetível)
+function localDe(ev) {
+  const L = ev.local;
+  if (!L) return null;
+  if (typeof L === 'string') return L === 'casa' ? 'brasil' : L;
+  const lista = L.entre ? L.entre.filter(id => e.territorios[id] || e.potencias[id]) : Object.keys(e.territorios).filter(id => !e.territorios[id].protegido);
+  let cand = lista.filter(id => {
+    const t = e.territorios[id];
+    if (!t) return true;
+    if (L.conflitoMin !== undefined && t.conflito < L.conflitoMin) return false;
+    if (L.estabilidadeMax !== undefined && t.estabilidade > L.estabilidadeMax) return false;
+    if (L.vulnerabilidadeMin !== undefined && t.vulnerabilidade < L.vulnerabilidadeMin) return false;
+    return true;
+  });
+  if (!cand.length && L.conflitoMin) {   // a vitrine acende um conflito para o evento poder sair
+    const id = lista.includes('sahel') ? 'sahel' : lista[0];
+    e.territorios[id].conflito = Math.max(1, L.conflitoMin);
+    cand = [id];
+  }
+  return cand[0] ?? null;
+}
+
+// Painel de controle
+const $v = s => document.querySelector(s);
+$v('#evento').innerHTML = EVENTOS.map(ev => `<option value="${ev.id}">${ev.id} — ${esc(ev.titulo)}${ev.escolha ? ' (' + ev.escolha.tipo + ')' : ''}</option>`).join('');
+$v('#evento').value = EVENTOS.some(ev => ev.id === Q.get('evento')) ? Q.get('evento') : 'furacao';
+$v('#local').innerHTML = '<option value="">(o que o motor sortearia)</option><option value="-">mundo todo (sem lugar)</option>' +
+  [...POTENCIAS, ...TERRITORIOS].map(t => `<option value="${t.id}">${esc(t.nome)}</option>`).join('');
+$v('#local').value = Q.get('local') || '';
+$v('#humanos').innerHTML = PIDS.map(p => `<label class="eq"><input type="checkbox" value="${p}" ${humanosPadrao.includes(p) ? 'checked' : ''}>${formaDe(p)}${esc(nomeCurto(p))}</label>`).join('');
+if (Q.has('limpo')) $v('#vitrine').hidden = true;
+$v('#esconder').onclick = () => ($v('#vitrine').hidden = true);
+$v('#geral').onclick = () => Mapa3D.visaoGeral();
+$v('#tocar').onclick = () => tocar($v('#evento').value);
+
+async function tocar(id, { automatico = false } = {}) {
+  if (tocando) return null;
+  tocando = true;
+  try {
+    const humanos = automatico ? [] : [...document.querySelectorAll('#humanos input:checked')].map(x => x.value);
+    novoEstado(humanos);
+    if (Q.has('crise')) e.global.tensao = Math.max(e.global.tensao, 85);
+    const ev = EVENTOS.find(x => x.id === id), escolhido = $v('#local').value;
+    const local = escolhido === '-' ? null : escolhido || localDe(ev);
+    const { mudancas } = S.aplicarEvento(e, id, local);
+    if (Q.has('hud')) Hud.fase?.('plantao');   // como na Partida: topo visível, coluna recolhida, sem doca
+    $v('#saida').textContent = `${id} @ ${local ?? 'mundo'} · ${mudancas.length} mudanças`;
+    const res = await Plantao.noticia(e, { id, local }, mudancas);
+    window.ultimo = res;
+    $v('#saida').textContent += `\nescolha: ${res.escolha ?? '—'}${res.pulou ? ' (pulou)' : ''}` + (res.resultado?.escolhas ? '\n' + JSON.stringify(res.resultado.escolhas) : '');
+    await Mapa3D.visaoGeral();
+    return res;
+  } finally { tocando = false; }
+}
+window.vitrine = { tocar, get estado() { return e; } };
+
+// Início: o mapa, os bonecos e o HUD da partida por trás
+gsap.ticker.lagSmoothing(0);   // no Chrome sem placa de vídeo as animações seguem o relógio de verdade
+if (+Q.get('lento') > 1) gsap.globalTimeline.timeScale(1 / +Q.get('lento'));
+if (Q.has('hud')) { mostrarTela('partida'); Hud.montar(); }
+Mapa3D.iniciar($v('#mundo'));
+novoEstado(humanosPadrao);
+Mapa3D.modo?.('jogo');
+Promise.all([fontesProntas, Mapa3D.pronto]).then(async () => {
+  document.body.dataset.pronta = '1';
+  if (Q.has('todos')) {
+    for (const ev of EVENTOS) {
+      $v('#evento').value = ev.id;
+      const espera = setInterval(() => document.querySelectorAll('[data-teste="continuar-painel"]:not([hidden]), [data-teste^="opcao-"]:not(:disabled), [data-teste="doar-0"]:not(:disabled), [data-teste="voto-sim"]:not(:disabled)')[0]?.click(), 400);
+      try { await tocar(ev.id, { automatico: true }); } finally { clearInterval(espera); }
+    }
+    document.body.dataset.todos = 'ok';
+  } else if (Q.has('auto')) tocar($v('#evento').value);
+});
+</script>
+</body>
+</html>

@@ -1,5 +1,7 @@
 # Créditos — Geografia Irada
 
+**Criação, direção e conteúdo:** João Vitor Borges da Silva Matias.
+
 O Geografia Irada é feito com bibliotecas, fontes, ícones, modelos 3D, música e efeitos sonoros livres. Cada item abaixo
 traz o autor, a licença, o endereço e o crédito pedido. A tela de créditos do jogo lê a versão curta em `dados/creditos.js`.
 

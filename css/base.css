@@ -58,6 +58,13 @@
   --ganho: #5BE37D; --perda: #FF6B6B;
   --bom: #2FCB62; --medio: #FFC21A; --risco: #FF8A1F; --critico: #F0303A;   /* faixas, sempre com ✓ ! !! ✕ */
 
+  /* marca: cores tiradas da LOGO OFICIAL (img/logo.webp). Só onde a marca aparece (logo, títulos e selos de marca);
+     nunca como cor de estado ou de equipe (azul ≈ Equipe Azul; verde-limão ≈ "ok"/Brasil) — guia §8.2 */
+  --marca-azul: #02569F; --marca-azul-claro: #1E8CCD;      /* oceano do globo (meio-tom · lado aceso) */
+  --marca-verde: #96C513; --marca-verde-claro: #AFD522; --marca-verde-lado: #74AF07;   /* continentes, IRADA, traço */
+  --marca-marinho: #153255; --marca-marinho-escuro: #102949;                            /* base e contorno das letras */
+  --marca-branco: #FAFAF8;                                                             /* GEOGRAFIA e a luva */
+
   /* estados (§2.6) */
   --crise: #FF8A1F; --colapso: #F0303A; --conflito: #FF4B2B; --foco-tensao: #FFD21F; --paz: #BFF5C9; --sancionado: #6C6E68;
   --vetada: #B0001A; --sem-maioria: #8A94A6; --pessego-alerta: #FFE3D0;
@@ -192,6 +199,8 @@ body.jogo { height: 100%; overflow: hidden; user-select: none; -webkit-user-sele
               0 var(--lado) 0 calc(-1 * var(--b)) var(--face-lado), 0 var(--lado) 0 0 var(--tinta),
               var(--anel, 0 0 #0000), var(--solta, 0 0 #0000);
 }
+/* o anel é de cada peça: um contêiner .peca focado (tabindex=-1) não passa o anel aos botões de dentro */
+@property --anel { syntax: '*'; inherits: false; }
 .peca:focus-visible, .peca.is-foco { --anel: var(--anel-foco); }
 .flutua { --solta: var(--sombra-solta); }                 /* painel, balão e aviso sobre o mapa */
 .fina { --lado: calc(.6 * var(--u)); }
@@ -673,3 +682,7 @@ svg.forma { display: inline-block; flex: none; width: 1em; height: 1em; overflow
   *, ::before, ::after { transition-duration: 1ms !important; animation-duration: 1ms !important; animation-iteration-count: 1 !important; }
 }
 html.rm *, html.rm ::before, html.rm ::after { transition-duration: 1ms !important; animation-duration: 1ms !important; animation-iteration-count: 1 !important; }
+
+/* PC fraco: sem filtros caros na interface */
+.pc-fraco *, .pc-fraco *::before, .pc-fraco *::after { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+.pc-fraco [class*="ini-"], .pc-fraco img { filter: none !important; }
