@@ -4,6 +4,7 @@
 const CREDITOS = [
   // Criação
   { grupo: 'Criação', item: 'Geografia Irada – Geopolítica Internacional', autor: 'João Vitor Borges da Silva Matias', licenca: 'Autor', url: '', uso: 'Criação e direção do jogo' },
+  { grupo: 'Criação', item: 'Consultoria', autor: 'Jean Carlos Feltrin - Fraiburgo SC', licenca: 'Consultor', url: '', uso: 'Consultoria do jogo' },
   { grupo: 'Criação', item: 'Nome "Geografia Irada"', autor: 'Prof. Marcelo Silva, canal Geografia Irada', licenca: 'Inspirado e autorizado', url: 'https://www.youtube.com/@geografiairada', uso: 'Nome do jogo, inspirado no canal e usado com autorização do professor' },
   { grupo: 'Criação', item: 'SIIF – Simulação das Organizações Internacionais', autor: 'Prof. Marcelo Silva, IFC Fraiburgo (2016)', licenca: 'Inspiração', url: '', uso: 'Projeto de simulação que inspirou o jogo' },
 
