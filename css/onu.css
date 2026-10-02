@@ -188,15 +188,14 @@
 .onu-tijolinho-neutro { --cor: var(--prata); --cor-lado: var(--prata-lado); }
 
 /* Pistas da reunião de emergência (as 4 agendas possíveis) */
-.onu-pistas { display: grid; gap: calc(.8 * var(--u)); padding: calc(1.2 * var(--u)) calc(1.4 * var(--u)); background: var(--ladrilho-2); border-radius: var(--raio); box-shadow: var(--rebaixo);
-  font: 800 var(--fs-min) / 1.25 var(--f-texto); }
-.onu-pistas ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: calc(.8 * var(--u)); }
+.onu-pistas .onu-pauta-titulo { font-size: calc(3.4 * var(--u) * var(--texto)); }
+.onu-pistas ul { list-style: none; margin: calc(.4 * var(--u)) 0 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: calc(.8 * var(--u)); }
 .onu-pistas li { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: calc(.7 * var(--u)); padding: calc(.5 * var(--u)) calc(.8 * var(--u));
   background: #fff; border: var(--b-fino) solid var(--tinta); border-radius: var(--raio-btn); box-shadow: 0 calc(.35 * var(--u)) 0 var(--ladrilho-lado); }
 .onu-pistas li .ico { width: calc(3.6 * var(--u)); }
 .onu-pistas li span { display: grid; }
 .onu-pistas li b { font: 700 var(--fs-min) / 1.1 var(--f-titulo); }
-.onu-pistas li small { font: 800 max(16px, calc(1.8 * var(--u))) / 1.15 var(--f-texto); color: var(--tinta-suave); }
+.onu-pistas li small { font: 800 var(--fs-min) / 1.15 var(--f-texto); color: var(--tinta-suave); }
 .onu-pilha { display: flex; align-items: center; gap: calc(.5 * var(--u)); }
 .onu-pilha .onu-tijolinho { width: calc(3.8 * var(--u)); height: calc(3.8 * var(--u)); }
 .onu-acusacao { align-self: end; margin: 0 0 calc(7 * var(--u)); gap: calc(.4 * var(--u)); }
@@ -239,6 +238,8 @@
   background-color: var(--noite-borda); }
 .onu-privado-cartao { width: min(calc(120 * var(--u)), 100%); max-height: 100%; }
 .onu-privado-cartao:focus { outline: none; }
+/* o cartão só recebe foco para o leitor de tela: sem anel (e o --anel herdado não vaza para os botões de dentro) */
+.onu-privado-cartao:focus-visible { --anel: 0 0 #0000; }
 .onu-privado-cartao > .painel-cab { padding-left: calc(17 * var(--u)); min-height: calc(8 * var(--u)); }
 .onu-privado-cartao .painel-titulo { font-size: var(--fs-h2); }
 .onu-privado-cartao .painel-sub { margin: 0 0 calc(.3 * var(--u)); font-size: var(--fs-corpo); }
@@ -387,6 +388,7 @@ kbd { display: inline-grid; place-items: center; min-width: 1.6em; height: 1.6em
    ===================================================================================================== */
 .onu-doacao { --alt-max: calc(92 * var(--u)); }
 .painel > .tela.onu-doa-tela { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: calc(2.4 * var(--u)); align-items: start; }
+.onu-doa-esq { display: grid; gap: calc(1.4 * var(--u)); align-content: start; min-width: 0; }
 .onu-doa-dir, .onu-doa-area { display: grid; gap: calc(1.4 * var(--u)); min-width: 0; }
 .onu-doa-medidor { --enc: calc(5.4 * var(--u)); width: fit-content; }
 /* rodapé da vez: retrato + pergunta à esquerda, botões grandes de quantidade à direita */

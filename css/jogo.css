@@ -199,6 +199,10 @@
 .hud-encerrar small { font-size: max(18px, calc(1.8 * var(--u))); color: var(--amarelo-texto); }
 .hud-encerrar.com-tempo::after { content: ''; position: absolute; inset: calc(-1.3 * var(--u)); z-index: -1; border-radius: calc(2.6 * var(--u)); pointer-events: none;
   background: conic-gradient(var(--amarelo) calc(var(--resta, 1) * 1turn), rgb(26 20 51 / .55) 0); border: calc(.35 * var(--u)) solid var(--tinta); }
+.hud-encerrar.chamando { animation: chamar 1.8s var(--c-suave) infinite; }
+@keyframes chamar { 0%, 70%, 100% { scale: 1; filter: none; } 80% { scale: 1.06 .95; } 88% { scale: .97 1.04; filter: drop-shadow(0 0 calc(1.4 * var(--u)) var(--amarelo)); } }
+html.rm .hud-encerrar.chamando { outline: calc(.5 * var(--u)) solid var(--amarelo); outline-offset: calc(.5 * var(--u)); }
+.doca-trocar .btn-ic.bloqueado > img, .doca-trocar:has(.bloqueado) .pilula { opacity: .45; }
 .hud-tempo { position: absolute; left: 50%; top: calc(-4.6 * var(--u)); translate: -50% 0; min-width: calc(8.4 * var(--u)); min-height: calc(4.6 * var(--u)); font-size: calc(2.8 * var(--u)); }
 
 /* =====================================================================================================
@@ -264,7 +268,7 @@
 .dec-quem > .dec-ampulheta { position: absolute; right: calc(-2.6 * var(--u)); bottom: calc(-1.6 * var(--u)); width: calc(5.6 * var(--u)); height: auto; z-index: 2; }
 .dec-textos { display: grid; gap: calc(.5 * var(--u)); }
 .dec-tit { font: 700 var(--fs-cartao) / 1 var(--f-titulo); white-space: nowrap; }
-.dec-sub { font: 800 var(--fs-min) / 1.1 var(--f-texto); color: var(--tinta-suave); white-space: nowrap; }
+.dec-sub { max-width: calc(38 * var(--u)); font: 800 var(--fs-min) / 1.1 var(--f-texto); color: var(--tinta-suave); }
 .dec-log { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: calc(1 * var(--u)); margin: 0 0 0 calc(1.4 * var(--u)); padding: 0; list-style: none; min-width: 0; }
 .dec-jogada { display: flex; align-items: center; gap: calc(.8 * var(--u)); min-width: 0; padding: calc(.6 * var(--u)) calc(1 * var(--u)) calc(.6 * var(--u)) calc(.6 * var(--u));
   background: var(--ladrilho-2); border-radius: calc(1.2 * var(--u)); box-shadow: var(--rebaixo); }
@@ -341,6 +345,7 @@
    PAINÉIS DA PARTIDA: lista de alvos, convite, pausa, jornal
    ===================================================================================================== */
 .hud-alvos { --larg: calc(96 * var(--u)); }
+.hud-alvos .painel-objeto, .hud-convite .painel-objeto { width: calc(13 * var(--u)); left: calc(-4 * var(--u)); top: calc(-5.6 * var(--u)); rotate: -8deg; }
 .hud-alvos > .tela { max-height: calc(58 * var(--u)); }
 .hud-alvos .opcao-fim .pilula { font-size: var(--fs-corpo); }
 .hud-alvos .opcao > .soquete > .ico { width: 78%; }
@@ -357,11 +362,15 @@
 .hud-pausa .painel-objeto { width: calc(13 * var(--u)); left: calc(-4.4 * var(--u)); top: calc(-6.4 * var(--u)); }
 .hud-pausa .painel-titulo.marca { flex: 0 0 auto; font-size: calc(6 * var(--u)); color: var(--tinta); text-shadow: 0 .06em 0 rgb(255 255 255 / .6); }
 .pausa-ano { margin-left: auto; margin-right: calc(1 * var(--u)); font: 900 var(--fs-corpo) / 1 var(--f-texto); color: var(--amarelo-texto); }
-.pausa-tela { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: calc(3 * var(--u)); align-items: start; }
+.pausa-tela { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: calc(3 * var(--u)); align-items: start; }
 .pausa-bts { display: grid; gap: calc(1.6 * var(--u)); padding-top: calc(.6 * var(--u)); }
-.pausa-bts .btn { min-height: calc(8 * var(--u)); justify-content: flex-start; padding-left: calc(2 * var(--u)); }
+.pausa-dir { display: grid; gap: calc(1.6 * var(--u)); }
+.pausa-bts .btn { min-height: calc(7.4 * var(--u)); justify-content: flex-start; padding-left: calc(2 * var(--u)); }
 .pausa-bts .btn .ico { width: 1.2em; }
+.pausa-marca { display: flex; justify-content: center; padding-top: calc(.8 * var(--u)); filter: drop-shadow(0 calc(.3 * var(--u)) 0 rgb(26 20 51 / .25)); }
 .pausa-ajustes { display: grid; gap: calc(.4 * var(--u)); padding: calc(.6 * var(--u)) calc(1.6 * var(--u)); background: var(--ladrilho-2); border-radius: calc(1.2 * var(--u)); box-shadow: var(--rebaixo); }
+.pausa-ajustes .ajuste { font-size: max(var(--fs-min), calc(2.5 * var(--u))); }
+.pausa-ajustes .ajuste > span:first-child { white-space: nowrap; }
 .pausa-ajustes .ajuste + .ajuste { border-top: calc(.25 * var(--u)) dashed rgb(26 20 51 / .2); }
 .pausa-teclas { display: flex; flex-wrap: wrap; align-items: center; gap: calc(.5 * var(--u)) calc(1.2 * var(--u)); color: var(--tinta); }
 .pausa-tecla { white-space: nowrap; }
@@ -379,3 +388,4 @@
   border-bottom: calc(.2 * var(--u)) solid rgb(26 20 51 / .15); font: 700 var(--fs-corpo) / 1.18 var(--f-titulo); }
 .jornal-lista .soquete { width: calc(4.2 * var(--u)); box-shadow: none; }
 .jornal-vazio { padding: calc(3 * var(--u)) 0; text-align: center; font: 800 var(--fs-corpo) / 1.3 var(--f-texto); }
+.hud[aria-busy="true"] .doca-acoes .tijolo { cursor: progress; }   /* ação anterior ainda animando */

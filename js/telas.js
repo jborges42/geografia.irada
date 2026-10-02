@@ -75,6 +75,8 @@ const Telas = (() => {
     mostrarTela('inicio');
     if ((typeof Mapa3D !== 'undefined')) tenta(() => { Mapa3D.iniciar($('#mundo')); Mapa3D.pausar(false); Mapa3D.modo('inicio'); });
     if ((typeof Mascote !== 'undefined')) tenta(() => Mascote.iniciar(t.querySelector('.ini-palco')));
+    if (!tenta(() => document.createElement('canvas').getContext('webgl2'))) t.querySelector('.ini').insertAdjacentHTML('afterbegin',
+      '<p role="alert" style="position:absolute;z-index:9;right:2vh;top:2vh;max-width:46vh;padding:1.4vh;border-radius:1.2vh;background:#FFE14D;color:#222;font:700 1.8vh system-ui">O 3D não abriu: o navegador está sem WebGL. No Chrome, ative \'Usar aceleração de hardware\' em Configurações › Sistema, reinicie e confira em chrome://gpu.</p>');
     if ((typeof Som !== 'undefined')) tenta(() => Som.musica('menu'));
     t.querySelector('.ini').addEventListener('click', cliqueInicio);
     ini = { tl: entradaInicio(t), falas: 0 };
@@ -95,7 +97,7 @@ const Telas = (() => {
     const q = s => t.querySelectorAll(s), u = uPx();
     if (RM) { gsap.fromTo(q('.ini-marca, .ini-menu, .ini-ajustes, .ini-mascote, .ini-rodape'), { opacity: 0 }, { opacity: 1, duration: .2 }); return null; }
     const tl = gsap.timeline();
-    const svg = t.querySelector('svg.logo');
+    const svg = t.querySelector('.logo');
     if (svg && typeof animarLogo === 'function') { const l = animarLogo(svg); if (l) tl.add(l, .1); }
     tl.fromTo(q('.ini-mascote'), { y: 14 * u, opacity: 0, scale: .82 }, { y: 0, opacity: 1, scale: 1, duration: .62, ease: 'back.out(1.6)' }, .35)
       .fromTo(q('.ini-missao'), { scale: .3, opacity: 0, rotation: -14 }, { scale: 1, opacity: 1, rotation: 0, duration: .5, ease: 'back.out(2.2)',
@@ -355,7 +357,7 @@ const Telas = (() => {
     if (acao === 'passo-2') return S.passo !== 2 && irPara(2);
     if (acao === 'modo') return escolherModo(b.dataset.modo);
     if (acao === 'rodadas') {
-      S.rodadas = +b.dataset.n; pintarRodadas();
+      S.rodadas = +b.dataset.n; pintarRodadas(); validar();
       const r = RODADAS.find(x => x.n === S.rodadas);
       if (!RM) gsap.fromTo(b, { scaleY: .86, scaleX: 1.06 }, { scaleY: 1, scaleX: 1, duration: .35, ease: 'back.out(3)' });
       return anunciar(`Partida ${r.nome}: ${r.n} mandatos de ${r.anos} anos, cerca de ${r.min} minutos.`);

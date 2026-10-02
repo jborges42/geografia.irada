@@ -9,7 +9,24 @@ const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 // Movimento reduzido: pedido pelo sistema ou pelo ajuste do jogo (gravarPref('movimento-reduzido', true) + recarregar)
 const RM = matchMedia('(prefers-reduced-motion: reduce)').matches || lerPref('movimento-reduzido', false) === true;
+// Ajustes de acessibilidade guardados (menu de pausa): texto maior e contraste alto
+if (lerPref('texto', 1) !== 1) document.documentElement.style.setProperty('--texto', lerPref('texto', 1));
+if (lerPref('contraste', false)) document.documentElement.dataset.contraste = 'alto';
 const RAPIDO = new URLSearchParams(location.search).has('rapido');
+// O navegador tem 3D (WebGL)? O Chrome desliga o WebGL depois de travar a placa de vídeo algumas vezes, até ser reiniciado.
+const TEM_3D = (() => {
+  try {
+    const gl = document.createElement('canvas').getContext('webgl2');
+    gl?.getExtension('WEBGL_lose_context')?.loseContext();   // só testa: devolve o contexto na hora
+    return !!gl;
+  } catch { return false; }
+})();
+function avisoSem3D() {
+  document.body.insertAdjacentHTML('beforeend', `<div class="painel sem-3d" role="alert" style="position:fixed;inset:auto 0 0 0;margin:auto;top:0;max-width:640px;height:fit-content;padding:32px;z-index:100;text-align:center;background:#FFF9EC;color:#1A1433;border:5px solid #1A1433;border-radius:24px;box-shadow:0 8px 0 #1A1433;font-size:20px">
+    <h2>O 3D do navegador está desligado</h2>
+    <p>O mapa do jogo precisa de aceleração gráfica (WebGL). Feche <b>todas</b> as janelas do navegador e abra de novo.
+    Se continuar, ative em Configurações → Sistema → "Usar aceleração gráfica quando disponível" e reinicie o navegador.</p></div>`);
+}
 if (RAPIDO && window.gsap) gsap.globalTimeline.timeScale(10);
 document.documentElement.classList.toggle('rm', RM);
 
@@ -36,7 +53,7 @@ function pxDe(ficha) {
   s.remove();
   return px;
 }
-const efeitoSom = nome => { if (nome && typeof Som !== 'undefined') Som.efeito(nome); };
+const efeitoSom = (nome, o) => { if (nome && typeof Som !== 'undefined') Som.efeito(nome, o); };
 const abafarTrilha = () => { if (typeof Som !== 'undefined') Som.abafar?.(pilhaPaineis.length > 0); };   // painel aberto: música abafada
 // Fontes do jogo carregadas (para medir texto ou desenhar em canvas/textura)
 const fontesProntas = document.fonts
@@ -411,7 +428,7 @@ function iniciarTempo(segundos, aoAcabar) {
     if (tempoTween?.paused()) return;
     resta = Math.max(0, resta - 1);
     num.textContent = resta;
-    if (resta <= 5 && resta > 0) { barra.classList.add('acabando'); efeitoSom('tique'); if (!RM) gsap.fromTo(num, { scale: 1.08 }, { scale: 1, duration: .4, ease: 'power2.out' }); }
+    if (resta <= 5 && resta > 0) { barra.classList.add('acabando'); efeitoSom('tique', { semitons: 5 - resta }); if (!RM) gsap.fromTo(num, { scale: 1.08 }, { scale: 1, duration: .4, ease: 'power2.out' }); }
   }, 1000);
 }
 function pararTempo() { tempoTween?.kill(); tempoTween = null; clearInterval(tempoTique); }

@@ -7,7 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Manual do Diplomata — Geografia Irada</title>
 <meta name="theme-color" content="#22339A">
-<link rel="icon" href="img/favicon.png" type="image/png">
+<link rel="icon" href="img/marca/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="img/marca/favicon-180.png">
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/arte.css">
 <link rel="stylesheet" href="css/manual.css">
@@ -42,7 +43,7 @@
 <script>
   'use strict';
   document.getElementById('livro').innerHTML = Manual.livro();
-  if (typeof logo === 'function') document.getElementById('mn-barra-logo').innerHTML = logo('mn-logo');
+  if (typeof logo === 'function') document.getElementById('mn-barra-logo').innerHTML = logo('horizontal', 'mn-logo');
   document.getElementById('mn-imprimir').onclick = () => print();
   // manual.html?imprimir abre direto a janela de impressão (depois das fontes)
   if (new URLSearchParams(location.search).has('imprimir')) fontesProntas.then(() => setTimeout(print, 300));

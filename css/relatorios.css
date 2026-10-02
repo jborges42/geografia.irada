@@ -187,6 +187,8 @@
 .rb-blocos { display: flex; gap: calc(.3 * var(--u)); }
 .rb-blocos i { display: grid; place-items: center; width: calc(2.4 * var(--u)); height: calc(2.4 * var(--u)); border-radius: calc(.5 * var(--u)); font: 900 calc(1.7 * var(--u)) / 1 var(--f-texto);
   font-style: normal; color: #fff; background: var(--conflito); border: calc(.22 * var(--u)) solid var(--tinta); box-shadow: 0 calc(.25 * var(--u)) 0 var(--tinta); }
+.rb-blocos i.paz { background: var(--verde-ok); color: var(--tinta); }
+.rb-blocos i.paz svg { width: 70%; height: 70%; }
 .rb-calmo { font: 800 var(--fs-min) / 1.25 var(--f-texto); color: var(--tinta-suave); }
 .rb-critico { display: flex; flex-wrap: wrap; align-items: center; gap: calc(.6 * var(--u)); margin-top: calc(1 * var(--u)); padding: calc(.7 * var(--u)) calc(1 * var(--u));
   background: var(--pessego-alerta); border-radius: var(--raio); font: 800 var(--fs-min) / 1.2 var(--f-texto); }

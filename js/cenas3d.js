@@ -27,19 +27,20 @@ const Cenas3D = (() => {
   };
 
   // ---------- Renderizador único ----------
-  let renderer = null, ambiente = null, timer = null, palco = null, palcoFundo = null, rodando = false, modo = 'auto';
+  let renderer = null, ambiente = null, timer = null, palco = null, palcoFundo = null, rodando = false, modo = window.PC_FRACO ? 'leves' : 'auto';
   let medidos = 0, somaDt = 0;
   const elCena = () => document.getElementById('cena');
   function obterRenderer() {
     if (renderer) return renderer;
-    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+    renderer = new THREE.WebGLRenderer({ antialias: !window.PC_FRACO, alpha: true, powerPreference: 'high-performance' });
     renderer.setClearColor(0x000000, 0);
     renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
     renderer.toneMapping = THREE.NeutralToneMapping;
     renderer.toneMappingExposure = 1;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
-    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.enabled = !window.PC_FRACO;
     renderer.shadowMap.type = THREE.PCFShadowMap;
+    if (window.PC_FRACO) renderer.setPixelRatio(1);
     const cv = renderer.domElement;
     cv.setAttribute('aria-hidden', 'true');
     Object.assign(cv.style, { position: 'absolute', inset: '0', width: '100%', height: '100%', display: 'block', touchAction: 'none' });

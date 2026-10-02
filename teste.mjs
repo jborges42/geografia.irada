@@ -1,5 +1,7 @@
 // Teste da partida inteira pela interface (index.html?rapido), clicando nos data-teste, sem erros no console.
-// Uso: node teste.mjs [competitivo|cooperativo|todos] [--largura 1366 --altura 768] [--rm] [--arquivo] [--capturas pasta]
+// Uso: node teste.mjs [competitivo|cooperativo|todos] [--largura 1366 --altura 768] [--rm] [--arquivo] [--capturas pasta] [--extras] [--normal]
+//   --normal: sem ?rapido (velocidade real das animações; leva bem mais tempo).
+//   --extras: captura também créditos, manual, professor, provador, negociação e cada passo do fim (para a revisão visual).
 //   competitivo: 2 equipes (Brasil e China) + 4 do computador, 4 mandatos, com "Continuar" no meio (recarrega a página).
 //   cooperativo: 3 equipes (Brasil, EUA e Índia), agente infiltrado e reunião de emergência, 4 mandatos.
 // Capturas dos momentos-chave vão para --capturas (padrão: pasta temporária). Sai com código 1 se algo falhar.
@@ -11,7 +13,7 @@ import { join } from 'node:path';
 const args = process.argv.slice(2);
 const opc = (nome, padrao) => { const i = args.indexOf('--' + nome); return i >= 0 ? args[i + 1] : padrao; };
 const cenarios = args[0] && !args[0].startsWith('--') ? (args[0] === 'todos' ? ['competitivo', 'cooperativo'] : [args[0]]) : ['competitivo', 'cooperativo'];
-const largura = +opc('largura', 1366), altura = +opc('altura', 768);
+const largura = +opc('largura', 1366), altura = +opc('altura', 768), EXTRAS = args.includes('--extras'), PAGINA = args.includes('--normal') ? 'index.html' : 'index.html?rapido';
 const pasta = opc('capturas', join(tmpdir(), 'geografia-irada-teste'));
 await mkdir(pasta, { recursive: true });
 
@@ -29,7 +31,7 @@ const NA_PAGINA = `
 
 async function rodar(nome) {
   const C = CENARIOS[nome], t0 = Date.now(), log = (...m) => console.log(`[${nome} ${((Date.now() - t0) / 1000).toFixed(0)}s]`, ...m);
-  const nav = await abrirJogo({ pagina: 'index.html?rapido', largura, altura, movimentoReduzido: args.includes('--rm'), arquivo: args.includes('--arquivo') });
+  const nav = await abrirJogo({ pagina: PAGINA, largura, altura, movimentoReduzido: args.includes('--rm'), arquivo: args.includes('--arquivo') });
   const foto = async rotulo => { await comPrazo(nav.foto(join(pasta, `${nome}-${largura}-${rotulo}.png`)), 90000, 'captura'); };
   const fotos = new Set();
   const fotoUma = async rotulo => { if (!fotos.has(rotulo)) { fotos.add(rotulo); await foto(rotulo); } };
@@ -50,12 +52,30 @@ async function rodar(nome) {
     await esperar('[data-teste="jogar"]', 60000);
     await nav.espera(600);
     await fotoUma('01-inicio');
+    // painéis da tela inicial: abre, fotografa e fecha com Esc
+    if (EXTRAS) for (const [sel, rot] of [['[data-acao="creditos"]', '30-creditos'], ['[data-teste="manual"]', '31-manual'], ['[data-teste="professor"]', '32-professor']]) {
+      await clicarSel(sel);
+      await nav.esperarPor(`!!document.querySelector('#camada > [aria-modal="true"]')`, { tempo: 15000 });
+      await nav.espera(1200);
+      await foto(rot);
+      await nav.teclar('Escape');
+      await nav.esperarPor(`!document.querySelector('#camada > [aria-modal="true"]')`, { tempo: 15000 });
+      await nav.espera(400);
+    }
     await clicar('jogar');
     await esperar(`[data-teste="modo-${C.modo}"]`);
     await nav.espera(400);
+    if (EXTRAS) await foto('02a-modos');
     await clicar(`modo-${C.modo}`);
     await esperar('[data-teste="comecar"]');
     await nav.espera(700);
+    if (EXTRAS) {   // provador do boneco da 1ª vaga
+      await clicarSel('[data-acao="editar"]');
+      await nav.espera(2500);
+      await foto('02b-provador');
+      await nav.teclar('Escape');
+      await nav.espera(800);
+    }
     for (const pid of PIDS) {
       const sel = `[data-teste="potencia-${pid}"]`;
       const equipe = await pagina(`const b = document.querySelector('${sel}'); return b ? (b.getAttribute('aria-pressed') ?? b.getAttribute('aria-checked')) === 'true' : null;`);
@@ -74,16 +94,16 @@ async function rodar(nome) {
     await clicar('comecar');
 
     // ---------- a partida ----------
-    let ultimoEstado = '', parado = Date.now(), recarregou = false, acoes = 0, vezes = 0, trocou = false, pausou = false, reuniu = false, rodadaVista = 0;
+    let cenas = 0, negociou = false, ultimoEstado = '', parado = Date.now(), recarregou = false, acoes = 0, vezes = 0, trocou = false, pausou = false, reuniu = false, rodadaVista = 0;
     const humanoNaVez = () => pagina(`return document.querySelector('.hud')?.dataset.fase === 'decisoes' && !!__ache('.hud-encerrar');`);
     for (;;) {
-      if (Date.now() - t0 > 25 * 60000) throw new Error('a partida passou de 25 minutos');
+      if (Date.now() - t0 > (PAGINA === 'index.html' ? 60 : 25) * 60000) throw new Error('a partida passou do tempo-limite');
       const s = await pagina(`
         const hud = document.querySelector('.hud'), fase = hud?.dataset.fase;
         if (document.body.dataset.tela === 'inicio' && !Jogo.estado && window.__comecou) return 'fim';
         if (Jogo.estado) window.__comecou = true;
         if (__ache('[data-teste="revanche"], [data-teste="novo-jogo"]')) return 'fim-tela';
-        for (const t of ['revelacao-ok', 'aceitar', 'voto-sim', 'cop-1', 'doar-1', 'continuar-painel']) if (__ache('[data-teste="' + t + '"]')) return t;
+        for (const t of ['revelacao-ok', 'aceitar', 'voto-sim', 'cop-1', 'doar-1', 'doar-0', 'continuar-painel']) if (__ache('[data-teste="' + t + '"]')) return t;
         if (fase !== 'decisoes' && __ache('[data-teste="confirmar"]')) return 'confirmar';
         if (__ache('#camada [data-teste="alvo"]:not(.hud-alvos *)') && !document.querySelector('#camada [data-teste="alvo"][aria-checked="true"]:not(.hud-alvos *)')) return 'alvo-onu';
         if (__ache('.onu-res:not(.bloqueado)') && !document.querySelector('.onu-res[aria-checked="true"]')) return 'resolucao';
@@ -96,11 +116,22 @@ async function rodar(nome) {
       if (s !== ultimoEstado) { ultimoEstado = s; parado = Date.now(); if (!s.startsWith('esperando')) log(s); }
       else if (Date.now() - parado > 90000) throw new Error('travou em ' + s);
       if (s === 'fim' || s === 'fim-tela') { await nav.espera(800); await fotoUma('99-fim'); if (s === 'fim-tela') await clicar('inicio', true); break; }
-      if (s === 'revelacao-ok') { await fotoUma('03-revelacao'); await clicar(s, true); }
-      else if (['aceitar', 'voto-sim', 'cop-1', 'doar-1'].includes(s)) { await fotoUma('20-' + s); await clicar(s, true); }
+      if (s === 'revelacao-ok') {
+        await fotoUma('03-revelacao');
+        // "Segure para ver": aperta, segura 2,5 s e solta (no ?rapido o tempo encolhe, mas segurar também vale)
+        const p = await pagina(`const el = __ache('[data-teste="revelacao-ok"]'); return el && { ...__centro(el), segurar: el.classList.contains('rev-segurar') };`);
+        if (p?.segurar) {
+          await nav.mover(p.x, p.y);
+          await nav.cmd('Input.dispatchMouseEvent', { type: 'mousePressed', x: p.x, y: p.y, button: 'left', clickCount: 1 });
+          await nav.espera(2500);
+          await nav.cmd('Input.dispatchMouseEvent', { type: 'mouseReleased', x: p.x, y: p.y, button: 'left', clickCount: 1 });
+        } else if (p) await nav.clicarEm(p.x, p.y);
+      }
+      else if (['aceitar', 'voto-sim', 'cop-1', 'doar-1', 'doar-0'].includes(s)) { await fotoUma('20-' + s); await clicar(s, true); }
       else if (s === 'continuar-painel') {
         const onde = await pagina(`return document.querySelector('.hud')?.dataset.fase || '';`);
-        await fotoUma(onde === 'plantao' ? '04-plantao' : onde === 'balanco' ? '14-balanco' : onde === 'dilema' ? '05b-dilema-porque' : '21-' + onde);
+        const rot = onde === 'plantao' ? '04-plantao' : onde === 'balanco' ? '14-balanco' : onde === 'dilema' ? '05b-dilema-porque' : '21-' + onde;
+        if (EXTRAS && onde === 'cena') { cenas++; await nav.espera(1500); await foto(`${rot}-${cenas}`); } else await fotoUma(rot);
         await clicar(s, true);
       } else if (s === 'opcao') { await fotoUma('05-dilema'); await clicarSel('[data-teste^="opcao-"]', true); }
       else if (s === 'confirmar') await clicar('confirmar', true);
@@ -117,9 +148,9 @@ async function rodar(nome) {
           recarregou = true;
           log('recarregando a página para testar Continuar');
           const ano = await pagina('return Jogo.estado.ano;');
-          await nav.ir('index.html?rapido');
+          await nav.ir(PAGINA);
           await esperar('[data-teste="continuar"]', 60000);
-          await nav.espera(500);
+          await nav.espera(PAGINA === "index.html" ? 3000 : 500);   // sem ?rapido, o menu ainda está entrando
           await clicar('continuar');
           await nav.esperarPor(`Jogo.estado && Jogo.estado.ano === ${ano}`, { tempo: 30000 });
           await nav.espera(1500);
@@ -139,10 +170,20 @@ async function rodar(nome) {
           await clicar('continuar-jogo');
           await nav.espera(500);
         }
+        if (EXTRAS && !negociou && await existe('[data-teste="negociar"]')) {   // negociação: abre, fotografa e desiste
+          negociou = true;
+          await clicar('negociar');
+          await nav.espera(1500);
+          await foto('25-negociar');
+          await nav.teclar('Escape');
+          await nav.espera(800);
+          continue;
+        }
         if (C.reuniao && !reuniu && await existe('[data-teste="reuniao"]')) { reuniu = true; await fotoUma('22-reuniao'); await clicar('reuniao'); await nav.espera(800); continue; }
         if (!trocou && await existe('[data-teste="trocar-acoes"]')) { trocou = true; await clicar('trocar-acoes'); await nav.espera(700); }
         // até 2 ações por vez
         for (let k = 0; k < 2; k++) {
+          await nav.esperarPor(`!document.querySelector('[aria-busy="true"]')`, { tempo: 30000 });   // a ação anterior terminou de animar
           const id = await pagina(`const b = __ache('.doca-acoes [data-teste="acao"]:not(.bloqueado):not(.usado)'); return b && b.dataset.id;`);
           if (!id) break;
           const sel = `.doca-acoes [data-teste="acao"][data-id="${id}"]`;
@@ -150,8 +191,11 @@ async function rodar(nome) {
           await nav.mover(p.x, p.y);
           await nav.espera(400);
           await fotoUma('06b-previa');
-          await clicarSel(sel);
-          await esperar('.hud-ficha [data-teste="confirmar"]', 10000);
+          // a ação anterior pode ainda estar animando (clique ignorado): tenta de novo a cada 2 s
+          for (let t = 0; ; t++) {
+            await clicarSel(sel);
+            try { await esperar('.hud-ficha [data-teste="confirmar"]', 2000); break; } catch (erro) { if (t >= 5) throw erro; }
+          }
           await nav.espera(400);
           await fotoUma('07-ficha');
           await clicarSel('.hud-ficha [data-teste="confirmar"]');

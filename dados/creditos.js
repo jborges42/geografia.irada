@@ -2,6 +2,9 @@
 // Créditos de terceiros mostrados na tela de créditos (dono: Som e créditos). Versão completa, com os textos das licenças: CREDITOS.md.
 // Campos: item, autor, licenca, url, uso (+ grupo, para a tela agrupar). Créditos sem nome de marca de brinquedo ou de jogo.
 const CREDITOS = [
+  // Criação
+  { grupo: 'Criação', item: 'Geografia Irada', autor: 'João Vitor Borges da Silva Matias', licenca: 'Autor', url: '', uso: 'Criação, direção e conteúdo do jogo' },
+
   // Bibliotecas (vão para o site)
   { grupo: 'Bibliotecas', item: 'Three.js r186', autor: 'Autores do three.js (mrdoob e colaboradores)', licenca: 'MIT', url: 'https://threejs.org', uso: 'Mapa-múndi 3D, bonecos e cenas' },
   { grupo: 'Bibliotecas', item: 'N8AO 1.10.3', autor: 'N8python', licenca: 'CC0 1.0', url: 'https://github.com/N8python/n8ao', uso: 'Sombra de contato entre as peças do mapa' },

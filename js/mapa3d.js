@@ -9,6 +9,15 @@ const Mapa3D = (() => {
   // ============================== PALETA E MEDIDAS (cópia do guia §2; os valores do guia mandam) ==============================
   const M = MAPA, COLS = M.colunas, LINS = M.linhas, TERR = M.territorios, NC = COLS * LINS;
   const Q = new URLSearchParams(location.search);
+  // PC fraco: WebGL por software (sem GPU), poucos núcleos ou pouca memória. Começa direto nos gráficos leves, sem esperar o medidor
+  const SOFT = (() => { try {
+    const c = document.createElement('canvas'), g = c.getContext('webgl2') || c.getContext('webgl'), x = g?.getExtension('WEBGL_debug_renderer_info');
+    const r = x ? g.getParameter(x.UNMASKED_RENDERER_WEBGL) : '';
+    g?.getExtension('WEBGL_lose_context')?.loseContext();
+    return !g || /swiftshader|llvmpipe|software|basic render/i.test(r);
+  } catch { return true; } })();
+  window.PC_FRACO = SOFT || (navigator.hardwareConcurrency || 8) <= 4 || (navigator.deviceMemory || 8) <= 4;
+  document.documentElement.classList.toggle('pc-fraco', window.PC_FRACO);
   // Movimento reduzido: o do jogo (js/ui.js, que também lê o ajuste do professor) ou o do sistema
   const REDUZ = typeof RM !== 'undefined' ? RM : matchMedia('(prefers-reduced-motion: reduce)').matches;
   const VEL = Q.has('rapido') ? .25 : 1;           // ?rapido (teste automático): animações mais curtas
@@ -355,7 +364,7 @@ const Mapa3D = (() => {
 
   // ============================== CENA, LUZ, MESA E PÓS-PROCESSAMENTO ==============================
   let renderer, cena, camera, controles, raiz, composer = null, n8 = null, sol, elemento, sobreposicao;
-  let qualidade = Q.has('leve') ? 'leves' : 'bonitos', qualidadeFixa = Q.has('leve'), pausado = false, modoAtual = 'jogo', iniciado = false;
+  let qualidade = Q.has('leve') || window.PC_FRACO ? 'leves' : 'bonitos', qualidadeFixa = Q.has('leve'), pausado = false, modoAtual = 'jogo', iniciado = false;
   let resolverPronto;
   const pronto = new Promise(ok => (resolverPronto = ok));
   const animados = new Set();            // objetos com tique(dt, t)
@@ -379,9 +388,9 @@ const Mapa3D = (() => {
     if (iniciado) return api;
     iniciado = true;
     elemento = el;
-    renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+    renderer = new THREE.WebGLRenderer({ antialias: !window.PC_FRACO, powerPreference: 'high-performance' });
     renderer.toneMapping = THREE.NeutralToneMapping;
-    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.enabled = !SOFT;   // sem GPU: sem sombras
     renderer.shadowMap.type = THREE.PCFShadowMap;
     renderer.shadowMap.autoUpdate = false;   // o laço pede a sombra (needsUpdate) só quando ela pode ter mudado
     renderer.domElement.style.cssText = 'display:block;width:100%;height:100%;touch-action:none';
@@ -459,7 +468,7 @@ const Mapa3D = (() => {
     if (!auto) qualidadeFixa = true;
     fpsAuto = !qualidadeFixa && qualidade === 'bonitos';
     const leve = qualidade === 'leves';
-    renderer.setPixelRatio(leve ? 1 : Math.min(devicePixelRatio, 2));
+    renderer.setPixelRatio(leve ? (SOFT ? .6 : 1) : Math.min(devicePixelRatio, 2));
     sol.shadow.mapSize.set(leve ? 2048 : 4096, leve ? 1024 : 2048);
     sol.shadow.map?.dispose(); sol.shadow.map = null; renderer.shadowMap.needsUpdate = true;
     if (terra) terra.castShadow = !leve;
@@ -1250,7 +1259,8 @@ const Mapa3D = (() => {
     };
     for (const [id, t] of Object.entries(torres)) {
       if (!t.lista.length) continue;
-      if (!pertoDeMais && t.lista.length > 2) {
+      // "+N" só onde a turma está olhando (mouse, alvo, foco, evento): na visão geral parada, poluía o mapa
+      if (!pertoDeMais && t.lista.length > 2 && [...(rotulos[id]?.motivos || [])].some(m => m !== 'casa')) {
         const [x, y, z] = posTorre(id, 1, 2), [px, py, ok] = naTela(x + 1.7, y + .2, z + 1);
         poePilula('p:' + id, '+' + (t.lista.length - 2), px + .9 * u, py, ok);
       }
@@ -1318,7 +1328,7 @@ const Mapa3D = (() => {
     for (const k of Object.keys(bonecosMapa)) delete bonecosMapa[k];
     for (const av of avatares) {
       const pid = av.pid; if (!ehPotencia(pid)) continue;
-      const b = criarBoneco({ ...av, cor: av.cor || eq(pid).cor, forma: av.forma || eq(pid).forma }, { base: true });
+      const b = criarBoneco({ ...av, cor: av.cor || eq(pid).cor, forma: av.forma || eq(pid).forma }, { base: true, tijolinhos: false });
       const [ax, az] = ancoraXZ(pid);
       b.position.set(ax + 3, ALT_TERRA + CASA, az - 3.5); b.rotation.y = -.3;
       b.userData.territorio = pid; b.userData.pid = pid;

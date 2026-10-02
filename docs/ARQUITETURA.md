@@ -25,8 +25,8 @@ papel, pódio 3D com chuva de tijolinhos. Acabamento de versão final.
   ligado automaticamente se o FPS cair; no máximo 2 contextos WebGL vivos; pause o que não está visível.
   O jogo não pode ficar mais lento com o tempo: nada cresce sem limite durante a partida (dispose, pools, instancing,
   tweens e listeners removidos). Recomendações medidas para todos os módulos em
-  `/private/tmp/claude-501/-Users-joaovitorborgesdasilvamatias-Documents-dev-geografia-irada/ee37fc0c-bcc9-4413-94a1-530f15b530d7/scratchpad/qa/desempenho.md` (a integração aplica).
-  Trocas pendentes da logo oficial: `/private/tmp/claude-501/-Users-joaovitorborgesdasilvamatias-Documents-dev-geografia-irada/ee37fc0c-bcc9-4413-94a1-530f15b530d7/scratchpad/qa/pendencias-logo.md` (a integração aplica).
+  `docs/trabalho/DESEMPENHO.md` (a integração aplica).
+  Trocas pendentes da logo oficial: `docs/trabalho/PENDENCIAS-LOGO.md` (a integração aplica).
 - **Ganchos de teste:** todo controle que o teste automático precisa usar tem `data-teste="..."` (lista em §Teste).
 - **Cancelamento:** toda espera usa `espera/fim/aguardar` de ui.js (lançam `CANCELADA` quando a partida é encerrada).
 
@@ -43,7 +43,7 @@ js/bonecos.js  js/mapa3d.js  js/cenas3d.js  js/mascote.js
 js/plantao.js  js/dilemas.js  js/onu.js  js/relatorios.js  js/manual.js  js/hud.js  js/telas.js  js/jogo.js
 ```
 CSS: `css/base.css` (fichas de design + componentes), `css/arte.css` (ornamentos e ilustrações) e um por módulo: `css/telas.css`, `css/jogo.css`,
-`css/plantao.css`, `css/onu.css`, `css/relatorios.css`, `css/manual.css`.
+`css/plantao.css`, `css/dilemas.css`, `css/onu.css`, `css/relatorios.css`, `css/manual.css`.
 
 ## Donos dos arquivos
 
@@ -115,7 +115,8 @@ Avatar = `{ pid, nome, cor, forma, pele, cabelo, chapeu, acessorio, humano }` (`
   'refugiados', 'petroleo', 'comercio', 'ajuda', 'influencia', 'parceria', 'golpe', 'desinformacao', 'cop', 'onu'),
   `numeroFlutuante(id, texto, cor)`, `bonecos(avatares)` (um por potência na capital), `acaoBoneco(pid, acao)`,
   `modo('inicio' | 'jogo')` (no início a câmera passeia sozinha), `pausar(bool)`, `graficos('bonitos' | 'leves')`,
-  `pronto` (Promise). Clique devolve `{ id }` do território/potência.
+  `pronto` (Promise). Clique e passar devolvem `{ id, x, y }`. Extras: `vez(pid)`, `posicaoNaTela(id)`, `EQUIPES`, `ACOES()`,
+  `EFEITOS()`, 3º parâmetro opcional de `efeito` (`{ pid, de, para }`).
 - **Bonecos** (js/bonecos.js): `Bonecos.criar(avatar)` → `THREE.Group` com `.acao('acenar'|'pular'|'comemorar'|'triste'|
   'votar'|'falar'|'parado')`; listas `Bonecos.PELES`, `CABELOS`, `CHAPEUS`, `ACESSORIOS` (`{ id, nome }`).
   Usado pelo Mapa3D e pelo Cenas3D (fonte única do boneco).
@@ -230,7 +231,7 @@ Estado `e` é JSON puro (salva com `JSON.stringify`). Funções:
 - `data-teste` usados: `jogar`, `continuar`, `manual`, `professor`, `modo-<id>`, `rodadas-<n>`, `potencia-<pid>`
   (alterna equipe/computador), `comecar`, `revelacao-ok`, `opcao-<n>`, `acao` (com `data-id`), `alvo` (com `data-id`), `confirmar`, `cancelar`,
   `encerrar-vez`, `trocar-acoes`, `negociar`, `voto-<sim|nao|abst|veto>`, `cop-<0|1|2>`, `doar-<n>`, `continuar-painel`,
-  `pular`, `menu`, `sair`, `revanche`, `novo-jogo`, `inicio`.
+  `pular`, `menu`, `continuar-jogo`, `sair`, `revanche`, `novo-jogo`, `inicio`; Manual: `manual-<aba>`, `fechar-manual`.
 
 ## Catálogo de componentes (Fundação: `css/base.css` + `js/ui.js`)
 

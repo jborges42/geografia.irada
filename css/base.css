@@ -199,6 +199,8 @@ body.jogo { height: 100%; overflow: hidden; user-select: none; -webkit-user-sele
               0 var(--lado) 0 calc(-1 * var(--b)) var(--face-lado), 0 var(--lado) 0 0 var(--tinta),
               var(--anel, 0 0 #0000), var(--solta, 0 0 #0000);
 }
+/* o anel é de cada peça: um contêiner .peca focado (tabindex=-1) não passa o anel aos botões de dentro */
+@property --anel { syntax: '*'; inherits: false; }
 .peca:focus-visible, .peca.is-foco { --anel: var(--anel-foco); }
 .flutua { --solta: var(--sombra-solta); }                 /* painel, balão e aviso sobre o mapa */
 .fina { --lado: calc(.6 * var(--u)); }
@@ -680,3 +682,7 @@ svg.forma { display: inline-block; flex: none; width: 1em; height: 1em; overflow
   *, ::before, ::after { transition-duration: 1ms !important; animation-duration: 1ms !important; animation-iteration-count: 1 !important; }
 }
 html.rm *, html.rm ::before, html.rm ::after { transition-duration: 1ms !important; animation-duration: 1ms !important; animation-iteration-count: 1 !important; }
+
+/* PC fraco: sem filtros caros na interface */
+.pc-fraco *, .pc-fraco *::before, .pc-fraco *::after { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+.pc-fraco [class*="ini-"], .pc-fraco img { filter: none !important; }

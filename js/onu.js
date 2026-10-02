@@ -663,7 +663,7 @@ const ONU = (() => {
       s.tela.querySelector('.onu-placar').after(area);   // a frase entra logo abaixo do placar; os votos continuam à vista até ela terminar
       s.tela.scrollTop = 0;
       narrar(s, tipo === 'aprovada' ? '✅' : '⚖', { aprovada: 'A resolução foi aprovada.', vetada: 'Veto no Conselho: a resolução cai.', empate: 'Empate: sem maioria.', rejeitada: 'A resolução não passou.' }[tipo]);
-      await mostrarConsequencias(area, s.rodape, { frase: fraseResultado(e, r, res, resultado, tipo), mudancas: resultado.mudancas, porque: porqueResultado(r, tipo), ocultar: r.nome, max: 4,
+      await mostrarConsequencias(area, s.rodape, { frase: fraseResultado(e, r, res, resultado, tipo), mudancas: resultado.mudancas, porque: porqueResultado(r, tipo), ocultar: r.nome, max: innerHeight < 900 ? 3 : 4,   // projetor 1366×768: o porquê cabe sem rolar
         sai: [s.tela.querySelector('.onu-delegacoes'), s.tela.querySelector('.onu-territorios')], quemInfluencia: listaNomes(resultado.vetos.map(nomeCurtoPid)) });
       await fecharSessao(s);
       s = null;
@@ -757,6 +757,7 @@ const ONU = (() => {
     { n: 1, nome: 'Compromisso médio', efeito: 'Energia limpa +6 · economia −1', botao: 'cat-natureza' },
     { n: 2, nome: 'Compromisso alto', efeito: 'Energia limpa +12 · economia −3', botao: 'btn-confirmar' },
   ];
+  const unidades = n => `${n} ${n === 1 ? 'unidade' : 'unidades'}`;
   const tijolinho = (pid, extra = '') => `<i class="onu-tijolinho${extra}" data-equipe="${pid}">${formaDe(pid, { branca: true })}</i>`;
   async function cop(e) {
     pidsN = pidsDe(e).length;
@@ -874,7 +875,7 @@ const ONU = (() => {
   }
   async function copSecreto(e, pid, meta) {
     const opcoes = COP_OPCOES.map(o => `<button class="btn peca pinos onu-voto onu-cop-botao ${o.botao}" type="button" data-acao="${o.n}" data-teste="cop-${o.n}">
-      <span class="onu-voto-glifo num">${o.n}</span><span class="onu-voto-palavra">${o.nome}</span><small>${o.efeito}</small></button>`).join('');
+      <span class="onu-voto-glifo num">${o.n}</span><span class="onu-voto-palavra">${o.nome}</span><small>${o.efeito.replace(' · ', '<br>')}</small></button>`).join('');
     const conteudo = `<p class="onu-privado-pauta">${ICO('🌡')}<b>Quanto vocês prometem cortar?</b></p><p class="onu-privado-meta">Meta da cúpula: a soma de todos chegar a ${meta}.</p>`;
     const el = await telaSecreta(e, pid, { pre: 'Vez de prometer', conteudo, opcoes, teclas: `${tecla('0')} · ${tecla('1')} · ${tecla('2')}`, carimbo: 'GUARDADA', classeCarimbo: 'indigo', icone: '🔒', objeto: 'envelope-secreto' });
     const v = await esperarBotao(el.querySelector('.onu-votos'), { teclas: { 0: '0', 1: '1', 2: '2' } });
@@ -896,7 +897,7 @@ const ONU = (() => {
         <h2 class="painel-titulo" id="onu-doa-tit">Pedido de ajuda<small class="painel-sub">${esc(ev.titulo)}${typeof lugar === 'string' && dado(lugar) ? ' · ' + esc(nome(lugar)) : ''}</small></h2>
         <span class="pilula onu-meta-chip">${ICO('🎯')} Meta: ${meta} ${ICO(rec.ico)}</span></header>
       <div class="tela onu-doa-tela">
-        <ol class="onu-delegacoes onu-doa-esq" aria-label="Delegações">${quem.map(p => linhaDelegacao(e, p, { marcas: false }).replace('<span class="onu-linha-sub">', `<span class="onu-linha-sub"><span class="onu-tem">tem ${e.potencias[p].recursos[rec.id]} ${ICO(rec.ico)}</span> · `)).join('')}</ol>
+        <div class="onu-doa-esq"><ol class="onu-delegacoes" aria-label="Delegações">${quem.map(p => linhaDelegacao(e, p, { marcas: false }).replace('<span class="onu-linha-sub">', `<span class="onu-linha-sub"><span class="onu-tem">tem ${e.potencias[p].recursos[rec.id]} ${ICO(rec.ico)}</span> · `)).join('')}</ol></div>
         <div class="onu-doa-dir">
           <div class="onu-medidor-caixa"><p class="onu-medidor-tit"><b>${esc(rec.nome)} doados</b> <span class="num onu-soma" aria-live="polite">0</span><span class="num"> de ${meta}</span></p>
             <div class="onu-medidor onu-doa-medidor" role="meter" aria-label="${esc(rec.nome)} doados" aria-valuemin="0" aria-valuemax="${meta}" aria-valuenow="0">
@@ -960,15 +961,15 @@ const ONU = (() => {
       efeitoSom(resultado.sucesso ? 'sucesso' : 'descer');
       const doaram = quem.filter(p => doacoes[p] > 0);
       const frase = resultado.sucesso
-        ? `Ajuda a caminho! Foram ${resultado.total} de ${rec.nome.toLowerCase()}, e a meta era ${meta}.`
-        : `Faltou ajuda: chegaram ${resultado.total} de ${rec.nome.toLowerCase()}, e a meta era ${meta}.`;
+        ? `Ajuda a caminho! Chegaram ${unidades(resultado.total)} de ${rec.nome.toLowerCase()}, e a meta era ${meta}.`
+        : `Faltou ajuda: ${resultado.total === 1 ? 'chegou' : 'chegaram'} ${unidades(resultado.total)} de ${rec.nome.toLowerCase()}, e a meta era ${meta}.`;
       const porque = (resultado.sucesso
         ? 'Com ajuda a tempo, menos gente precisa deixar a própria casa e a região se recupera mais rápido.'
         : 'Sem ajuda suficiente, a região demora a se recuperar e mais gente precisa fugir.') +
         (doaram.length ? ` Quem doou (${esc(listaNomes(doaram.map(nomeCurtoPid)))}) ganhou influência ali e apoio em casa.` : '');
       const area = $('.onu-doa-area');
       area.classList.add('onu-doa-resultado');
-      await mostrarConsequencias(area, rodape, { frase, mudancas: resultado.mudancas.filter(m => m.v !== 'influencia' && m.v !== 'apoio'), porque, titulo: 'O que muda', max: 4, ocultar: ev.titulo });
+      await mostrarConsequencias(area, rodape, { frase, mudancas: resultado.mudancas.filter(m => m.v !== 'influencia' && m.v !== 'apoio'), porque, titulo: 'O que muda', max: 4, ocultar: ev.titulo, porqueEm: $('.onu-doa-esq') });
       await fecharPainel(el);
       return resultado;
     } finally { if (el.isConnected) el.remove(); }
@@ -987,11 +988,16 @@ const ONU = (() => {
       s.tela.innerHTML = `<div class="onu-regra onu-cs"><span class="soquete">${ICO('🕵')}</span>
           <p><b>Uma delegação tem uma agenda secreta</b> contra as Metas 2050. Conversem por 1 minuto e votem em quem vocês acham que é.
           Errar custa caro: o acusado perde 2 CP e a tensão mundial sobe 5.</p></div>
-        <ol class="onu-delegacoes" aria-label="Suspeitos">${humanos.map(p => linhaDelegacao(e, p, { marcas: false })).join('')}</ol>
-        <div class="onu-pistas"><p class="onu-sub">${ICO('🔍')} Pistas para conversar</p>
-          <p>A agenda secreta é uma destas. Quem agiu assim nos últimos mandatos?</p>
+        <ol class="onu-delegacoes" aria-label="Suspeitos">${humanos.map(p => linhaDelegacao(e, p, { marcas: false })).join('')}</ol>`;
+      // pistas: ficha embaixo da sala (onde fica a pauta numa votação), com espaço para letra grande
+      const pistas = criar(`<article class="onu-pauta onu-pistas peca flutua" aria-label="Pistas para conversar">
+        ${ART('lupa', 'onu-pauta-arte')}
+        <div class="onu-pauta-corpo"><h3 class="onu-pauta-titulo">Pistas para conversar</h3>
+          <p class="onu-pauta-texto">A agenda secreta é uma destas. Quem agiu assim nos últimos mandatos?</p>
           <ul>${[['🌡', 'Esquentar o planeta', 'travou acordos do clima'], ['⏰', 'Aumentar a tensão', 'armou-se e sancionou'], ['🚢', 'Travar o comércio', 'tarifas e sanções'], ['🧳', 'Fechar as portas', 'não ajudou quem fugia']]
-            .map(([i, t, d]) => `<li>${ICO(i)}<span><b>${t}</b><small>${d}</small></span></li>`).join('')}</ul></div>`;
+            .map(([i, t, d]) => `<li>${ICO(i)}<span><b>${t}</b><small>${d}</small></span></li>`).join('')}</ul></div></article>`);
+      s.el.insertBefore(pistas, s.tablet);
+      if (!RM) gsap.from(pistas, { y: 8 * uPx(), opacity: 0, duration: .45, ease: 'back.out(1.6)', delay: .25 });
       linha(s, pid)?.querySelector('.onu-linha-marcas')?.insertAdjacentHTML('beforeend', `<span class="onu-megafone">${ART('megafone')}<span class="so-leitor">convocou a reunião</span></span>`);
       preencherRetratos(s.tela, e);
       if (!RM) gsap.from(s.tela.querySelectorAll('.onu-regra, .onu-linha'), { y: 1.4 * uPx(), opacity: 0, duration: .3, stagger: .06, ease: 'power2.out', delay: .2 });
@@ -1017,7 +1023,8 @@ const ONU = (() => {
       }
       // revelação: cada voto vira um tijolinho na linha do acusado
       tituloSessao(s, 'Revelação');
-      s.tela.querySelector('.onu-pistas')?.remove();
+      const fichaPistas = s.el.querySelector('.onu-pistas');
+      if (fichaPistas) { await fim(gsap.to(fichaPistas, { opacity: 0, y: RM ? 0 : 4 * uPx(), duration: RM ? .15 : .25, ease: 'power2.in' })); fichaPistas.remove(); }
       s.tela.querySelector('.onu-regra')?.remove();
       s.tela.classList.add('onu-revelando');
       narrar(s, '🔎', 'Cada voto vira um tijolinho na linha de quem foi acusado.');
@@ -1175,7 +1182,7 @@ const ONU = (() => {
         : `${Com(para)} ${verbo(para, 'recusou', 'recusaram')} a troca.`);
       await esperarContinuar(rodape, 'Continuar');
     }
-    const textoTroca = t => listaNomes(RECURSOS.filter(r => t[r.id] > 0).map(r => `${t[r.id]} de ${r.nome.toLowerCase()}`)) || 'nada';
+    const textoTroca = t => listaNomes(RECURSOS.filter(r => t[r.id] > 0).map(r => `${unidades(t[r.id])} de ${r.nome.toLowerCase()}`)) || 'nada';
 
     return new Promise((ok, falha) => {
       let feito = false, passo = 'parceiro';

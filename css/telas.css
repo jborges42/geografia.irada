@@ -11,7 +11,7 @@
     linear-gradient(0deg, rgb(20 31 102 / .4), rgb(20 31 102 / 0) 26%); }
 .ini-marca { position: absolute; left: calc(5 * var(--u)); top: calc(3.2 * var(--u)); width: calc(66 * var(--u)); }
 .ini-h1 { margin: 0; }
-.ini-logo { width: calc(64 * var(--u)); filter: drop-shadow(0 calc(.8 * var(--u)) calc(1.6 * var(--u)) rgb(10 14 50 / .35)); }
+.ini-logo { filter: drop-shadow(0 calc(.8 * var(--u)) calc(1.6 * var(--u)) rgb(10 14 50 / .35)); }
 /* chamada "Missão 2050": placa amarela com pinos, inclinada como faixa */
 .ini-missao { --lado: calc(1 * var(--u)); display: flex; align-items: center; gap: calc(1.2 * var(--u)); width: max-content; max-width: calc(58 * var(--u));
   margin: calc(1.2 * var(--u)) 0 0 calc(9 * var(--u)); padding: calc(1 * var(--u)) calc(2.6 * var(--u)) calc(1.2 * var(--u)) calc(9.6 * var(--u)); rotate: -2.5deg; }
@@ -138,7 +138,7 @@
 .vaga-quem.peca { --raio: var(--raio-btn); }
 .vaga-quem .ico { width: calc(3 * var(--u)); }
 .vaga-quem { min-width: 0; }
-.vaga-quem > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.vaga-quem > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; letter-spacing: -.015em; }
 .vaga-quem[aria-pressed="false"] .ico-btn { display: none; }
 .vaga-quem .ico-btn { width: calc(2.2 * var(--u)); height: calc(2.2 * var(--u)); opacity: .7; }
 .vaga-quem[aria-pressed="false"] { --cor: var(--cinza-peca); --cor-lado: var(--cinza-peca-lado); color: var(--tinta-suave); }
@@ -327,7 +327,7 @@
 .prof-tela { height: calc(57 * var(--u)); padding: calc(2.2 * var(--u)) calc(2.4 * var(--u));
   background: linear-gradient(rgb(53 80 200 / .07) 1px, transparent 1px) 0 0 / calc(2 * var(--u)) calc(2 * var(--u)),
     linear-gradient(90deg, rgb(53 80 200 / .07) 1px, transparent 1px) 0 0 / calc(2 * var(--u)) calc(2 * var(--u)), var(--ladrilho); }
-.prof-tela [role="tabpanel"] { display: grid; gap: calc(1.8 * var(--u)); align-content: start; }
+.prof-tela [role="tabpanel"] { display: grid; gap: calc(1.8 * var(--u)); align-content: safe center; min-height: 100%; }
 .prof-tela [role="tabpanel"][hidden] { display: none; }
 .prof-passos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: calc(2.4 * var(--u)); margin: 0; padding: calc(2.4 * var(--u)) 0 0; list-style: none; }
 .prof-passo { position: relative; display: grid; justify-items: start; align-content: start; gap: calc(.8 * var(--u)); padding: calc(2 * var(--u)) calc(2 * var(--u)) calc(2.2 * var(--u));

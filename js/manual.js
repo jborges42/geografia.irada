@@ -562,7 +562,7 @@ const Manual = (() => {
   function livro() {
     const abas = abasValidas();
     const sumario = `<section class="mn-folha mn-folha-capa">
-      <div class="mn-livro-logo">${typeof logo === 'function' ? logo('mn-logo', { variante: 'claro' }) : ''}</div>
+      <div class="mn-livro-logo">${typeof logo === 'function' ? logo('completa', 'mn-logo') : ''}</div>
       ${obj('manual', 'mn-livro-obj')}
       <h1 class="mn-livro-titulo">Manual do Diplomata</h1>
       <p class="mn-livro-sub">Missão 2050 · regras, catálogos, glossário, projeções e o mapa da BNCC</p>

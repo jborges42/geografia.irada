@@ -318,7 +318,7 @@
 .mn-livro { --u: 1.32mm; --fs-min: calc(2.4 * var(--u)); --fs-corpo: calc(2.8 * var(--u)); font-family: var(--f-texto); color: var(--tinta); }
 .mn-barra { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 16px; padding: 12px max(16px, calc(50% - 105mm)); background: var(--mesa-meio);
   border-bottom: 4px solid var(--tinta); box-shadow: 0 6px 0 rgb(14 20 64 / .35); }
-.mn-barra .mn-logo { width: 150px; }
+.mn-barra .mn-logo { height: 40px; width: auto; }
 .mn-barra-tit { flex: 1; font: 700 26px / 1.1 var(--f-titulo); color: #fff; -webkit-text-stroke: .17em var(--tinta); paint-order: stroke fill; letter-spacing: .02em; }
 .mn-barra .btn { --u: 7.68px; text-decoration: none; }
 .mn-folha { position: relative; width: 210mm; min-height: 297mm; margin: 12mm auto; padding: 14mm 14mm 16mm; background: #fff; border-radius: 2mm;
@@ -333,7 +333,7 @@
 /* capa do livro */
 .mn-folha-capa { display: grid; justify-items: center; align-content: start; gap: calc(3 * var(--u)); text-align: center;
   background: radial-gradient(70% 50% at 50% 30%, #fff 30%, transparent 75%), linear-gradient(#EAF0FF, #fff 40%); }
-.mn-livro-logo .mn-logo { width: 66mm; height: auto; margin-top: 4mm; }
+.mn-livro-logo .mn-logo { width: 60mm; height: auto; margin-top: 4mm; }
 .mn-livro-obj { width: 42mm; rotate: -6deg; filter: drop-shadow(0 1.2mm 0 rgb(26 20 51 / .2)); }
 .mn-livro-titulo { font: 400 calc(9 * var(--u)) / 1 var(--f-marca); text-transform: uppercase; letter-spacing: .02em; color: #fff;
   -webkit-text-stroke: .16em var(--tinta); paint-order: stroke fill; text-shadow: 0 .08em 0 var(--tinta); }

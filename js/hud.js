@@ -305,7 +305,7 @@ const Hud = (() => {
     const segredo = pot.humano && (pot.missao || e.config.infiltrado);
     const reuniao = pot.humano && e.config.modo === 'cooperativo' && e.config.infiltrado && !e.reuniaoUsada;
     const cp = pot.humano ? `<span class="pilula amarela vez-cpn"><b class="num">0</b>${FINO}CP</span><span class="vez-pinos" aria-hidden="true"></span>`
-      : `<span class="pilula vez-parc">${ic('🤝', 40)}<b class="num">${Simulacao.parceirosDe(e, id).length}</b> parceiros</span>`;
+      : `<span class="pilula vez-parc">${ic('🤝', 40)}<b class="num">${Simulacao.parceirosDe(e, id).length}</b> <span class="vez-parc-rot">${Simulacao.parceirosDe(e, id).length === 1 ? 'parceiro' : 'parceiros'}</span></span>`;
     return `<li class="vez painel peca pinos" data-pid="${id}" data-equipe="${id}" aria-label="Vez ${esc(com(id, 'de'))}">
       ${ponteiroVez()}<span class="selo pos" ${e.config.modo === 'cooperativo' ? 'hidden' : ''}></span>
       <div class="vez-cab">${retratoHTML(id, 'medio')}<div><b class="letra-bolha">${esc(vezDe(id))}</b><small class="letra-bolha">${quem}</small></div></div>
@@ -328,7 +328,7 @@ const Hud = (() => {
       const total = Math.min(8, Math.max(cpInicio, p.cp));
       li.querySelector('.vez-pinos').innerHTML = Array.from({ length: total }, (_, i) => `<i class="pino-cp${i < p.cp ? '' : ' vazio'}"></i>`).join('');
       li.querySelector('.vez-cpn').setAttribute('aria-label', `${p.cp} de Capital Político`);
-    } else li.querySelector('.vez-parc b').textContent = Simulacao.parceirosDe(e, id).length;
+    } else { const n = Simulacao.parceirosDe(e, id).length; li.querySelector('.vez-parc b').textContent = n; li.querySelector('.vez-parc-rot').textContent = n === 1 ? 'parceiro' : 'parceiros'; }
     RECURSOS.forEach(([k]) => {
       const el = li.querySelector(`[data-rec="${k}"] b`);
       saltar(el, antes?.[k], p.recursos[k], animar);
@@ -423,7 +423,7 @@ const Hud = (() => {
   // Desenha a doca da equipe da vez (mao = as 6 sorteadas desta vez, inclusive as já usadas)
   function doca(e, pid, mao, { entrar = false } = {}) {
     const d = raiz.querySelector('.hud-doca'), enc = raiz.querySelector('.hud-encerrar');
-    if (!pid) { d.innerHTML = ''; enc.hidden = true; return; }
+    if (!pid) { d.innerHTML = ''; enc.hidden = true; enc.classList.remove('chamando'); return; }
     maoDaVez = mao;
     const p = e.potencias[pid], fixa = POLITICAS.find(c => c.fixa), stF = estadoAcao(e, pid, fixa.id);
     const trocaOk = p.cp >= 1;
@@ -440,9 +440,11 @@ const Hud = (() => {
           aria-label="Trocar as ações: sorteia outras 6 por 1 de Capital Político" title="Trocar as ações (1 CP)" ${trocaOk ? '' : 'aria-disabled="true"'}><img src="${ICONES_BOTAO.trocar}" alt=""></button>
         <span class="pilula amarela"><i class="pino-cp"></i>1${FINO}CP</span></div>`;
     enc.hidden = false;
+    // nada mais para fazer com o CP que sobrou: o Encerrar vez chama a atenção
+    enc.classList.toggle('chamando', !d.querySelector('[data-ao="acao"]:not(.bloqueado):not(.usado)'));
     d.querySelectorAll('[data-ao="acao"]').forEach(b => {
       b.addEventListener('pointerenter', () => ao.passar?.(b.dataset.id));
-      b.addEventListener('focus', () => { if (b.matches(':focus-visible')) ao.passar?.(b.dataset.id); });
+      b.addEventListener('focus', () => { if (viaTeclado) ao.passar?.(b.dataset.id); });
       b.addEventListener('pointerleave', () => ao.sair?.(b.dataset.id));
       b.addEventListener('blur', () => ao.sair?.(b.dataset.id));
     });
@@ -460,6 +462,12 @@ const Hud = (() => {
     });
   }
   const tijoloEl = cid => raiz?.querySelector(`.hud-doca [data-id="${cid}"]`);
+  // Foco do jogo (começo da vez, volta de painel): não abre a ficha de prévia por cima do mapa
+  // (a prévia por foco só vale quando a turma navega com Tab ou setas; o evento de foco pode chegar atrasado)
+  let viaTeclado = false;
+  document.addEventListener('keydown', ev => { if (ev.key === 'Tab' || ev.key.startsWith('Arrow')) viaTeclado = true; }, true);
+  document.addEventListener('pointerdown', () => { viaTeclado = false; }, true);
+  const focar = el => { if (!el) return; viaTeclado = false; el.focus({ preventScroll: true }); };
 
   // ============================== FICHA DA AÇÃO (guia §5.4) ==============================
   /* modo: 'previa' (passar o mouse), 'escolha' (selecionada), 'bloqueada', 'confirmar' (com alvo).
@@ -528,7 +536,7 @@ const Hud = (() => {
     if (!pid) { el.hidden = true; return; }
     el.style.setProperty('--faixa', corDe(pid));
     el.innerHTML = `<span class="dec-quem">${retratoHTML(pid, 'medio')}${arte('ampulheta', { px: 96, classe: 'dec-ampulheta' })}</span>
-      <div class="dec-textos"><b class="dec-tit">${esc(maiuscula(com(pid, '')))} ${plural(pid) ? 'estão' : 'está'} decidindo…</b>
+      <div class="dec-textos"><b class="dec-tit">${maiuscula(DE[pid].slice(1))} ${esc(nomeCurto(pid))} ${plural(pid) ? 'estão' : 'está'} decidindo…</b>
       <span class="dec-sub">Computador: cada governo pesa as coisas do seu jeito</span></div><ol class="dec-log" aria-live="polite"></ol>
       <button class="btn btn-neutro peca dec-pular" data-teste="pular">Pular <small>Espaço</small></button>`;
     el.querySelector('.dec-pular').onclick = () => { efeitoSom('clique'); aoPular?.(); };
@@ -586,7 +594,7 @@ const Hud = (() => {
     const txt = `${Math.floor(seg / 60)}:${String(seg % 60).padStart(2, '0')}`;
     if (el.textContent !== txt) {
       el.textContent = txt;
-      if (seg <= 5 && seg > 0) { el.classList.add('acabando'); efeitoSom('tique'); if (!RM) gsap.fromTo(el, { scale: 1.08 }, { scale: 1, duration: .4, ease: 'power2.out' }); }
+      if (seg <= 5 && seg > 0) { el.classList.add('acabando'); efeitoSom('tique', { semitons: 5 - seg }); if (!RM) gsap.fromTo(el, { scale: 1.08 }, { scale: 1, duration: .4, ease: 'power2.out' }); }
       else el.classList.remove('acabando');
     }
   }
@@ -684,7 +692,7 @@ const Hud = (() => {
     const p = e.potencias[id], ficha = typeof FICHAS !== 'undefined' ? FICHAS[id] : null;
     return `<div class="bal-cab"><span class="balao-tit">${formaDe(id)}${esc(nomePot(id))}<small>${p.humano ? esc(nomeEquipe(id)) : 'Computador'}</small></span>
       <div class="balao-pilulas"><span class="pilula amarela">IGI <b class="num">${Simulacao.igi(e, id).total}</b></span>
-        <span class="pilula">${ic('🤝', 40)}${Simulacao.parceirosDe(e, id).length} parceiros</span></div></div>
+        <span class="pilula">${ic('🤝', 40)}${Simulacao.parceirosDe(e, id).length} ${Simulacao.parceirosDe(e, id).length === 1 ? 'parceiro' : 'parceiros'}</span></div></div>
       <div class="vez-nacao">${NACAO.map(([k, ico, nome]) => `<span class="cel-nacao${p[k] < 30 ? ' alerta' : ''}" title="${nome}">${ic(ico, 40)}<b class="num">${r0(p[k])}</b><span class="so-leitor"> de ${nome}</span></span>`).join('')}</div>
       ${ficha?.resumo ? `<p class="balao-resumo">${esc(primeiraFrase(ficha.resumo))}</p>` : ''}`;
   }
@@ -779,7 +787,7 @@ const Hud = (() => {
 
   return {
     montar, atualizar, manchete, fase, ocultar, previa, doca, voo, lembrarBalanco, selecionar, tijoloEl, ficha, instrucao, decidindo, jogadaIA, cronometro, balao,
-    abrirJornal, comecarVez, estadoAcao, retratoUrl: pid => retratos[pid + '|rosto'] || null, alvosDe, chipsEfeitos, curto, retratoHTML, pedirRetrato, limparRetratos, ao,
+    abrirJornal, comecarVez, focar, estadoAcao, retratoUrl: pid => retratos[pid + '|rosto'] || null, alvosDe, chipsEfeitos, curto, retratoHTML, pedirRetrato, limparRetratos, ao,
     get raiz() { return raiz; }, get vez() { return vez; }, NACAO, RECURSOS,
   };
 })();

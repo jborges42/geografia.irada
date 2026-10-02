@@ -126,6 +126,7 @@ const Jogo = (() => {
     mapa()?.vez(null);
     mapa()?.visaoGeral();
     musica();
+    try { if (typeof Som !== 'undefined') Som.vinheta?.('rodada'); } catch { /* sem som */ }
     await splash({ pre: estado.rodada === 1 ? 'Começa a Missão 2050' : 'Começa o mandato', titulo: fmtAno(estado.ano),
       sub: `Mandato ${estado.rodada} de ${estado.config.rodadas}`, cor: 'anil', raios: true, icone: arte('globo', { px: 192 }) });
     for (const ev of Simulacao.sortearEventos(estado)) {
@@ -171,7 +172,7 @@ const Jogo = (() => {
     Hud.doca(estado, pid, v.mao, { entrar: true });
     Hud.atualizar(estado, { vez: pid });
     anunciar(`Vez ${Simulacao.com(pid, 'de')}. Escolham as ações na barra de baixo e depois encerrem a vez.`);
-    Hud.raiz.querySelector('.hud-doca .tijolo:not(.bloqueado)')?.focus({ preventScroll: true });
+    Hud.focar(Hud.raiz.querySelector('.hud-doca .tijolo:not(.bloqueado)'));
     iniciarCronometro();
     await aguardar(fimVez);
     pararCronometro();
@@ -231,7 +232,7 @@ const Jogo = (() => {
     if (!vez) return;
     const cid = vez.sel;
     limparSelecao();
-    Hud.tijoloEl(cid)?.focus({ preventScroll: true });
+    Hud.focar(Hud.tijoloEl(cid));
   }
   function limparSelecao() {
     if (!vez) return;
@@ -352,6 +353,7 @@ const Jogo = (() => {
   async function executar() {
     const v = vez, pid = v.pid, cid = v.sel, c = carta(cid), alvo = v.alvo ?? null;
     v.ocupado = true;
+    Hud.raiz?.setAttribute('aria-busy', 'true');   // ação animando: a doca ignora cliques até terminar
     sairModoAlvo();
     Hud.ficha(null);
     try {
@@ -378,12 +380,13 @@ const Jogo = (() => {
         atualizarHUD();
       }
     } finally {
+      Hud.raiz?.removeAttribute('aria-busy');
       if (vez === v) {
         v.ocupado = false;
         limparSelecao();
         Hud.doca(estado, pid, v.mao);
         Hud.atualizar(estado, { vez: pid });
-        Hud.tijoloEl(cid)?.focus({ preventScroll: true });
+        Hud.focar(Hud.tijoloEl(cid));
       }
     }
   }
@@ -608,9 +611,12 @@ const Jogo = (() => {
           <button class="btn btn-principal peca pinos" data-a="continuar" data-teste="continuar-jogo" autofocus>${GLIFOS.seta} Continuar</button>
           <button class="btn btn-neutro peca" data-a="manual">${imgIcone('📚', 48)} Manual do Diplomata</button>
           <button class="btn btn-neutro peca" data-a="sair" data-teste="sair">${imgIcone('💾', 48)} Salvar e sair</button>
+          <div class="pausa-ajustes">${ajuste('texto', '🔍', 'Texto grande', lerPref('texto', 1) !== 1)}
+            ${ajuste('contraste', '💡', 'Contraste alto', !!lerPref('contraste', false))}${ajuste('rm', '⏳', 'Menos movimento', RM)}</div>
         </div>
-        <div class="pausa-ajustes">${ajuste('musica', '🎤', 'Música', musicaOn)}${ajuste('efeitos', '🔊', 'Efeitos sonoros', efeitosOn)}
+        <div class="pausa-dir"><div class="pausa-ajustes">${ajuste('musica', '🎤', 'Música', musicaOn)}${ajuste('efeitos', '🔊', 'Efeitos', efeitosOn)}
           ${ajuste('leves', '⚙️', 'Gráficos leves', leves)}${ajuste('cheia', '📺', 'Tela cheia', cheia)}</div>
+          <div class="pausa-marca">${logo('horizontal', 'pequeno')}</div></div>
       </div>
       <footer class="painel-rodape"><span class="dica pausa-teclas">Teclas do professor:
         ${[['Espaço', 'pula'], ['P', 'pausa'], ['H', 'esconde o painel'], ['M', 'música'], ['F', 'tela cheia'], ['Esc', 'menu']].map(([k, t]) => `<span class="pausa-tecla"><kbd>${k}</kbd> ${t}</span>`).join(' ')}</span></footer>`;
@@ -625,6 +631,9 @@ const Jogo = (() => {
       if (k === 'efeitos' && typeof Som !== 'undefined') lig = Som.alternarEfeitos();
       if (k === 'leves') { m?.graficos(lig ? 'leves' : 'bonitos'); gravarPref('graficos', lig ? 'leves' : 'bonitos'); }
       if (k === 'cheia') telaCheia();
+      if (k === 'texto') { gravarPref('texto', lig ? 1.15 : 1); document.documentElement.style.setProperty('--texto', lig ? 1.15 : 1); }
+      if (k === 'contraste') { gravarPref('contraste', lig); if (lig) document.documentElement.dataset.contraste = 'alto'; else delete document.documentElement.dataset.contraste; }
+      if (k === 'rm') { gravarPref('movimento-reduzido', lig); aviso('Vale a partir da próxima vez que o jogo abrir (a partida fica salva).', { tipo: 'neutro', icone: imgIcone('⏳') }); }
       b.setAttribute('aria-checked', String(lig));
       efeitoSom('clique');
       atualizarBotaoSom();

@@ -299,7 +299,10 @@ const Relatorios = (() => {
 
   // ---------- Passo 1: o mundo ----------
   function cartaoIndicador(k, c, destaque) {
-    const d = c.depois - c.antes, st = estado(k, c.depois), b = bomSe(k, d);
+    // variação dos valores como aparecem na tela (61,4 → 61,6 mostra 61 → 62, então a pílula diz +1, não "igual")
+    const d = k === 'temperatura' ? Math.round(c.depois * 100) / 100 - Math.round(c.antes * 100) / 100
+      : k === 'tensao' ? (segundos(c.antes) - segundos(c.depois)) / 3 : Math.round(c.depois) - Math.round(c.antes);
+    const st = estado(k, c.depois), b = bomSe(k, d);
     const de = k === 'tensao' ? segundos(c.antes) : k === 'temperatura' ? c.antes : Math.round(c.antes);
     const para = k === 'tensao' ? segundos(c.depois) : k === 'temperatura' ? c.depois : Math.round(c.depois);
     // a causa principal e, na segunda linha, a outra causa ou a soma de todas as outras: as duas linhas somam a variação
@@ -423,7 +426,7 @@ const Relatorios = (() => {
     const sobeV = porPeso(sobe).slice(0, cai.length ? 3 : 4), caiV = porPeso(cai).slice(0, 4 - sobeV.length), sobra = sobe.length + cai.length - sobeV.length - caiV.length;
     const listados = new Set([...sobeV, ...caiV].map(c => c.territorio));
     const criticos = Object.values(e.territorios).filter(t => t.conflito >= 3 && !listados.has(t.id)).map(t => t.id);
-    const blocos = n => `<span class="rb-blocos" aria-label="nível ${n}">${'<i>!</i>'.repeat(Math.max(0, n))}</span>`;
+    const blocos = n => `<span class="rb-blocos" aria-label="nível ${n}">${n > 0 ? '<i>!</i>'.repeat(n) : `<i class="paz">${GLIFOS.ok}</i>`}</span>`;   // nível 0 = paz
     const linhaC = c => `<li>${blocos(c.depois)}<span>${esc(nomeLugar(c.territorio))}</span><b class="num">${c.antes} → ${c.depois}</b></li>`;
     const metas = e.config.modo === 'cooperativo' ? Simulacao.metas(e) : null;
     const total = e.config.rodadas, mandato = e.rodada - 1;
