@@ -1,6 +1,6 @@
 # Créditos — Geografia Irada
 
-**Criação, direção e conteúdo:** João Vitor Borges da Silva Matias.
+**Geografia Irada – Geopolítica Internacional** foi criado por João Vitor Borges da Silva Matias: criação e direção do jogo.
 
 **Nome:** inspirado no canal Geografia Irada (https://www.youtube.com/@geografiairada), do professor Marcelo Silva, e usado com a autorização dele.
 
