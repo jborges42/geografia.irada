@@ -2,6 +2,10 @@
 
 **Criação, direção e conteúdo:** João Vitor Borges da Silva Matias.
 
+**Nome:** inspirado no canal Geografia Irada (https://www.youtube.com/@geografiairada), do professor Marcelo Silva, e usado com a autorização dele.
+
+**Inspiração:** SIIF – Simulação das Organizações Internacionais, projeto executado no IFC Fraiburgo em 2016 pelo professor Marcelo Silva.
+
 O Geografia Irada é feito com bibliotecas, fontes, ícones, modelos 3D, música e efeitos sonoros livres. Cada item abaixo
 traz o autor, a licença, o endereço e o crédito pedido. A tela de créditos do jogo lê a versão curta em `dados/creditos.js`.
 
