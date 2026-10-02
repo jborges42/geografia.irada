@@ -3,7 +3,9 @@
 // Campos: item, autor, licenca, url, uso (+ grupo, para a tela agrupar). Créditos sem nome de marca de brinquedo ou de jogo.
 const CREDITOS = [
   // Criação
-  { grupo: 'Criação', item: 'Geografia Irada', autor: 'João Vitor Borges da Silva Matias', licenca: 'Autor', url: '', uso: 'Criação, direção e conteúdo do jogo' },
+  { grupo: 'Criação', item: 'Geografia Irada – Geopolítica Internacional', autor: 'João Vitor Borges da Silva Matias', licenca: 'Autor', url: '', uso: 'Criação e direção do jogo' },
+  { grupo: 'Criação', item: 'Nome "Geografia Irada"', autor: 'Prof. Marcelo Silva, canal Geografia Irada', licenca: 'Inspirado e autorizado', url: 'https://www.youtube.com/@geografiairada', uso: 'Nome do jogo, inspirado no canal e usado com autorização do professor' },
+  { grupo: 'Criação', item: 'SIIF – Simulação das Organizações Internacionais', autor: 'Prof. Marcelo Silva, IFC Fraiburgo (2016)', licenca: 'Inspiração', url: '', uso: 'Projeto de simulação que inspirou o jogo' },
 
   // Bibliotecas (vão para o site)
   { grupo: 'Bibliotecas', item: 'Three.js r186', autor: 'Autores do three.js (mrdoob e colaboradores)', licenca: 'MIT', url: 'https://threejs.org', uso: 'Mapa-múndi 3D, bonecos e cenas' },
