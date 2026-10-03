@@ -130,7 +130,7 @@ const Plantao = (() => {
   // "nas 6 potências", "em 4 territórios"…
   function ondeGrupo(ids) {
     const n = ids.length, pot = ids.filter(ehPotencia).length;
-    return pot === n ? (n === 6 ? 'nas 6 potências' : `em ${n} potências`) : pot ? `em ${n} lugares` : `em ${n} territórios`;
+    return pot === n ? (n === PIDS.length ? `nas ${n} potências` : `em ${n} potências`) : pot ? `em ${n} lugares` : `em ${n} territórios`;
   }
   const arred = (v, casas = 0) => Math.round(v * 10 ** casas) / 10 ** casas;
   function textoValor(c) {

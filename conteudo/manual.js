@@ -18,16 +18,16 @@ const MANUAL = [
   {
     id: 'objetivo', titulo: 'Missão 2050', icone: '🌍',
     html: `
-<p>Bem-vindo, diplomata! Em <b>Geografia Irada</b>, cada equipe governa uma das <b>seis potências</b> do mapa — Brasil, Estados Unidos, China, União Europeia, Índia e Rússia — de <b>2026 a 2050</b>. Cada rodada é um <b>mandato</b> de alguns anos, e cada decisão mexe no mundo inteiro.</p>
+<p>Bem-vindo, diplomata! Em <b>Geografia Irada</b>, cada equipe governa uma das <b>treze potências</b> do mapa — Brasil, Estados Unidos, China, União Europeia, Índia, Rússia, Reino Unido, Japão, Austrália, Nova Zelândia, África do Sul, Nigéria e Egito — de <b>2026 a 2050</b>. Cada rodada é um <b>mandato</b> de alguns anos, e cada decisão mexe no mundo inteiro.</p>
 <p>O desafio é o mesmo da geopolítica de verdade: todo governo quer ver o próprio país prosperar, mas todos dividem <b>um planeta só</b>. Um clima estável, a paz e o comércio são <b>bens comuns</b>: ninguém consegue tê-los sozinho, e as crises humanitárias afetam todos. Quem só pensa em si empurra o mundo para o colapso — e, num planeta em colapso, <b>ninguém vence</b>.</p>
 <h3>Aqui ninguém ataca ninguém</h3>
-<p>Não existe guerra entre jogadores. A disputa é por <b>influência</b>: diplomacia, comércio, investimento, ajuda, cultura e ciência. Os conflitos aparecem no mapa como focos de crise que reagem às decisões de todos e pedem mediação, ajuda humanitária e missões de paz.</p>
+<p>Não existe guerra entre jogadores. A disputa é por <b>influência</b>: diplomacia, comércio, investimento, ajuda, cultura e ciência — e cada decisão mexe também na <b>relação</b> com os outros países (veja “Relações entre países”). Os conflitos aparecem no mapa como focos de crise que reagem às decisões de todos e pedem mediação, ajuda humanitária e missões de paz.</p>
 <h3>Escolha o modo</h3>
 <ul>
 <li><b>Cada nação por si (competitivo):</b> vence quem chegar a 2050 com o maior <b>Índice Geografia Irada (IGI)</b> — desde que o planeta sobreviva. Com as <b>missões secretas</b> ligadas, cada potência ainda persegue um objetivo escondido.</li>
 <li><b>Em blocos:</b> as equipes se juntam em 2 ou 3 blocos, e vence o bloco com a maior média de IGI. Aqui também há missões secretas.</li>
 <li><b>Todos pelo planeta (cooperativo):</b> a turma inteira tenta cumprir as <b>Metas 2050</b>. Opcional: um <b>agente infiltrado</b> com agenda secreta.</li>
-<li><b>Solo:</b> uma equipe contra (ou junto com) cinco potências do computador.</li>
+<li><b>Solo:</b> uma equipe contra (ou junto com) doze potências do computador.</li>
 </ul>
 <p>As potências que nenhuma equipe escolher ficam com o <b>computador</b>, que joga de forma realista e não sabota ninguém de propósito.</p>
 <h3>Metas 2050 (modo cooperativo)</h3>
@@ -39,8 +39,8 @@ const MANUAL = [
 <li>💰 <b>Prosperidade:</b> nenhuma potência com a economia menor que a de 2026.</li>
 </ul>
 <p>A turma vence se cumprir <b>pelo menos 4 das 5 metas</b>, sem colapso. Elas se inspiram no <b>Acordo de Paris</b> e nos <b>Objetivos de Desenvolvimento Sustentável</b> (ODS) da Agenda 2030 da ONU.</p>
-<h3>As seis potências</h3>
-<p>Cada potência tem uma <b>força</b> e uma <b>fraqueza</b> inspiradas no mundo real: o Brasil é potência ambiental e agrícola, mas desigual; a União Europeia regula e negocia bem, mas importa energia; a Índia tem a maior população do mundo e sofre com o calor extremo… No lobby, toque numa potência para ver os detalhes. Os números do jogo são uma <b>aproximação didática</b> de dados reais: servem para o mundo começar parecido com o de verdade, não para dar nota a nenhum país.</p>`,
+<h3>As treze potências</h3>
+<p>Cada potência tem uma <b>força</b> e uma <b>fraqueza</b> inspiradas no mundo real: o Brasil é potência ambiental e agrícola, mas desigual; a União Europeia regula e negocia bem, mas importa energia; a Índia tem a maior população do mundo e sofre com o calor extremo; o Reino Unido tem diplomacia e veto na ONU, mas saiu da União Europeia; o Japão tem tecnologia, mas envelhece e importa energia; a Austrália vende minérios, mas depende da China; a Nova Zelândia tem energia limpa, mas é pequena e distante; a África do Sul tem minerais e voz na África, mas sofre com apagões; a Nigéria tem petróleo e muita gente jovem, mas enfrenta violência no norte; o Egito controla o Canal de Suez, mas depende do Nilo e do trigo importado… No lobby, toque numa potência para ver os detalhes. Os números do jogo são uma <b>aproximação didática</b> de dados reais: servem para o mundo começar parecido com o de verdade, não para dar nota a nenhum país.</p>`,
   },
   {
     id: 'como-jogar', titulo: 'Como uma partida funciona', icone: '🎮',
@@ -55,13 +55,13 @@ const MANUAL = [
 <h3>1. Abertura: o mundo dá notícias</h3>
 <p>Uma faixa anuncia o ano e entra no ar o <b>Plantão Global</b>, o telejornal do Jornal Mundial, com um evento (dois, se o mundo estiver em crise). Alguns eventos pedem uma votação na ONU, um pedido de ajuda ou uma <b>decisão de todas as potências</b>. Nos mandatos pares acontece também a <b>Cúpula do Clima</b>.</p>
 <h3>2. A vez de cada potência</h3>
-<p>As potências jogam na ordem do mapa, e a cada mandato começa uma diferente. Na vez da sua equipe:</p>
+<p>As treze potências jogam na ordem do mapa, e a cada mandato começa uma diferente: a ordem gira, para que ninguém jogue sempre por último. Na vez da sua equipe:</p>
 <ul>
 <li><b>Dilema de governo:</b> a vez começa com uma situação real e datada, com 2 ou 3 saídas defendidas pelos seus conselheiros. <b>Não existe resposta certa</b>: cada saída ganha numa coisa e perde em outra. A equipe escolhe, e a consequência aparece na hora no mapa e nos indicadores, com a manchete e o porquê (veja “Dilemas de governo”).</li>
 <li><b>Ações:</b> gaste seu Capital Político (CP) nas ações da barra (veja “Ações de governo”). Quando a ação tem alvo, os alvos válidos brilham no mapa — e também aparecem numa lista.</li>
 <li><b>Encerrar a vez:</b> até 1 CP que sobrar fica guardado para a próxima.</li>
 </ul>
-<p>A vez de cada equipe leva pouco mais de um minuto: uns 25 segundos para o dilema e uns 50 para as ações. As potências do computador também enfrentam dilemas: decidem sozinhas, cada uma do jeito do seu governo, e jogam em poucos segundos. Dá para pular a animação.</p>
+<p>Com treze potências, uma rodada completa é mais longa, e nenhuma decisão sozinha decide o clima ou a paz: por isso as coalizões importam. A vez de cada equipe leva pouco mais de um minuto: uns 25 segundos para o dilema e uns 50 para as ações. As potências do computador também enfrentam dilemas: decidem sozinhas, cada uma do jeito do seu governo, e jogam em poucos segundos. Dá para pular a animação.</p>
 <h3>Capital Político (CP)</h3>
 <p>É a força política do governo para agir: cada ação custa CP. No começo de cada vez, você recebe:</p>
 <ul>
@@ -202,7 +202,7 @@ const MANUAL = [
   {
     id: 'territorios', titulo: 'Influência e parcerias', icone: '🧱',
     html: `
-<p>Além das seis potências, o mapa tem <b>32 territórios</b> — países e regiões como o Cone Sul, o Sahel, a Península Arábica ou o Japão e a Coreia do Sul — e a <b>Antártida</b>. É um jogo de conquista sem guerra: ninguém conquista ninguém à força. As potências disputam <b>influência</b>. Toque num território para ver a ficha dele, com o “Você sabia?”.</p>
+<p>Além das treze potências, o mapa tem <b>31 territórios</b> — países e regiões como o Cone Sul, o Sahel, a Península Arábica, a Coreia do Sul ou a Melanésia — e a <b>Antártida</b>. É um jogo de conquista sem guerra: ninguém conquista ninguém à força. As potências disputam <b>influência</b>. Toque num território para ver a ficha dele, com o “Você sabia?”.</p>
 <h3>🧱 Influência</h3>
 <p>Cada ponto de influência é um tijolo numa torre com a cor da sua potência (até 10). A torre cresce com missões diplomáticas, comércio, investimento, ajuda, cultura e ciência. E encolhe quando um conflito piora no lugar (todos perdem 1), com eventos como golpes, com o desgaste de vetos na ONU e com a <b>reação soberanista</b>.</p>
 <h3>🤝 Parceria</h3>
@@ -229,6 +229,40 @@ const MANUAL = [
 <p>A <b>estabilidade</b> (0 a 100) mede o quanto o território está calmo e governável; o <b>desenvolvimento</b> (0 a 100) se parece com o IDH. Os dois sobem com paz, investimento e ajuda.</p>
 <h3>🧊 Antártida</h3>
 <p>Ninguém é dono da Antártida: o <b>Tratado da Antártida</b> (1959) reserva o continente para a paz e a ciência, e o <b>Protocolo de Madri</b> (1991) proíbe a mineração. No jogo, ela não aceita influência, bases nem obras.</p>`,
+  },
+  {
+    id: 'relacoes', titulo: 'Relações entre países', icone: '🧭',
+    html: `
+<p>Além do mapa e dos números, cada par de potências tem uma <b>relação bilateral</b>: um valor de <b>−100</b> (hostil) a <b>+100</b> (aliada) que mostra o quanto dois governos confiam um no outro. Ela muda a cada decisão. O ponto de partida, em 2026, é um retrato aproximado do mundo real: EUA e Japão são aliados, EUA e China vivem uma rivalidade estratégica, Rússia e União Europeia estão rompidas por causa da guerra na Ucrânia, e Brasil e África do Sul têm laços do Sul Global.</p>
+<h3>Como ler a relação</h3>
+<ul>
+<li><b>Aliada</b> (70 ou mais) e <b>Amiga</b> (40 a 69): confiança alta, comércio mais fluido e apoio nas votações.</li>
+<li><b>Cordial</b> (10 a 39) e <b>Fria</b> (−24 a 9): relação normal, sem grandes favores nem grandes brigas.</li>
+<li><b>Tensa</b> (−59 a −25) e <b>Hostil</b> (−60 ou menos): desconfiança, tarifas, sanções e risco de incidentes.</li>
+</ul>
+<h3>O que faz a relação subir ou descer</h3>
+<ul>
+<li><b>Ações com alvo:</b> acordos, alianças e missões diplomáticas aproximam; sanções, tarifas, embargos e espionagem afastam. Um pedido recusado também custa um pouco.</li>
+<li><b>Dilemas e decisões do Jornal Mundial:</b> cada saída traz a sua consequência diplomática, explicada no “porquê”. Vender armas, vetar uma resolução, aprofundar uma aliança militar ou aceitar ajuda de uma potência mexem na relação com outros países.</li>
+<li><b>Disputa por influência:</b> ganhar influência num território onde outra potência já tem laços esfria a relação com ela, e mais ainda se ela é a parceira dele.</li>
+<li><b>Alianças e sanções:</b> aliados se protegem, e as sanções cortam o comércio entre os dois países.</li>
+<li><b>Incidentes:</b> pares muito hostis (abaixo de −50) podem entrar em guerra comercial ou protagonizar um incidente. Já pares muito amigos (acima de 55) às vezes cooperam sozinhos.</li>
+<li><b>O mundo esquece devagar:</b> a cada Balanço, a relação volta cerca de 12% do caminho até o ponto de 2026. Ganhos e perdas pequenos se desfazem; os grandes ficam por mais tempo.</li>
+</ul>
+<h3>Contágio econômico</h3>
+<p>Quem comercia muito com um país sente o que acontece com ele. Se o seu maior parceiro cresce, parte do crescimento chega até você; se entra em crise, a crise também chega. E, quando a relação azeda, o comércio com aquele parceiro perde ritmo e a sua economia paga o atrito. A Austrália vende cerca de 29% de tudo o que exporta para a China (2024–25, DFAT), e a União Europeia é o maior mercado do Reino Unido: por isso brigas e acordos com esses parceiros pesam tanto. É a <b>interdependência</b> dos países, vivida na prática.</p>
+<h3>Reações do computador</h3>
+<ul>
+<li>O país que sofre uma ação <b>reage</b>: a relação piora, e quem governa sob pressão costuma fechar fileiras em casa.</li>
+<li>Os <b>amigos e aliados do alvo</b> tomam partido: olham com desconfiança quem o atacou e podem continuar comerciando com ele, o que enfraquece sanções.</li>
+<li>As potências do computador podem <b>responder na mesma moeda</b> a uma tarifa ou a uma sanção. A chance cresce quanto mais hostil já era a relação.</li>
+<li>Quem não é seu aliado e desconfia de você <b>se arma de volta</b> quando você amplia a defesa: é o dilema de segurança, agora com nome e endereço.</li>
+<li>Duas potências rivais com influência num mesmo território em conflito alimentam a briga por procuração, e a relação entre elas piora.</li>
+</ul>
+<h3>A força de cada decisão depende de quem está do outro lado</h3>
+<p>O mesmo gesto tem efeitos diferentes conforme o parceiro. Uma sanção contra quem quase não comercia com você custa pouco; contra um grande parceiro, custa caro também a você. Um gesto de amizade vale mais para quem já é próximo, e uma ruptura dói mais quando existe muita confiança a perder. Aliados do alvo não ficam parados, e rivais antigos já esperam o pior. Num mundo com treze potências, nenhuma decisão decide sozinha o clima, a paz ou o comércio: as coalizões e as relações é que fazem diferença.</p>
+<h3>E no mundo real?</h3>
+<p>Entre 2020 e 2024, a China barrou produtos australianos, como a cevada e o vinho, depois de um desentendimento diplomático. Em 05/08/2023, retirou as tarifas sobre a cevada e, em 29/03/2024, as do vinho: quando a relação melhorou, o comércio voltou. É o que o jogo quer mostrar: relações são um capital, que se constrói devagar e pode se perder depressa.</p>`,
   },
   {
     id: 'acoes', titulo: 'Ações de governo', icone: '🛠️',
@@ -311,7 +345,7 @@ const MANUAL = [
 </ul>
 <p>Os acordos, fundos e vacinas custam 1 ponto de 💰 a cada potência: cooperar também tem preço.</p>
 <h3>Conselho de Segurança</h3>
-<p>Decide sobre paz e sanções. No jogo votam as 6 potências e o Reino Unido. Têm <b>poder de veto</b> os EUA, a China, a Rússia, o Reino Unido e a União Europeia, que representa a França. A resolução passa com <b>pelo menos 4 votos sim e nenhum veto</b>. Como na ONU de verdade, o voto “não” de um membro permanente já é um veto; a abstenção não é.</p>
+<p>Decide sobre paz e sanções. No jogo votam as potências da partida. Têm <b>poder de veto</b> os EUA, a China, a Rússia, o Reino Unido e a União Europeia, que representa a França. A resolução passa com <b>cerca de 57% de votos sim (4 de 7 numa mesa de sete) e nenhum veto</b>. Como na ONU de verdade, o voto “não” de um membro permanente já é um veto; a abstenção não é.</p>
 <p>Vetar tem preço: a cooperação mundial cai 3, e quem vetou perde influência em até dois territórios.</p>
 <h3>Assembleia Geral</h3>
 <p>Decide sobre clima, ajuda humanitária, vacinas e desarmamento. Cada potência tem 1 voto, e cada território também. Os territórios parceiros votam com a sua potência (se a pressão ali não estiver alta); os outros votam pelo próprio interesse — os mais vulneráveis ao clima, por exemplo, apoiam acordos climáticos. Passa por <b>maioria simples</b>: mais votos sim do que não.</p>
@@ -332,7 +366,7 @@ const MANUAL = [
 <li><b>Médio:</b> +6 de energia limpa e −1 de 💰. Vale 1 ponto.</li>
 <li><b>Nenhum:</b> nada muda em casa. Vale 0.</li>
 </ul>
-<p>Os compromissos são revelados juntos. Se a soma chegar a <b>7 pontos</b>, sai um <b>acordo histórico</b>: a cooperação sobe 6, os países em desenvolvimento recebem tecnologia limpa (e passam a emitir menos) e o número de deslocados cai. Se não chegar, a cúpula fracassa e a cooperação cai 3.</p>
+<p>Os compromissos são revelados juntos. Se a soma chegar à meta da mesa — cerca de <b>1,2 ponto por potência em jogo</b>, ou seja, 7 pontos com seis potências e 15 com treze —, sai um <b>acordo histórico</b>: a cooperação sobe 6, os países em desenvolvimento recebem tecnologia limpa (e passam a emitir menos) e o número de deslocados cai. Se não chegar, a cúpula fracassa e a cooperação cai 3.</p>
 <h3>A tragédia dos comuns</h3>
 <p>Quem não se compromete economiza agora e ainda aproveita o esforço dos outros. Mas, se todos pensarem assim, o acordo não sai e todos perdem. É a <b>tragédia dos comuns</b>, descrita pelo ecólogo Garrett Hardin em 1968: um recurso de todos — como a atmosfera — tende a se esgotar quando cada um só pensa em si. A cientista política Elinor Ostrom, primeira mulher a ganhar o Nobel de Economia (2009), mostrou que comunidades conseguem cuidar de bens comuns quando criam regras, confiança e fiscalização.</p>
 <p>Dica: conversem antes! Promessas públicas, confiança e cobrança são o que tira acordos reais do papel.</p>
@@ -427,6 +461,8 @@ const MANUAL = [
 <li><b>Guarde reservas.</b> Comprar comida e energia no mercado em plena crise sai caro. E não deixe a economia fraca demais: as ações mais caras ficam bloqueadas.</li>
 <li><b>Credibilidade antes de mediar.</b> Confira a chance na tela. Construa influência no lugar antes, não seja parte do conflito e aproveite quando o mundo estiver mais cooperativo.</li>
 <li><b>Combine antes das decisões de todos.</b> Nas crises que pedem a escolha de todas as potências, a ação coletiva só acontece se várias escolherem a mesma saída.</li>
+<li><b>Olhe quem está do outro lado.</b> Uma sanção, uma tarifa ou um gesto de amizade pesa diferente conforme a relação e o comércio entre os dois países: quem depende do vizinho sente a briga no próprio bolso, e os amigos do alvo costumam tomar partido.</li>
+<li><b>Cuide das relações como cuida do caixa.</b> Confiança leva mandatos para ser construída e pode cair num gesto só. Aliados fortes protegem; rivais em excesso devolvem o golpe.</li>
 <li><b>Olhe o relógio.</b> Tensão alta deixa todos menos seguros, inclusive você. Às vezes, desarmar junto com outra potência rende mais do que se armar.</li>
 <li><b>Combine na Cúpula do Clima.</b> Se ninguém se comprometer, todos pagam o preço do calor — principalmente os mais vulneráveis.</li>
 <li><b>Vete com cuidado.</b> O veto protege seus interesses, mas custa cooperação e influência.</li>
@@ -441,7 +477,7 @@ const MANUAL = [
 <p><b>Não há perguntas para responder nem gabarito.</b> A turma aprende vivendo os conteúdos: cada decisão gera uma consequência visível no mapa e nos indicadores, e o jogo explica o porquê com o nome do conceito (“isso foi o dilema de segurança”). A BNCC define os conteúdos que a turma vai viver; ela não vira prova dentro do jogo.</p>
 <h3>Uma aula de 50 minutos</h3>
 <ul>
-<li><b>0 a 5 minutos — preparação:</b> divida a turma em até 6 equipes (uma por potência), escolham nomes e avatares e façam a revelação das missões secretas. Combine papéis dentro de cada equipe: quem lê o dilema, quem cuida do mapa, quem fala na ONU.</li>
+<li><b>0 a 5 minutos — preparação:</b> divida a turma em equipes (uma por potência; as potências que sobrarem ficam com o computador), escolham nomes e avatares e façam a revelação das missões secretas. Combine papéis dentro de cada equipe: quem lê o dilema, quem cuida do mapa, quem fala na ONU.</li>
 <li><b>5 a 35 minutos — partida Rápida</b> (4 mandatos de 6 anos). A cada dilema, a equipe da vez lê a situação em voz alta e diz, numa frase, por que escolheu aquela saída. Em aula dupla, use a partida Aula (6 mandatos) ou a Completa (8).</li>
 <li><b>35 a 50 minutos — conversa final:</b> use o relatório de 2050 (gráficos ano a ano, manchetes, dilemas e escolhas de cada equipe, habilidades da BNCC vividas) e as sugestões de debate abaixo. Feche pedindo que cada equipe explique uma decisão que mudou o mundo — e por quê.</li>
 </ul>
@@ -461,12 +497,12 @@ const MANUAL = [
 <h3>Foco da aula e ajustes</h3>
 <p>Nos ajustes, escolha um ou mais temas para o <b>foco da aula</b>: Território e Soberania, Ordem Mundial, Globalização e Economia, Natureza, Clima e Energia, Conflitos e Paz ou Pessoas e Direitos. Os dilemas e os eventos ligados a esses temas passam a sair com muito mais frequência (2,5 vezes mais). Alguns exemplos de dilemas por tema:</p>
 <ul>
-<li>🗺️ <b>Território e Soberania:</b> base militar no vizinho, Essequibo, Ártico, Rota Marítima do Norte, pastores nômades, Antártida, pesca no alto-mar.</li>
-<li>🌐 <b>Ordem Mundial:</b> vetar uma resolução contra um parceiro, sair de um organismo internacional, escolher entre dois polos, sediar uma cúpula, mandar soldados para uma missão de paz, golpe na região.</li>
-<li>🚢 <b>Globalização e Economia:</b> tarifa sofrida, proteger a indústria, refinar terras raras, fábrica de chips, robôs no trabalho, primeiro emprego, plataforma que não cumpre a lei, acordo Mercosul–União Europeia.</li>
-<li>🌱 <b>Natureza, Clima e Energia:</b> soja ou floresta, minas de carvão, águas do Indo, meta climática, fundo das florestas tropicais, cidade alagada, geoengenharia, lixo eletrônico.</li>
-<li>🕊️ <b>Conflitos e Paz:</b> venda de armas, corrida armamentista, resposta a um atentado, cessar-fogo rápido ou paz completa.</li>
-<li>👥 <b>Pessoas e Direitos:</b> refugiados na fronteira, abrigos em Roraima, xenofobia, terras indígenas, tesouro colonial, vídeo falso na eleição, censo, promessa eleitoral, surto no vizinho, grãos para quem tem fome.</li>
+<li>🗺️ <b>Território e Soberania:</b> base militar no vizinho, Essequibo, Ártico, Rota Marítima do Norte, pastores nômades, Antártida, pesca no alto-mar, Chagos e a base de Diego Garcia (Reino Unido), ilhas Senkaku e a rota dos chips (Japão).</li>
+<li>🌐 <b>Ordem Mundial:</b> vetar uma resolução contra um parceiro, sair de um organismo internacional, escolher entre dois polos, sediar uma cúpula, mandar soldados para uma missão de paz, golpe na região, a China compra e os EUA protegem (Austrália), entre a China e os aliados no Pacífico (Nova Zelândia), BRICS ou Ocidente (África do Sul).</li>
+<li>🚢 <b>Globalização e Economia:</b> tarifa sofrida, proteger a indústria, refinar terras raras, fábrica de chips, robôs no trabalho, primeiro emprego, plataforma que não cumpre a lei, acordo Mercosul–União Europeia, Brexit e o comércio com a UE, platina para fora ou baterias em casa (África do Sul), pão barato e trigo importado e Suez sem navios (Egito).</li>
+<li>🌱 <b>Natureza, Clima e Energia:</b> soja ou floresta, minas de carvão, águas do Indo, meta climática, fundo das florestas tropicais, cidade alagada, geoengenharia, lixo eletrônico, religar usinas nucleares (Japão), carvão e a Grande Barreira (Austrália), o metano das vacas (Nova Zelândia), apagões da Eskom (África do Sul), o Nilo e a barragem (Egito).</li>
+<li>🕊️ <b>Conflitos e Paz:</b> venda de armas, corrida armamentista, resposta a um atentado, cessar-fogo rápido ou paz completa, violência no norte e o Sahel (Nigéria).</li>
+<li>👥 <b>Pessoas e Direitos:</b> refugiados na fronteira, abrigos em Roraima, xenofobia, terras indígenas, tesouro colonial, vídeo falso na eleição, censo, promessa eleitoral, surto no vizinho, grãos para quem tem fome, envelhecer ou abrir as portas (Japão), subsídio da gasolina e jovens sem vagas (Nigéria).</li>
 </ul>
 <p>Você também escolhe o número de mandatos, o modo, as missões secretas e, se quiser, um cronômetro para as decisões.</p>
 <ul>
@@ -483,7 +519,7 @@ const MANUAL = [
 <li><b>fichas.js</b> e <b>territorios.js</b>: os textos das potências e dos territórios.</li>
 <li><b>manual.js</b> (este manual e o glossário) e <b>bncc.js</b> (o mapa da BNCC).</li>
 </ul>
-<p>O jeito mais seguro é copiar um dilema ou um evento que já existe e trocar os textos. Conte a situação com data e fonte e confira se cada saída ganha numa coisa e perde em outra: se uma saída for melhor em tudo, ela vira resposta certa, e o dilema deixa de ser dilema. Use aspas curvas “ ” dentro dos textos e mantenha as vírgulas entre os itens. Se algo quebrar, a tela inicial avisa. Quem tiver o Node instalado pode conferir tudo com <b>node ferramentas/validar-conteudo.mjs</b>. Os números do jogo (custos, efeitos e limites) ficam em <b>politicas.js</b>, <b>potencias.js</b>, <b>resolucoes.js</b> e <b>js/simulacao.js</b>: mexa só se quiser rebalancear e rode <b>node teste-simulacao.mjs</b> depois (ele também avisa se o computador escolhe sempre a mesma saída de um dilema).</p>
+<p>Dilemas e eventos também podem mexer nas <b>relações entre países</b>: um efeito como <b>rel.china</b> muda a relação de quem decide com a China, e <b>rel.rivais</b>, <b>rel.aliados</b> e <b>rel.todos</b> valem para grupos (o modelo está no começo de dilemas.js e de eventos.js). O jeito mais seguro é copiar um dilema ou um evento que já existe e trocar os textos. Conte a situação com data e fonte e confira se cada saída ganha numa coisa e perde em outra: se uma saída for melhor em tudo, ela vira resposta certa, e o dilema deixa de ser dilema. Use aspas curvas “ ” dentro dos textos e mantenha as vírgulas entre os itens. Se algo quebrar, a tela inicial avisa. Quem tiver o Node instalado pode conferir tudo com <b>node ferramentas/validar-conteudo.mjs</b>. Os números do jogo (custos, efeitos e limites) ficam em <b>politicas.js</b>, <b>potencias.js</b>, <b>resolucoes.js</b> e <b>js/simulacao.js</b>: mexa só se quiser rebalancear e rode <b>node teste-simulacao.mjs</b> depois (ele também avisa se o computador escolhe sempre a mesma saída de um dilema).</p>
 <h3>Sugestões de debate</h3>
 <ul>
 <li>Teve um dilema em que nenhuma saída parecia boa? O que vocês precisariam saber para decidir melhor?</li>
@@ -509,13 +545,16 @@ const GLOSSARIO = [
   { termo: 'Amazônia Azul', definicao: 'Nome dado pela Marinha às águas jurisdicionais e à plataforma continental do Brasil: cerca de 5,7 milhões de km² reivindicados no Atlântico Sul. Ali estão pesca, petróleo, minérios, rotas de navegação e cabos submarinos.' },
   { termo: 'Apátrida', definicao: 'Pessoa que não é reconhecida como cidadã por nenhum país e, por isso, pode ficar sem documentos e sem acesso a direitos básicos, como escola, saúde e trabalho formal.' },
   { termo: 'Assembleia Geral da ONU', definicao: 'Órgão em que todos os países-membros da ONU têm um voto cada. Debate os grandes temas globais; suas resoluções, em geral, são recomendações, não ordens.' },
+  { termo: 'AUKUS', definicao: 'Parceria de defesa entre Austrália, Reino Unido e Estados Unidos, anunciada em 2021, que prevê submarinos de propulsão nuclear para a Austrália e cooperação em tecnologias militares. Em dezembro de 2025, os EUA concluíram uma revisão do pacto e o mantiveram.' },
   { termo: 'Autodeterminação dos povos', definicao: 'Princípio segundo o qual cada povo pode decidir livremente seu destino político. Pode entrar em choque com a integridade territorial dos Estados, como nos casos de separatismo.' },
   { termo: 'Autoritarismo', definicao: 'Regime político que concentra o poder, limita a oposição, a imprensa e as liberdades e não aceita a troca livre de governantes por eleições.' },
   { termo: 'Bloco econômico', definicao: 'Grupo de países que reduzem barreiras ao comércio entre si. Pode ser zona de livre-comércio, união aduaneira (com tarifa externa comum), mercado comum ou união econômica e monetária, como a zona do euro.' },
+  { termo: 'Brexit', definicao: 'Saída do Reino Unido da União Europeia, votada em plebiscito em 2016 (51,9% a favor) e concluída em 31/01/2020. Trouxe fiscalização, papelada e regras diferentes para o comércio com o antigo bloco.' },
   { termo: 'BRICS', definicao: 'Agrupamento político-diplomático de economias emergentes criado por Brasil, Rússia, Índia e China e ampliado com a África do Sul, com Egito, Etiópia, Irã e Emirados Árabes Unidos (2024) e com a Indonésia (2025). A Arábia Saudita aparece na lista do grupo, mas não confirmou a adesão. Não é bloco comercial nem aliança militar.' },
   { termo: 'Cadeia global de valor', definicao: 'As etapas da fabricação de um produto (pesquisa, peças, montagem, transporte, marca) espalhadas por vários países. O maior lucro costuma ficar com quem controla a tecnologia e a marca.' },
   { termo: 'Cessar-fogo', definicao: 'Acordo para suspender os combates. É diferente de um acordo de paz, que trata das causas do conflito e de como os lados vão conviver.' },
   { termo: 'Commodity', definicao: 'Produto básico e padronizado, como soja, minério de ferro ou petróleo, com preço definido no mercado internacional. Depender da exportação de commodities deixa a economia sujeita às oscilações desse preço.' },
+  { termo: 'Commonwealth', definicao: 'Associação de 56 países, a maioria antigas colônias do Império Britânico, ligados por história, língua e cooperação. Cada membro é independente, e a reunião de chefes de governo de 2024 foi em Samoa.' },
   { termo: 'Conselho de Segurança', definicao: 'Órgão da ONU responsável pela paz e pela segurança internacionais. Tem 15 membros: 5 permanentes com direito a veto (EUA, Rússia, China, Reino Unido e França) e 10 eleitos para mandatos de dois anos.' },
   { termo: 'Cooperação Sul-Sul', definicao: 'Parcerias entre países em desenvolvimento para trocar experiências em saúde, agricultura, educação e tecnologia, como as do Brasil com países da África e da América Latina.' },
   { termo: 'COP', definicao: 'Conferência das Partes: a reunião anual dos países da Convenção-Quadro da ONU sobre Mudança do Clima, de 1992. A COP30 aconteceu em Belém (PA), em novembro de 2025.' },
@@ -567,6 +606,7 @@ const GLOSSARIO = [
   { termo: 'Protecionismo', definicao: 'Uso de tarifas, cotas e outras barreiras para proteger produtores nacionais da concorrência estrangeira. Pode proteger empregos no curto prazo, mas encarece produtos e provoca retaliações.' },
   { termo: 'Quilombo', definicao: 'Na história, comunidade formada sobretudo por pessoas que fugiam da escravidão e resistiam a ela. Hoje, as comunidades quilombolas são grupos com trajetória histórica própria e ancestralidade negra ligada a essa resistência; a Constituição de 1988 (ADCT, art. 68) garante a elas a propriedade definitiva das terras que ocupam.' },
   { termo: 'Refugiado', definicao: 'Pessoa que deixou seu país por fundado temor de perseguição (por raça, religião, nacionalidade, grupo social ou opinião política) ou, pela lei brasileira de 1997, por grave e generalizada violação de direitos humanos. Não pode ser devolvida ao perigo.' },
+  { termo: 'Relações bilaterais', definicao: 'O nível de confiança entre dois países, que vai da hostilidade à aliança. Muda com acordos, sanções, tarifas, alianças e incidentes, e influencia comércio, votações e segurança.' },
   { termo: 'Sanções econômicas', definicao: 'Restrições ao comércio, a investimentos e a operações financeiras com um país para pressionar seu governo. Também custam caro a quem sanciona e podem atingir a população comum.' },
   { termo: 'Segurança alimentar', definicao: 'Quando todas as pessoas têm acesso, o tempo todo, a comida suficiente, segura e nutritiva (FAO). Em 2025, a FAO anunciou que o Brasil havia saído do Mapa da Fome.' },
   { termo: 'Separatismo', definicao: 'Movimento que busca separar uma região de um Estado para criar um novo país ou se unir a outro. Escócia, Catalunha e Quebec são exemplos de regiões com movimentos desse tipo.' },

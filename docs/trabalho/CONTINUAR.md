@@ -1,7 +1,7 @@
 # Onde paramos (02/10/2026, 12h45)
 
 ## Pronto
-- Motor com dilemas (sem quiz), 48 dilemas, 40 eventos, equilíbrio dentro das metas (`node teste-simulacao.mjs 300`).
+- Motor com dilemas (sem quiz), 66 dilemas, 48 eventos, 13 potências, 32 territórios neutros e relações bilaterais, equilíbrio dentro das metas (`node teste-simulacao.mjs 300`).
 - Conteúdo validado (`node ferramentas/validar-conteudo.mjs`): fichas, manual, BNCC, COMO-JOGAR.md, BNCC.md.
 - Guia de arte (docs/GUIA-DE-ARTE.md), Fundação (css/base.css, index.html), Ilustração (img/arte, js/arte.js, css/arte.css),
   Mundo 3D (js/mapa3d.js), Bonecos e cenas, Som e créditos, Telas, Dilemas, Manual.

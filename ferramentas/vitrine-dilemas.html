@@ -110,7 +110,7 @@ const EXEMPLOS = [
 if (typeof DILEMAS === 'undefined') window.DILEMAS = [];
 DILEMAS.push(...EXEMPLOS);
 
-const Q = new URLSearchParams(location.search), PIDS = ['brasil', 'eua', 'china', 'ue', 'india', 'russia'];
+const Q = new URLSearchParams(location.search);   // PIDS vem de js/ui.js (as 13 potências)
 let pid = PIDS.includes(Q.get('pid')) ? Q.get('pid') : 'brasil', escolhido = Q.get('d') || 'exemplo_nilo';
 const avatares = Bonecos.avataresIniciais(PIDS, 11).map(a => ({ ...a, humano: true }));
 const e = Simulacao.criarEstado({ modo: 'competitivo', rodadas: 6, semente: 7, jogadores: PIDS.map(p => ({ potencia: p, nome: nomeEquipe(p) })) });

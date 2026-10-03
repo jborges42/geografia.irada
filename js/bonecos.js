@@ -8,6 +8,7 @@
      .posar(acao, t, expr)   congela uma pose (fotos e retratos) · .soltar() volta a animar
      .tique()                avança a animação (opcional: ela anda sozinha quando o boneco é desenhado)
      .descartar()            libera o que é só dele (as peças são compartilhadas)
+   Opção mesclar: false (retratos, desenhados uma vez só): sem juntar as peças numa malha com esqueleto.
    Avatar = { pid, nome, cor, forma, pele, cabelo, penteado, chapeu, acessorio, humano, roupa }; humano === false → cabeça de
    monitor (computador). A animação é função do relógio: chamar .tique() duas vezes no mesmo quadro não acelera nada.
    Original (guia de arte §7): cabeça-bloco grande, sem pino na cabeça, mãos de luvinha; nada de boneco de marca. */
@@ -18,14 +19,8 @@ const Bonecos = (() => {
   const TINTA = '#1A1433', CREME = '#FFF4DC', LADRILHO = '#FFF9EC', GRAFITE = '#2B2D42', AMARELO = '#FFD21F', PRETA = '#2B2747';
 
   // ---------- Paleta do guia de arte (§2.3, §2.8) ----------
-  const EQUIPES = {
-    brasil: { cor: '#27B263', sombra: '#0D6E4E', clara: '#73CD9A', contorno: '#011C13', forma: 'circulo' },
-    eua: { cor: '#0A32B4', sombra: '#0B2384', clara: '#3657C2', contorno: '#00041C', forma: 'quadrado' },
-    china: { cor: '#D0180E', sombra: '#81001C', clara: '#DB4F48', contorno: '#1C0006', forma: 'triangulo' },
-    ue: { cor: '#9645EE', sombra: '#651C94', clara: '#AD6EF2', contorno: '#12031C', forma: 'estrela' },
-    india: { cor: '#FF9C0A', sombra: '#9E3400', clara: '#FFC267', contorno: '#1C0900', forma: 'losango' },
-    russia: { cor: '#F2248F', sombra: '#960773', clara: '#F66EB5', contorno: '#1C0015', forma: 'hexagono' },
-  };
+  // as equipes vêm de CORES_GUIA (js/ui.js, fonte única; PIDS segue a ordem de conteudo/potencias.js)
+  const EQUIPES = Object.fromEntries(PIDS.map(p => [p, { cor: CORES_GUIA[p].cor, sombra: CORES_GUIA[p].lado, clara: CORES_GUIA[p].clara, contorno: CORES_GUIA[p].contorno, forma: CORES_GUIA[p].forma }]));
   const CATEGORIAS = {
     diplomacia: { cor: '#DCCFFF', lado: '#8F79CC', chapeu: 'cartola', cargo: 'Diplomacia' },
     economia: { cor: '#FFE08A', lado: '#CCA742', chapeu: 'capacete', cargo: 'Economia' },
@@ -34,16 +29,7 @@ const Bonecos = (() => {
     pessoas: { cor: '#FFCAE6', lado: '#CC75A3', chapeu: 'bone', cargo: 'Pessoas e Direitos' },
     ciencia: { cor: '#99CDF8', lado: '#4F90C6', chapeu: 'oculos-lab', cargo: 'Ciência' },
   };
-  // Formas das equipes (viewBox 100): usa as de js/ui.js se já existirem; estas são a mesma cópia do guia.
-  const FORMAS_LOCAIS = {
-    circulo: 'M50,9A41,41 0 1,1 49.99,9Z',
-    quadrado: 'M13.0,27.0A14,14 0 0,1 27.0,13.0L73.0,13.0A14,14 0 0,1 87.0,27.0L87.0,73.0A14,14 0 0,1 73.0,87.0L27.0,87.0A14,14 0 0,1 13.0,73.0Z',
-    triangulo: 'M42.2,19.9A9,9 0 0,1 57.8,19.9L87.5,72.6A9,9 0 0,1 79.6,86.0L20.4,86.0A9,9 0 0,1 12.5,72.6Z',
-    estrela: 'M45.3,17.1A5,5 0 0,1 54.7,17.1L61.9,35.8A2,2 0 0,0 63.6,37.1L83.7,38.2A5,5 0 0,1 86.5,47.0L71.0,59.7A2,2 0 0,0 70.3,61.7L75.5,81.1A5,5 0 0,1 67.9,86.6L51.1,75.7A2,2 0 0,0 48.9,75.7L32.1,86.6A5,5 0 0,1 24.5,81.1L29.7,61.7A2,2 0 0,0 29.0,59.7L13.5,47.0A5,5 0 0,1 16.3,38.2L36.4,37.1A2,2 0 0,0 38.1,35.8Z',
-    losango: 'M43.6,9.4A9,9 0 0,1 56.4,9.4L90.6,43.6A9,9 0 0,1 90.6,56.4L56.4,90.6A9,9 0 0,1 43.6,90.6L9.4,56.4A9,9 0 0,1 9.4,43.6Z',
-    hexagono: 'M46.0,5.3A8,8 0 0,1 54.0,5.3L86.7,24.2A8,8 0 0,1 90.7,31.1L90.7,68.9A8,8 0 0,1 86.7,75.8L54.0,94.7A8,8 0 0,1 46.0,94.7L13.3,75.8A8,8 0 0,1 9.3,68.9L9.3,31.1A8,8 0 0,1 13.3,24.2Z',
-  };
-  const caminhoForma = f => (typeof FORMAS !== 'undefined' && FORMAS[f]) || FORMAS_LOCAIS[f] || null;
+  const caminhoForma = f => FORMAS[f] || null;   // caminhos de js/ui.js (window.FORMAS)
 
   // ---------- Opções do provador (guia §7.3–7.4) ----------
   const PELES = [
@@ -112,7 +98,15 @@ const Bonecos = (() => {
   const cil = (rt, rb, h, s = 32) => geo(`c${rt}|${rb}|${h}|${s}`, () => new THREE.CylinderGeometry(rt, rb, h, s));
   const esfera = (r, meia = false, s = 32) => geo(`e${r}|${meia}|${s}`, () => new THREE.SphereGeometry(r, s, s / 2, 0, Math.PI * 2, 0, meia ? Math.PI / 2 : Math.PI));
   const toro = (r, t, arco = Math.PI * 2, s = 32) => geo(`t${r}|${t}|${arco}|${s}`, () => new THREE.TorusGeometry(r, t, 12, s, arco));
-  const plastico = (cor, rug = .32) => (mats[cor + '|' + rug] ||= fixo(new THREE.MeshStandardMaterial({ color: cor, roughness: rug, metalness: 0 })));
+  const lisos = new WeakSet();   // materiais de plástico liso: as peças com eles podem virar uma malha só por articulação
+  const plastico = (cor, rug = .32) => (mats[cor + '|' + rug] ||= (m => (lisos.add(m), fixo(m)))(new THREE.MeshStandardMaterial({ color: cor, roughness: rug, metalness: 0 })));
+  // Material único das peças lisas mescladas: cor por vértice e rugosidade por vértice (aRug), igual ao plástico de cada peça
+  const matMesclado = fixo(new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, metalness: 0 }));
+  matMesclado.onBeforeCompile = sh => {
+    sh.vertexShader = 'attribute float aRug;\nvarying float vRug;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\nvRug = aRug;');
+    sh.fragmentShader = 'varying float vRug;\n' + sh.fragmentShader.replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\nroughnessFactor = vRug;');
+  };
+  matMesclado.customProgramCacheKey = () => 'boneco-mesclado';
   const tinta = cor => (mats['t' + cor] ||= fixo(new THREE.MeshBasicMaterial({ color: cor, side: THREE.BackSide })));
   const INVISIVEL = fixo(new THREE.MeshBasicMaterial({ visible: false }));
   const semIndice = g => (g.index ? g.toNonIndexed() : g);
@@ -143,30 +137,72 @@ const Bonecos = (() => {
     return m;
   }
 
-  // As cascas de cada grupo rígido viram uma malha só por material (menos chamadas de desenho por boneco)
-  function mesclarCascas(raiz, proprios) {
+  // Desempenho (skinning rígido): as peças de plástico liso do boneco inteiro viram UMA malha com esqueleto (cor e rugosidade
+  // por vértice; cada vértice preso 100% ao seu grupo: perna, joelho, tronco, braço, cabeça…) e as cascas do contorno, uma
+  // por cor. Os grupos continuam sendo animados como antes e servem de ossos. ~31 → ~6 chamadas de desenho por boneco
+  // (6 no mapa, até 12 na ONU). Fica de fora o que some ou troca de material: plaquinha de voto, rosto, broche, sombra.
+  const _m = new THREE.Matrix4();
+  function esqueletar(raiz, proprios, fora) {
     raiz.updateMatrixWorld(true);
-    const grupos = [];
-    raiz.traverse(o => { if (o.isGroup || o === raiz) grupos.push(o); });
-    for (const g of grupos) {
-      const inv = new THREE.Matrix4().copy(g.matrixWorld).invert(), porMat = new Map();
+    const ossos = [], inv = new THREE.Matrix4().copy(raiz.matrixWorld).invert(), solidas = [], cascas = new Map(), tirar = [];
+    const visitar = g => { if (fora.includes(g)) return; ossos.push(g); g.children.forEach(o => o.isGroup && visitar(o)); };
+    visitar(raiz);
+    const preso = (geo, k) => {   // osso k com peso 1
+      const n = geo.getAttribute('position').count, si = new Uint16Array(n * 4), sw = new Float32Array(n * 4);
+      for (let i = 0; i < n; i++) { si[i * 4] = k; sw[i * 4] = 1; }
+      geo.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(si, 4));
+      geo.setAttribute('skinWeight', new THREE.Float32BufferAttribute(sw, 4));
+      return geo;
+    };
+    const so = (src, nomes) => {   // cópia não indexada só com os atributos pedidos, no espaço da raiz
+      const g = src.index ? src.toNonIndexed() : src, out = new THREE.BufferGeometry();
+      nomes.forEach(n => out.setAttribute(n, g.getAttribute(n).clone()));
+      if (g !== src) g.dispose();
+      return out;
+    };
+    ossos.forEach((g, k) => {
       for (const m of g.children) {
-        if (!m.isMesh) continue;
-        for (const c of [...m.children]) {
+        if (!m.isMesh || m.isInstancedMesh || Array.isArray(m.material) || !m.visible || !lisos.has(m.material) || !m.castShadow) continue;
+        if (m.children.some(c => !(c.isMesh && c.material?.side === THREE.BackSide))) continue;   // segura outra coisa: fica como está
+        for (const c of m.children) {
           if (!c.isMesh || c.material?.side !== THREE.BackSide) continue;
-          const geo = c.geometry.clone().applyMatrix4(new THREE.Matrix4().multiplyMatrices(inv, c.matrixWorld));
-          if (!porMat.has(c.material)) porMat.set(c.material, []);
-          porMat.get(c.material).push(geo);
-          m.remove(c);
+          if (!cascas.has(c.material)) cascas.set(c.material, []);
+          cascas.get(c.material).push(preso(so(c.geometry, ['position']).applyMatrix4(_m.multiplyMatrices(inv, c.matrixWorld)), k));
         }
+        const out = so(m.geometry, ['position', 'normal']), n = out.getAttribute('position').count;
+        const cl = m.material.color, cor = new Float32Array(n * 3), rug = new Float32Array(n).fill(m.material.roughness);
+        for (let i = 0; i < n; i++) { cor[i * 3] = cl.r; cor[i * 3 + 1] = cl.g; cor[i * 3 + 2] = cl.b; }
+        out.setAttribute('color', new THREE.BufferAttribute(cor, 3));
+        out.setAttribute('aRug', new THREE.BufferAttribute(rug, 1));
+        solidas.push(preso(out.applyMatrix4(_m.multiplyMatrices(inv, m.matrixWorld)), k));
+        tirar.push(m);
       }
-      porMat.forEach((lista, mat) => {
-        const geo = lista.length === 1 ? lista[0] : THREE.mergeGeometries(lista);
-        if (lista.length > 1) lista.forEach(x => x.dispose());
-        const casca = new THREE.Mesh(geo, mat); casca.castShadow = false;
-        g.add(casca); proprios.push(geo);
-      });
-    }
+    });
+    const esq = new THREE.Skeleton(ossos);
+    proprios.push(esq);   // a textura dos ossos é só deste boneco
+    const malha = (geos, mat, sombra) => {
+      const caixas = ossos.map(() => new THREE.Box3());   // caixa de cada osso, para a caixa da pose (Box3.setFromObject)
+      geos.forEach(g => { g.computeBoundingBox(); caixas[g.getAttribute('skinIndex').getX(0)].union(g.boundingBox); });
+      const geo = THREE.mergeGeometries(geos); geos.forEach(x => x.dispose());
+      const sk = new THREE.SkinnedMesh(geo, mat);
+      sk.castShadow = sombra; sk.frustumCulled = false;   // a pose muda o volume: sem teste de visibilidade (são poucos)
+      raiz.add(sk); sk.bind(esq); proprios.push(geo);
+      // esfera da pose de montagem (só ordena a fila de desenho): a do SkinnedMesh passaria todos os vértices pelos ossos (~30 ms cada)
+      geo.computeBoundingSphere(); sk.boundingSphere = geo.boundingSphere.clone();
+      // caixa na pose atual (o retrato de corpo inteiro enquadra por ela), montada pelas caixas dos ossos como antes
+      const caixa = new THREE.Box3(), tmp = new THREE.Box3(), m = new THREE.Matrix4(), invMalha = new THREE.Matrix4();
+      Object.defineProperty(sk, 'boundingBox', { set() {}, get() {
+        raiz.updateMatrixWorld(true);   // os ossos na pose de agora
+        invMalha.copy(sk.matrixWorld).invert(); caixa.makeEmpty();
+        caixas.forEach((c, k) => { if (!c.isEmpty()) caixa.union(tmp.copy(c).applyMatrix4(m.multiplyMatrices(invMalha, ossos[k].matrixWorld).multiply(esq.boneInverses[k]).multiply(sk.bindMatrix))); });
+        return caixa;
+      } });
+      return sk;
+    };
+    const corpo = solidas.length ? malha(solidas, matMesclado, true) : null;
+    for (const [mat, geos] of cascas) malha(geos, mat, false);
+    tirar.forEach(m => m.removeFromParent());
+    return corpo;
   }
 
   // Biblioteca de peças do guia (§4.3), também usada pelas cenas: pino com bisel, tijolo/placa com pinos, peça redonda.
@@ -521,7 +557,7 @@ const Bonecos = (() => {
   const EXPR_DA_ACAO = { comemorar: 'alegre', palmas: 'alegre', pular: 'alegre', girar: 'alegre', triste: 'triste', surpreso: 'surpreso',
     votar: 'determinado', falar: 'falando', pensar: 'pensativo' };
 
-  function criar(avatar = {}, { base = false, contorno = true, tijolinhos: comTijolinhos = true } = {}) {
+  function criar(avatar = {}, { base = false, contorno = true, tijolinhos: comTijolinhos = true, mesclar = true } = {}) {
     const a = resolver(avatar);
     const ctn = contorno ? tinta(a.contorno) : null, ctnK = contorno ? tinta(TINTA) : null, escura = peleEscura(a.pele);
     const sobr = a.cabelo === '#C9CCD1' || a.cabelo === '#E8C25A' ? mistura(a.cabelo, '#3B2414', .55) : mistura(a.cabelo, TINTA, .35);
@@ -809,7 +845,8 @@ const Bonecos = (() => {
     };
     b.soltar = () => { est.congelado = false; est.ultimo = 0; return b; };
     b.descartar = () => { b.removeFromParent(); proprios.forEach(m => m.dispose()); tijolinhos.dispose(); };
-    mesclarCascas(b, proprios);
+    const unica = mesclar ? esqueletar(b, proprios, [placa]) : null;
+    if (unica && !camisa.parent) unica.onBeforeRender = b.tique;
     Object.values(mats).forEach(fixo);   // materiais de cache ficam fora da faxina das cenas
     b.userData.alturaBase = alturaBase;
     b.userData.cabeca = cabeca;

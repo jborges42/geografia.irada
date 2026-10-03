@@ -23,7 +23,6 @@ const Manual = (() => {
   const contr = (prep, id) => { const a = potencia(id)?.artigo; return (a ? (prep === 'de' ? 'd' + a : prep + ' ' + a) : prep) + ' ' + nomePot(id); };
   const CONTINENTES = { an: 'América do Norte', as: 'América do Sul', eu: 'Europa', af: 'África', ai: 'Ásia', oc: 'Oceania', po: 'Polos' };
   const RECURSOS = { alimentos: ['🌾', 'alimentos'], energia: ['⚡', 'energia'], minerais: ['💎', 'minerais críticos'], tecnologia: ['💻', 'tecnologia'], economia: ['💰', 'economia'] };
-  const PIDS = ['brasil', 'eua', 'china', 'ue', 'india', 'russia'];
 
   // ---------- texto do manual: marcadores, passos numerados e ícones Fluent no lugar dos emojis ----------
   function valor(chave) {
@@ -50,7 +49,7 @@ const Manual = (() => {
   // tom = pastel do marcador · caps = capítulos de MANUAL · antes/depois = catálogos gerados
   const ABAS = [
     { id: 'objetivo', nome: 'Missão 2050', icone: '🌍', arte: 'selo-missao-2050', tom: 'amarelo', caps: ['objetivo'],
-      lead: 'Seis potências, um planeta só: o que a turma precisa fazer até 2050.' },
+      lead: 'Treze potências, um planeta só: o que a turma precisa fazer até 2050.' },
     { id: 'como-jogar', nome: 'Como jogar', icone: '🎮', arte: 'pilha-tijolos', tom: 'ciencia', caps: ['como-jogar', 'dicas'],
       lead: 'Cada mandato tem notícias, a vez de cada potência e um balanço. Veja o passo a passo.' },
     { id: 'dilemas', nome: 'Dilemas', icone: '⚖️', arte: 'globo-irado-pensando', tom: 'diplomacia', caps: ['dilemas'],
@@ -207,12 +206,12 @@ const Manual = (() => {
     const grupos = Object.entries(CONTINENTES).map(([k, n]) => [k, n, TERRITORIOS.filter(t => t.continente === k)]).filter(g => g[2].length);
     const titulo = `<hr class="divisoria"><section class="mn-cap" id="mn-c-fichas"><h3 class="mn-cap-titulo"><span class="soquete">${ic('📍', 56)}</span><span>Fichas dos lugares</span></h3>
       <p class="mn-nota">Números de 2026, uma aproximação didática de dados reais. Durante a partida, toque num lugar do mapa para ver como ele está agora.</p>`;
-    if (impressao) return titulo + `<h4 class="mn-grupo peca">${ic('🏛️', 48)}As seis potências</h4><div class="mn-grade">${pots.map(fichaLugar).join('')}</div>` +
+    if (impressao) return titulo + `<h4 class="mn-grupo peca">${ic('🏛️', 48)}As ${PIDS.length} potências</h4><div class="mn-grade">${pots.map(fichaLugar).join('')}</div>` +
       grupos.map(([, n, l]) => `<h4 class="mn-grupo peca">${ic('📍', 48)}${esc(n)}</h4><div class="mn-grade">${l.map(t => fichaLugar(t.id)).join('')}</div>`).join('') + '</section>';
     const botao = (id, nome, marca) => `<button class="mn-lugar peca" aria-pressed="false" data-lugar="${esc(id)}">${marca}<span>${esc(nome)}</span></button>`;
     return titulo + `<div class="mn-lugares">
       <div class="mn-lugares-lista" role="group" aria-label="Escolha um lugar">
-        <p class="mn-rot">As seis potências</p><div class="mn-lugares-grupo">${pots.map(id => botao(id, nomePot(id), formaDe(id))).join('')}</div>
+        <p class="mn-rot">As ${PIDS.length} potências</p><div class="mn-lugares-grupo">${pots.map(id => botao(id, nomePot(id), formaDe(id))).join('')}</div>
         ${grupos.map(([k, n, l]) => `<p class="mn-rot">${esc(n)}</p><div class="mn-lugares-grupo">${l.map(t =>
           botao(t.id, t.nome, `<i class="mn-pastilha" style="--c:${corDe(k) || '#E9E0CC'}"></i>`)).join('')}</div>`).join('')}
       </div>

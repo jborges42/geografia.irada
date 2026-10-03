@@ -50,7 +50,7 @@ function jogar(config) {
     S.balanco(e);
     if (e.rodada > 20) throw new Error('partida não terminou');
   }
-  if (new Set(e.dilemasUsados).size !== e.dilemasUsados.length) throw new Error('dilema repetido na partida');
+  if ([e.dilemasUsados, ...Object.values(e.potencias).map(p => p.dilemasUsados || [])].some(l => new Set(l).size !== l.length)) throw new Error('dilema repetido na partida');
   return { e, r: S.resultado(e), conta, decisoes: conta.cartas + conta.dilemas + conta.eventos };
 }
 
@@ -78,6 +78,26 @@ function conferirContrato() {
   if (!Array.isArray(rd.mudancas) || rd.manchetes.length !== 2) falha('resolverDecisao fora do formato');
   const ia = S.iaJogarVez(e, 'china');
   if (ia[0]?.tipo !== 'dilema' || !Number.isInteger(ia[0].opcao)) falha('iaJogarVez deve começar pelo dilema');
+  // Diplomacia: relações bilaterais, reações e rótulos (docs/ARQUITETURA.md)
+  const d2 = S.criarEstado({ semente: 7, jogadores: [{ potencia: 'brasil', nome: 'Equipe Verde' }] });
+  if (Object.keys(d2.relacoes).length !== 78) falha('13 potências devem ter 78 pares de relação');
+  if (S.relacao(d2, 'eua', 'china') !== S.relacao(d2, 'china', 'eua')) falha('relação deve ser simétrica');
+  if (S.rotuloRelacao(75).texto !== 'Aliada' || S.rotuloRelacao(-70).texto !== 'Hostil' || S.rotuloRelacao(0).nivel !== -1) falha('rótulos de relação');
+  const rl = S.relacoesDe(d2, 'brasil');
+  if (rl.length !== 12 || rl.some((x, i) => i && x.valor > rl[i - 1].valor) || !rl.every(x => x.rotulo?.texto && 'aliada' in x && 'sancionada' in x)) falha('relacoesDe fora do formato');
+  S.iniciarVez(d2, 'eua'); d2.potencias.eua.cp = 9; d2.potencias.eua.mao.push('tarifas', 'cupula_bilateral', 'espionagem');
+  const antesCh = S.relacao(d2, 'eua', 'china'), tar = S.jogarCarta(d2, 'eua', 'tarifas', 'china');
+  if (!tar.ok || !(S.relacao(d2, 'eua', 'china') <= antesCh - 15) || !tar.reacoes.length || !tar.reacoes.every(x => x.texto && x.tipo)
+    || !tar.relacoes.some(x => x.a === 'eua' && x.b === 'china') || !tar.mudancas.some(x => x.v === 'relacao')) falha('tarifa deve piorar a relação e devolver reações');
+  const antesUe = S.relacao(d2, 'eua', 'ue'), cup = S.jogarCarta(d2, 'eua', 'cupula_bilateral', 'ue', { aceita: true });
+  if (!cup.ok || !cup.aceita || !(S.relacao(d2, 'eua', 'ue') > antesUe)) falha('cúpula aceita deve melhorar a relação');
+  const rec = S.jogarCarta(d2, 'eua', 'cupula_bilateral', 'china', { aceita: false });
+  if (rec.ok && rec.aceita !== false) falha('cúpula recusada deve avisar');
+  const ctxRel = S.criarEstado({ semente: 9, jogadores: [] });
+  S.aplicarEfeitos(ctxRel, [{ v: 'rel.china.eua', d: -10 }], { motivo: 'teste' });
+  if (S.relacao(ctxRel, 'china', 'eua') !== -45) falha("efeito 'rel.a.b' em evento");
+  S.aplicarEfeitos(ctxRel, [{ v: 'rel.russia', d: 10 }, { v: 'rel.rivais', d: 1 }], { potencia: 'ue', motivo: 'teste' });
+  if (S.relacao(ctxRel, 'ue', 'russia') !== -49) falha("efeito 'rel.x' em dilema");
 }
 conferirContrato();
 
@@ -89,6 +109,7 @@ const valoresOk = e => {
     for (const k of ['economia', 'bemEstar', 'ambiente', 'seguranca', 'apoio', 'limpa', 'militar']) conferir(p.id + '.' + k, p[k], 0, 100);
     for (const [r, v] of Object.entries(p.recursos)) conferir(p.id + '.recursos.' + r, v, 0, 12);
     conferir(p.id + '.cp', p.cp, 0, 20);
+    for (const q of Object.keys(e.potencias)) if (q !== p.id) conferir(`relacao ${p.id}×${q}`, S.relacao(e, p.id, q), -100, 100);
     for (const [k, v] of Object.entries(p.contadores)) conferir(p.id + '.contadores.' + k, v, 0, 1000);
   }
   for (const t of Object.values(e.territorios)) {
@@ -104,7 +125,7 @@ const pct = (n, d) => Math.round(100 * n / d) + '%';
 // Metas: docs/DESIGN.md §13
 const CENARIOS = [
   { nome: 'IA padrão, competitivo, 6 rodadas', config: { perfilIA: 'padrao', rodadas: 6 },
-    metas: { colapsoMax: .25, colapsoMin: .02, tMin: 1.85, tMax: 2.25, vitoriaMax: .30, vitoriaMin: .05, tensao: [60, 80], deslocados: [100, 160], decisoes: [60, 120] } },
+    metas: { colapsoMax: .25, colapsoMin: .01, tMin: 1.85, tMax: 2.25, vitoriaMax: .22, vitoriaMin: .01, tensao: [60, 80], deslocados: [100, 160], decisoes: [110, 320] } },
   { nome: 'IA gananciosa (só economia)', config: { perfilIA: 'ganancioso', rodadas: 6 }, metas: { colapsoMin: .5 } },
   { nome: 'IA cooperativa, modo cooperativo', config: { perfilIA: 'cooperativo', modo: 'cooperativo', rodadas: 6 }, metas: { colapsoMenor: .05, coopVitoria: [.4, .8] } },
   { nome: 'IA padrão, partida rápida (4 rodadas)', config: { perfilIA: 'padrao', rodadas: 4 }, metas: {} },

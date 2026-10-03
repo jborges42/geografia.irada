@@ -56,7 +56,6 @@
 'use strict';
 const q = new URLSearchParams(location.search);
 if (q.has('rm')) document.documentElement.classList.add('rm');
-const PIDS = ['brasil', 'eua', 'china', 'ue', 'india', 'russia'];
 const humanos = q.get('humanos') === 'nenhum' ? [] : (q.get('humanos') || 'brasil,china,ue').split(',');
 // Estado de exemplo: 2030, mandato 2, com um pouco de tudo (conflitos, estoques variados, uma sanção)
 function estado() {

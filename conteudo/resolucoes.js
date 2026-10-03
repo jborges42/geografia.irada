@@ -1,7 +1,7 @@
 // =====================================================================
 //  GEOGRAFIA IRADA — resoluções da ONU e missões secretas
 // =====================================================================
-//  orgao: 'cs' = Conselho de Segurança (votam as 6 potências e o Reino Unido; EUA, China, Rússia,
+//  orgao: 'cs' = Conselho de Segurança (votam as 13 potências; EUA, China, Rússia,
 //         França (pela UE) e Reino Unido têm veto) · 'ag' = Assembleia Geral (1 voto por potência e
 //         1 por território; maioria simples).
 //  alvo: 'conflito' (território em conflito) · 'potencia' · 'nenhum'
@@ -41,9 +41,10 @@ const RESOLUCOES = [
 // Missões secretas (estilo War). Cada condição precisa ser verdadeira em 2050.
 //  tipos: parceirosContinente {continente, n} · parceirosContinentes {n} · indicador {v, min|max}
 //         global {v, min|max} · contador {c, min} · estoque {r, min} · progresso {v, min} · parceiro {territorio}
+//         aliancas {n} · relacoes {min, n} (n potências com relação ≥ min) · relacoesCom {com: [ids], min, n} · semHostis {limite} (nenhuma relação ≤ limite)
 const MISSOES = [
   { id: 'lider_sul', nome: 'Liderança sul-americana', texto: 'Seja parceiro de 3 territórios da América do Sul.',
-    para: ['brasil', 'eua', 'china', 'ue'], condicoes: [{ tipo: 'parceirosContinente', continente: 'as', n: 3 }] },
+    para: ['brasil', 'eua', 'china', 'ue', 'reino_unido', 'japao'], condicoes: [{ tipo: 'parceirosContinente', continente: 'as', n: 3 }] },
   { id: 'amiga_africa', nome: 'Amiga da África', texto: 'Seja parceiro de 3 territórios africanos.',
     para: 'todas', condicoes: [{ tipo: 'parceirosContinente', continente: 'af', n: 3 }] },
   { id: 'rota_seda', nome: 'Rota da Seda', texto: 'Tenha parceiros em 3 continentes diferentes.',
@@ -53,13 +54,13 @@ const MISSOES = [
   { id: 'pacificadora', nome: 'Pacificadora', texto: 'Termine 2050 com a tensão mundial abaixo de 55.',
     para: 'todas', condicoes: [{ tipo: 'global', v: 'tensao', max: 55 }] },
   { id: 'celeiro', nome: 'Celeiro do mundo', texto: 'Exporte ou doe 10 alimentos (🌾) ao longo da partida.',
-    para: ['brasil', 'eua', 'russia', 'india', 'ue'], condicoes: [{ tipo: 'contador', c: 'alimentosCedidos', min: 10 }] },
+    para: ['brasil', 'eua', 'russia', 'india', 'ue', 'australia', 'nova_zelandia', 'nigeria'], condicoes: [{ tipo: 'contador', c: 'alimentosCedidos', min: 10 }] },
   { id: 'vale_silicio', nome: 'Vale do Silício', texto: 'Termine com 10 de tecnologia (💻) em estoque.',
     para: 'todas', condicoes: [{ tipo: 'estoque', r: 'tecnologia', min: 10 }] },
   { id: 'anfitria', nome: 'Anfitriã solidária', texto: 'Acolha refugiados ou envie ajuda humanitária 3 vezes.',
     para: 'todas', condicoes: [{ tipo: 'contador', c: 'solidariedade', min: 3 }] },
-  { id: 'artico', nome: 'Guardiã do Ártico', texto: 'Seja parceira da Groenlândia e Ártico e do Canadá ou do Reino Unido e Noruega.',
-    para: ['eua', 'ue', 'russia', 'china'], condicoes: [{ tipo: 'parceiro', territorio: 'groenlandia' }, { tipo: 'parceiroUm', territorios: ['canada', 'reino_unido'] }] },
+  { id: 'artico', nome: 'Guardiã do Ártico', texto: 'Seja parceira da Groenlândia e Ártico e do Canadá ou da Noruega, Islândia e Suíça.',
+    para: ['eua', 'ue', 'russia', 'china', 'reino_unido'], condicoes: [{ tipo: 'parceiro', territorio: 'groenlandia' }, { tipo: 'parceiroUm', territorios: ['canada', 'noruega_suica'] }] },
   { id: 'diplomata_chefe', nome: 'Diplomata-chefe', texto: 'Proponha 2 resoluções na ONU que sejam aprovadas.',
     para: 'todas', condicoes: [{ tipo: 'contador', c: 'propostasAprovadas', min: 2 }] },
   { id: 'ilha_estabilidade', nome: 'Ilha de estabilidade', texto: 'Termine com 85 de segurança e a tensão mundial abaixo de 70.',
@@ -67,9 +68,19 @@ const MISSOES = [
   { id: 'revolucao_educacional', nome: 'Revolução educacional', texto: 'Aumente o bem-estar em 10 pontos.',
     para: 'todas', condicoes: [{ tipo: 'progresso', v: 'bemEstar', min: 10 }] },
   { id: 'asia_conectada', nome: 'Ásia conectada', texto: 'Seja parceiro de 4 territórios da Ásia.',
-    para: ['china', 'india', 'eua', 'russia', 'ue'], condicoes: [{ tipo: 'parceirosContinente', continente: 'ai', n: 4 }] },
+    para: ['china', 'india', 'eua', 'russia', 'ue', 'japao', 'australia'], condicoes: [{ tipo: 'parceirosContinente', continente: 'ai', n: 4 }] },
   { id: 'mediadora', nome: 'Mediadora da paz', texto: 'Faça 2 mediações de paz bem-sucedidas.',
     para: 'todas', condicoes: [{ tipo: 'contador', c: 'mediacoes', min: 2 }] },
+  { id: 'rede_aliados', nome: 'Rede de aliados', texto: 'Termine 2050 com 3 alianças estratégicas.',
+    para: ['brasil', 'china', 'ue', 'india', 'russia', 'africa_do_sul', 'nigeria', 'egito', 'nova_zelandia'], condicoes: [{ tipo: 'aliancas', n: 3 }] },
+  { id: 'amiga_de_muitos', nome: 'Amiga de muitos', texto: 'Termine com relação Amiga (40 ou mais) com 6 potências.',
+    para: 'todas', condicoes: [{ tipo: 'relacoes', min: 40, n: 6 }] },
+  { id: 'sem_inimigos', nome: 'Sem inimigos', texto: 'Termine sem nenhuma relação pior que Tensa (−30) com outra potência.',
+    para: ['brasil', 'india', 'africa_do_sul', 'nigeria', 'egito'], condicoes: [{ tipo: 'semHostis', limite: -30 }] },
+  { id: 'voz_do_sul', nome: 'Voz do Sul Global', texto: 'Termine com relação Amiga (40 ou mais) com 3 potências do Sul Global (Brasil, Índia, África do Sul, Nigéria e Egito).',
+    para: 'todas', condicoes: [{ tipo: 'relacoesCom', com: ['brasil', 'india', 'africa_do_sul', 'nigeria', 'egito'], min: 40, n: 3 }] },
+  { id: 'ponte_dos_blocos', nome: 'Ponte entre os blocos', texto: 'Termine com relação Cordial (10 ou mais) com os EUA e com a China ao mesmo tempo.',
+    para: ['brasil', 'ue', 'india', 'russia', 'reino_unido', 'japao', 'australia', 'nova_zelandia', 'africa_do_sul', 'nigeria', 'egito'], condicoes: [{ tipo: 'relacoesCom', com: ['eua', 'china'], min: 10, n: 2 }] },
 ];
 
 // Agenda secreta do agente infiltrado (modo cooperativo)

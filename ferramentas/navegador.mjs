@@ -7,6 +7,7 @@
 //   await nav.esperarPor('document.querySelector("[data-teste=comecar]")');  // espera a expressão ficar verdadeira
 //   await nav.clicar('[data-teste=comecar]'); await nav.teclar('Escape'); await nav.digitar('Equipe Arara');
 //   await nav.clicarEm(800, 450); await nav.mover(800, 450);         // clique/passar o mouse em coordenadas (mapa 3D)
+//   nav.ao('Tracing.dataCollected', p => …);                      // ouve um evento do protocolo do Chrome
 //   console.log(nav.erros);                                          // erros do console e exceções
 //   await nav.fechar();
 // Opções de abrirJogo: { pagina, largura, altura, movimentoReduzido, arquivo: true (abre por file://, sem servidor) }
@@ -50,9 +51,10 @@ export async function abrirJogo({ pagina = 'index.html', largura = 1920, altura 
   const ws = new WebSocket(alvo.webSocketDebuggerUrl);
   await new Promise(r => (ws.onopen = r));
   let seq = 0;
-  const pend = new Map(), erros = [], logs = [];
+  const pend = new Map(), erros = [], logs = [], ouvintes = {};
   ws.onmessage = ev => {
     const m = JSON.parse(ev.data);
+    ouvintes[m.method]?.(m.params);
     if (pend.has(m.id)) { pend.get(m.id)(m); pend.delete(m.id); }
     if (m.method === 'Runtime.exceptionThrown') erros.push(m.params.exceptionDetails.exception?.description || m.params.exceptionDetails.text);
     if (m.method === 'Runtime.consoleAPICalled') {
@@ -70,6 +72,7 @@ export async function abrirJogo({ pagina = 'index.html', largura = 1920, altura 
 
   const nav = {
     base, erros, logs, cmd,
+    ao: (evento, fn) => { ouvintes[evento] = fn; },   // eventos do protocolo (ex.: 'Tracing.dataCollected')
     async js(expr) {
       const r = await cmd('Runtime.evaluate', { expression: expr, awaitPromise: true, returnByValue: true });
       if (r.result?.exceptionDetails) throw new Error(r.result.exceptionDetails.exception?.description || r.result.exceptionDetails.text);

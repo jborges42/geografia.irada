@@ -15,7 +15,6 @@
    (rel.mudancas) e a reação do mundo no balanço; a diferença que sobra aparece como "outras decisões", e a soma bate. */
 
 const Relatorios = (() => {
-  const PIDS = ['brasil', 'eua', 'china', 'ue', 'india', 'russia'];
   const ORDEM_IND = ['comercio', 'cooperacao', 'temperatura', 'tensao', 'deslocados', 'energia'];
   const IND = {
     comercio: { nome: 'Comércio', icone: '🚢', sobeBom: true, escala: 3 },
@@ -171,6 +170,8 @@ const Relatorios = (() => {
   }
   /* Linhas com pinos. series: [{ id, nome, pontos: [n…], cor?, icone? }] (id de potência = cor e forma da equipe);
      opcoes: { anos, min, max, casas, unidade, formatar(v), titulo, descricao, limiares: [{ valor, rotulo, nivel }], tabela } */
+  // Legenda em HTML para gráficos com muitas potências (13): forma + cor + nome (+ valor), nunca só a cor
+  const legendaPotencias = (itens, f = v => v) => `<ul class="rel-leg" aria-hidden="true">${itens.map(i => `<li data-equipe="${esc(i.pid)}">${formaDe(i.pid)}<b>${esc(i.nome ?? nomeCurto(i.pid))}</b>${i.valor !== undefined ? `<span class="num">${esc(f(i.valor))}</span>` : ''}</li>`).join('')}</ul>`;
   function linha(series, { anos = [], min, max, casas = 0, unidade = '', formatar, titulo = 'Gráfico', descricao = '', limiares = [], tabela: visivel = false, largura = 1000, altura = 420 } = {}) {
     const f = formatar || (v => FMT_A(v, casas) + unidade);
     const todos = series.flatMap(s => s.pontos).concat(limiares.map(l => l.valor));
@@ -201,7 +202,10 @@ const Relatorios = (() => {
         `<text class="limiar" x="10" y="8" fill="${T}">${esc(l.rotulo)}</text></g>`;
     }
     // etiquetas do valor final: empilhadas sem se cobrir (42 de distância), dentro da área do gráfico
-    const etq = series.map((sr, i) => ({ i, y: Y(sr.pontos.at(-1)) - 19 })).sort((a, b) => a.y - b.y);
+    // com muitas séries (13 potências) só as 3 mais altas e as 2 mais baixas ganham etiqueta de valor; a legenda em HTML lista todas
+    const muitas = series.length > 6 && series.every(sr => CORES_GUIA[sr.id]?.forma), final = sr => sr.pontos.at(-1);
+    const ordemFinal = [...series.keys()].sort((a, b) => final(series[b]) - final(series[a])), mostra = new Set(muitas ? [...ordemFinal.slice(0, 3), ...ordemFinal.slice(-2)] : ordemFinal);
+    const etq = series.map((sr, i) => ({ i, y: Y(sr.pontos.at(-1)) - 19 })).filter(q => mostra.has(q.i)).sort((a, b) => a.y - b.y);
     etq.forEach((q, j) => { q.y = Math.max(C + 4, j ? Math.max(q.y, etq[j - 1].y + 42) : q.y); });
     const passou = (etq.at(-1)?.y ?? 0) - (C + h - 40);
     if (passou > 0) etq.forEach(q => (q.y -= passou));
@@ -225,12 +229,13 @@ const Relatorios = (() => {
           (url ? `<image href="${url}" x="${r1(xu - 15)}" y="${r1(yu - 16)}" width="30" height="30"/>` : '') + '</g>';
       }
       const tx = f(sr.pontos[u0]), tw = tx.length * 15 + 30, ty = yEtq[si];
-      rotulos += `<g class="etiqueta" transform="translate(${r1(xu - tw - 30)} ${ty})"><rect width="${tw}" height="38" rx="10" fill="#fff" stroke="${T}" stroke-width="3.4"/>` +
+      if (ty !== undefined) rotulos += `<g class="etiqueta" transform="translate(${r1(xu - tw - 30)} ${ty})"><rect width="${tw}" height="38" rx="10" fill="#fff" stroke="${T}" stroke-width="3.4"/>` +
         `<rect x="5" y="7" width="7" height="24" rx="3.5" fill="${face}" stroke="${T}" stroke-width="2"/><text x="${r1(tw / 2 + 4)}" y="28" text-anchor="middle">${esc(tx)}</text></g>`;
     }
     s += pontas + rotulos + '</svg>';
     const tab = tabela(titulo, ['Ano', ...series.map(sr => sr.nome)], (anos.length ? anos : series[0].pontos.map((_, i) => i + 1)).slice(0, n).map((a, i) => [String(a), ...series.map(sr => (sr.pontos[i] === undefined ? '—' : f(sr.pontos[i])))]), visivel);
-    return `<figure class="rel-fig">${s}${descricao ? `<figcaption>${esc(descricao)}</figcaption>` : ''}${tab}</figure>`;
+    const leg = muitas ? legendaPotencias(ordemFinal.map(i => ({ pid: series[i].id, nome: series[i].nome, valor: final(series[i]) })), f) : '';
+    return `<figure class="rel-fig">${s}${leg}${descricao ? `<figcaption>${esc(descricao)}</figcaption>` : ''}${tab}</figure>`;
   }
   /* Barras = pilhas de tijolos (Arte.graficoTijolos). colunas: [{ pid, valor, rotulo? }];
      opcoes: { max, tijolos, unidade, casas, titulo, descricao, tabela } */
@@ -238,7 +243,8 @@ const Relatorios = (() => {
     const svg = Arte.graficoTijolos(colunas, { max, tijolos, unidade, casas, titulo: `${titulo}: ${colunas.map(c => `${c.rotulo ?? nomeCurto(c.pid)} ${fmt(c.valor, casas)}${unidade}`).join('; ')}` })
       .replace('class="grafico tijolos"', 'class="grafico tijolos rel-svg"');
     const tab = tabela(titulo, ['Potência', titulo], colunas.map(c => [c.rotulo ?? nomeCurto(c.pid), fmt(c.valor, casas) + unidade]), visivel);
-    return `<figure class="rel-fig">${svg}${descricao ? `<figcaption>${esc(descricao)}</figcaption>` : ''}${tab}</figure>`;
+    const leg = colunas.length > 8 && colunas.every(c => c.pid && CORES_GUIA[c.pid]?.forma) ? legendaPotencias(colunas.map(c => ({ pid: c.pid, nome: c.rotulo }))) : '';
+    return `<figure class="rel-fig">${svg}${leg}${descricao ? `<figcaption>${esc(descricao)}</figcaption>` : ''}${tab}</figure>`;
   }
   // Fileira de tijolinhos (1–n) na horizontal, para causas e tabelas: face/lado do guia
   function tijolinhos(q, cor, { w = 26, h = 24, gap = 3 } = {}) {
@@ -390,7 +396,7 @@ const Relatorios = (() => {
       const caixa = Math.round(merc.reduce((s, m) => s + m.valor, 0) * 10) / 10;
       const i = pos[pid], dp = antes && antes[pid] !== undefined ? antes[pid] - i : 0;
       const igi = placar.find(x => x.id === pid).total;
-      return `<li class="rb-nacao" data-equipe="${pid}">
+      return `<li class="rb-nacao" data-equipe="${pid}" data-humano="${!!e.potencias[pid]?.humano}">
         ${competitivo ? `<span class="selo ${['ouro', 'prata', 'bronze'][i] || ''} rb-pos" aria-label="${i + 1}º lugar">${i + 1}º</span>` : ''}
         <span class="retrato medio" data-equipe="${pid}" data-retrato="${pid}">${formaDe(pid, { classe: 'vazio' })}</span>
         <span class="rb-nome"><b>${esc(nomeCurto(pid))}</b><small>${esc(quem(e, pid))}</small></span>
@@ -402,8 +408,8 @@ const Relatorios = (() => {
     }).join('');
     const cab = `<div class="rb-nacoes-cab${competitivo ? '' : ' sem-placar'}" aria-hidden="true">${competitivo ? '<span></span>' : ''}<span></span><span>Nação</span>
       <span class="rb-cab-chips">${IND_P.map(([, , nome]) => `<span>${nome}</span>`).join('')}</span><span>Parceiros</span><span>Mercado</span>${competitivo ? '<span class="dir">IGI</span>' : ''}</div>`;
-    return `${cab}<ul class="rb-nacoes${competitivo ? '' : ' sem-placar'}" aria-label="Nações">${linhas}</ul>
-      <p class="rb-nota">${ico('💰', 36)}<span>Mercado mundial: quem produz mais do que consome vende a sobra; quem falta compra, e o preço muda com o mundo.</span></p>`;
+    return `${cab}<ul class="rb-nacoes${competitivo ? '' : ' sem-placar'}${ordem.length > 8 ? ' denso' : ''}" aria-label="Nações" tabindex="0">${linhas}</ul>
+      <p class="rb-nota">${ico('💰', 36)}<span>Mercado mundial: quem produz mais do que consome vende a sobra; quem falta compra, e o preço muda com o mundo.${ordem.length > 8 ? ` Role a lista para ver as ${ordem.length} nações.` : ''}</span></p>`;
   }
 
   // ---------- Passo 4: o Jornal Mundial do mandato ----------
@@ -467,6 +473,29 @@ const Relatorios = (() => {
       </aside></div>`;
   }
 
+  // ---------- Passo: diplomacia do mandato (relatorio.diplomacia do motor): quem se aproximou, quem se afastou, o que se espalhou ----------
+  const TIPO_INCIDENTE = { incidente: ['⚠️', 'Incidente'], cooperacao: ['🤝', 'Cooperação'], alianca_rompida: ['🚪', 'Aliança rompida'], guerra_comercial: ['🚢', 'Guerra comercial'] };
+  function passoDiplomacia(e, rel) {
+    const d = rel.diplomacia || {}, rot = v => (typeof Simulacao.rotuloRelacao === 'function' ? Simulacao.rotuloRelacao(v) : { texto: '', nivel: 0 });
+    const mudancas = (d.relacoes || []).slice(0, 5), contagio = (d.contagio || []).slice(0, 4), incidentes = (d.incidentes || []).slice(0, 5);
+    const par = r => {
+      const a = rot(r.antes), b = rot(r.depois), dif = Math.round(r.depois - r.antes), melhor = dif > 0;
+      return `<li class="rb-rel ${melhor ? 'boa' : 'ruim'}"><span class="rb-rel-par"><span data-equipe="${esc(r.a)}">${formaDe(r.a)}</span><span data-equipe="${esc(r.b)}">${formaDe(r.b)}</span></span>
+        <span class="rb-rel-txt"><b>${esc(nomeCurto(r.a))} e ${esc(nomeCurto(r.b))}</b><small>${esc(a.texto)} → ${esc(b.texto)}${r.motivo ? ' · ' + esc(r.motivo) : ''}</small></span>
+        <b class="num ${melhor ? 'sobe' : 'desce'}" aria-label="${melhor ? 'melhorou' : 'piorou'} ${Math.abs(dif)}">${melhor ? '▲' : '▼'}${Math.abs(dif)}</b></li>`;
+    };
+    const vazio = t => `<p class="rb-calmo">${t}</p>`;
+    return `<div class="rb-diplo">
+      <section class="rb-conflitos peca rb-diplo-rel"><h3>${ico('🤝', 40)} Relações que mudaram</h3>
+        ${mudancas.length ? `<ul>${mudancas.map(par).join('')}</ul>` : vazio('Nenhuma relação mudou muito neste mandato.')}</section>
+      <section class="rb-conflitos peca rb-diplo-contagio"><h3>${ico('🌊', 40)} A crise se espalhou</h3>
+        ${contagio.length ? `<ul>${contagio.map(c => `<li class="rb-cont"><span data-equipe="${esc(c.para)}">${formaDe(c.para)}</span><span>A crise ${esc(com(c.de, 'em'))} arrastou ${esc(com(c.para, ''))}</span><b class="num desce">${esc(sinal(Math.round(c.valor * 10) / 10, 1))}</b></li>`).join('')}</ul>
+          <p class="rb-calmo">Pontos de economia perdidos: os países vendem uns para os outros, então o tombo de um chega aos outros.</p>` : vazio('Nenhum choque econômico atravessou fronteiras.')}</section>
+      <section class="rb-conflitos peca rb-diplo-inc"><h3>${ico('📣', 40)} Incidentes e acordos</h3>
+        ${incidentes.length ? `<ul>${incidentes.map(i => { const [ic, nome] = TIPO_INCIDENTE[i.tipo] || ['🌍', 'Notícia']; return `<li class="rb-inc" data-tipo="${esc(i.tipo || '')}">${ico(ic, 40)}<span><b>${nome}</b> ${esc(i.texto)}</span></li>`; }).join('')}</ul>` : vazio('Foi um mandato sem incidentes entre as potências.')}</section>
+    </div>`;
+  }
+
   // ---------- Passo 5: para conversar ----------
   function perguntaDoMandato(e, rel, cz) {
     const g = rel.depois.global;
@@ -501,11 +530,11 @@ const Relatorios = (() => {
   }
 
   // ---------- Animação de cada passo (cascata + o que é próprio do passo) ----------
-  function animarPasso(el, i) {
+  function animarPasso(el, i, nome = '') {
     const itens = el.querySelectorAll(':scope > * > .peca, .rb-ind, .rb-nacao, .rb-pagina, .rb-lado > *, .rb-termo, .rb-emissoes, .rb-mascote, .rb-fala > *');
     if (RM) { gsap.fromTo(itens, { opacity: 0 }, { opacity: 1, duration: .18 }); return; }
     gsap.fromTo(itens, { opacity: 0, y: 1.4 * u() }, { opacity: 1, y: 0, duration: .32, stagger: .05, ease: 'power2.out' });
-    if (i === 0) {
+    if (nome === 'Mundo') {
       el.querySelectorAll('.rb-ind').forEach((c, n) => {
         const b = c.querySelector('.rb-depois'), k = c.dataset.k;
         if (!b) return;
@@ -517,7 +546,7 @@ const Relatorios = (() => {
       const d = el.querySelector('.rb-destaque');
       if (d) gsap.fromTo(d, { scale: 0, rotation: -16 }, { scale: 1, rotation: 0, duration: .55, ease: 'elastic.out(1, .5)', delay: .5, onStart: () => som('pop') });
     }
-    if (i === 1) {
+    if (nome === 'Clima') {
       const svg = el.querySelector('.rb-termo-svg svg'), cheios = svg ? [...svg.querySelectorAll(':scope > g')] : [];
       const a = +el.dataset.antes || 0, n0 = Math.max(0, Math.round((a - 1.0) * 10));
       cheios.slice(n0).forEach((g, k) => {
@@ -528,8 +557,8 @@ const Relatorios = (() => {
       });
       gsap.fromTo(el.querySelectorAll('.rb-barra svg'), { scaleX: 0, transformOrigin: '0 50%' }, { scaleX: 1, duration: .45, stagger: .025, ease: 'power2.out', delay: .2 });
     }
-    if (i === 3) { som('virar'); gsap.fromTo(el.querySelector('.rb-pagina'), { rotation: -4, scale: .94 }, { rotation: -1, scale: 1, duration: .5, ease: 'back.out(1.6)' }); }
-    if (i === 4) gsap.fromTo(el.querySelector('.rb-mascote img'), { scale: 0, rotation: -15 }, { scale: 1, rotation: 0, duration: .6, ease: 'elastic.out(1, .5)' });
+    if (nome === 'Jornal') { som('virar'); gsap.fromTo(el.querySelector('.rb-pagina'), { rotation: -4, scale: .94 }, { rotation: -1, scale: 1, duration: .5, ease: 'back.out(1.6)' }); }
+    if (nome === 'Conversa') gsap.fromTo(el.querySelector('.rb-mascote img'), { scale: 0, rotation: -15 }, { scale: 1, rotation: 0, duration: .6, ease: 'elastic.out(1, .5)' });
   }
 
   async function balanco(e, rel) {
@@ -538,10 +567,10 @@ const Relatorios = (() => {
     await splash({ pre: `Mandato ${mandato} de ${total}`, titulo: 'Balanço', sub: `De ${fmtAno(rel.ano)} a ${fmtAno(rel.proximoAno - 1)}`, cor: 'anil', icone: kit('prancheta'), tempo: 1200, som: 'whoosh' });
     await sobrevoo(e, rel);
     const cz = causas(e, rel), alerta = textoAlerta(rel.depois.global);
-    const PASSOS = [['Mundo', '🌍', passoMundo], ['Clima', '🌡️', passoClima], ['Nações', '🏛️', passoNacoes], ['Jornal', '📰', passoJornal], ['Conversa', '💬', passoConversa]];
+    const PASSOS = [['Mundo', '🌍', passoMundo], ['Clima', '🌡️', passoClima], ['Nações', '🏛️', passoNacoes], ...(rel.diplomacia ? [['Diplomacia', '🤝', passoDiplomacia]] : []), ['Jornal', '📰', passoJornal], ['Conversa', '💬', passoConversa]];
     const p = document.createElement('section');
     const idT = novoId('rb');
-    p.className = 'painel peca pinos painel-g anil rel-balanco';
+    p.className = `painel peca pinos painel-g anil rel-balanco${PASSOS.length > 5 ? ' rb-6' : ''}`;   // 6 abas: sem os ícones, para o título caber
     p.setAttribute('aria-labelledby', idT);
     p.innerHTML = `<header class="painel-cab">${kit('prancheta', { classe: 'painel-objeto' })}
         <h2 class="painel-titulo" id="${idT}">Balanço do mandato<small class="painel-sub">${fmtAno(rel.ano)} a ${fmtAno(rel.proximoAno - 1)} · mandato ${mandato} de ${total}</small></h2>
@@ -569,7 +598,7 @@ const Relatorios = (() => {
       const painel = p.querySelector(`#${idT}-p${i}`);
       const lado = painel.querySelector('.rb-lado');   // o que não cabe na coluna sai, de baixo para cima
       while (lado?.children.length > 1 && lado.scrollHeight > lado.clientHeight + 2) lado.lastElementChild.remove();
-      animarPasso(painel, i);
+      animarPasso(painel, i, PASSOS[i][0]);
       anunciar(`${PASSOS[i][0]}. Passo ${i + 1} de ${PASSOS.length}.`);
     };
     const escolher = ativarAbas(p.querySelector('.rb-passos'), (_, i) => mostrar(i));
@@ -869,7 +898,7 @@ const Relatorios = (() => {
     const ABAS = [['Resultado', '🏆', abaResultado], ['O mundo em 2050', '📈', abaMundo], ['Quem fez o quê', '⚖️', abaQuem], ['BNCC', '🎓', abaBncc], ['Para debater', '💬', abaDebate], ['Foto', '🏛️', abaFoto]];
     t.innerHTML = `<div class="rf-rel fundo-pinos">
       <header class="rf-cab">${kit('trofeu', { classe: 'rf-trofeu' })}<h1 class="marca letra-bolha relevo">Relatório 2050</h1>
-        <div class="abas rf-abas" role="tablist" aria-label="Relatório da partida">${ABAS.map(([n, ic], i) => `<button class="peca" role="tab" id="rf-a${i}" aria-controls="rf-p${i}" aria-selected="${i === 0}">${ico(ic, 40)}<span>${n}</span></button>`).join('')}</div></header>
+        <div class="abas rf-abas" role="tablist" aria-label="Relatório da partida">${ABAS.map(([n, ic], i) => `<button class="peca" role="tab" id="rf-a${i}" aria-label="${n}" title="${n}" aria-controls="rf-p${i}" aria-selected="${i === 0}">${ico(ic, 40)}<span>${n}</span></button>`).join('')}</div></header>
       <section class="painel peca rf-painel" aria-label="Conteúdo do relatório"><div class="tela">${ABAS.map(([, , f], i) => `<div class="rf-aba" role="tabpanel" id="rf-p${i}" aria-labelledby="rf-a${i}" tabindex="0"${i ? ' hidden' : ''}>${f(e, r, avs)}</div>`).join('')}</div></section>
       <footer class="rf-botoes"><button class="btn btn-neutro peca" data-teste="inicio">${GLIFOS.voltar} Início</button>
         <button class="btn btn-neutro peca" data-teste="novo-jogo">Novo jogo</button>
@@ -888,7 +917,7 @@ const Relatorios = (() => {
         const url = await Cenas3D.foto(avs, 'CÚPULA 2050', { data: new Date().toLocaleDateString('pt-BR') });
         const box = t.querySelector('.rf-foto-img'), a = t.querySelector('.rf-baixar');
         if (!box) return;
-        box.innerHTML = `<img src="${url}" alt="Foto oficial da Cúpula 2050: os bonecos das seis delegações em duas fileiras, sob a faixa CÚPULA 2050">`;
+        box.innerHTML = `<img src="${url}" alt="Foto oficial da Cúpula 2050: os bonecos das delegações em duas fileiras, sob a faixa CÚPULA 2050">`;
         a.href = url; a.removeAttribute('aria-disabled');
         if (!RM) gsap.fromTo(box.firstElementChild, { opacity: 0, scale: 1.04 }, { opacity: 1, scale: 1, duration: .6, ease: 'power2.out' });
       } catch { t.querySelector('.rf-foto-img').innerHTML = '<span>A foto não pôde ser revelada neste computador.</span>'; }

@@ -15,7 +15,7 @@ const [MANUAL, GLOSSARIO, POTENCIAS, POLITICAS, CATEGORIAS, ACOES_FIXAS, RESOLUC
 const P = S.PARAM;
 
 // Números que o texto do manual escreve por extenso (sem marcador): se o balanceamento mudar, avisa para revisar o manual
-const CITADOS = { cpBase: 3, cpGuardaMax: 1, copSucesso: 7, pressaoReacao: 60, pressaoQueda: 10, estoqueMax: 12, vendeAcima: 8,
+const CITADOS = { cpBase: 3, cpGuardaMax: 1, pressaoReacao: 60, pressaoQueda: 10, estoqueMax: 12, vendeAcima: 8,
   eventosPorRodada: 1, eventosEmCrise: 2, resistenciaBase: 3, margemParceria: 2, igiParceiro: 3, igiLideranca: 6, igiMissao: 12, igiSelo: 4, igiPlaneta: 10,
   pesosIGI: { bemEstar: 2, economia: 1.5, ambiente: 1, seguranca: 1, apoio: .5 },
   mediacao: { base: .3, porInfluencia: .06, influenciaMax: .3, cooperacao: .006, estabilidade: .004, porNivel: .1, parte: .3, vizinho: .1, min: .05, max: .9 } };
@@ -50,7 +50,7 @@ const partes = [
   ...MANUAL.map(s => `## ${s.icone} ${s.titulo}\n\n${md(s.html)}`),
   '## 📖 Glossário de geopolítica\n\n' + GLOSSARIO.map(g => `- **${g.termo}:** ${g.definicao}`).join('\n'),
   '## 🔢 Anexo: os números do jogo\n\nTabelas geradas dos arquivos de dados. Os valores 0–100 são uma aproximação didática de dados reais.',
-  '### As seis potências\n\n' + [linha(['Potência', 'Força', 'Fraqueza', 'Veto na ONU']), linha(['---', '---', '---', '---']),
+  '### As treze potências\n\n' + [linha(['Potência', 'Força', 'Fraqueza', 'Veto na ONU']), linha(['---', '---', '---', '---']),
     ...POTENCIAS.map(p => linha([`${p.emblema} ${p.nome}`, `**${p.forca.titulo}:** ${p.forca.texto}`, `**${p.fraqueza.titulo}:** ${p.fraqueza.texto}`, p.permanente ? 'sim' : 'não']))].join('\n'),
   '### Indicadores, produção e consumo em 2026\n\n' + [
     linha(['Potência', '💰', '❤️', '🌳', '🛡️', '🗳️', '⚡ limpa %', 'Produz por mandato', 'Consome por mandato']), linha(Array(9).fill('---')),
@@ -71,7 +71,7 @@ const partes = [
       ` + (estabilidade − 35) × ${pct(M.estabilidade)} − ${pct(M.porNivel)} por nível de conflito acima de 1 − ${pct(M.parte)} se for parte do conflito (ou −${pct(M.vizinho)} se for vizinha),` +
       ` sempre entre ${pct(M.min)} e ${pct(M.max)}.`,
     `- Eventos por mandato: ${P.eventosPorRodada} (${P.eventosEmCrise} com o mundo em crise).`,
-    `- Cúpula do Clima: acordo com ${P.copSucesso} pontos ou mais (compromisso alto = 2, médio = 1).`,
+    `- Cúpula do Clima: acordo com a meta da mesa, de cerca de 1,2 ponto por potência em jogo (7 com seis potências, 15 com treze) (compromisso alto = 2, médio = 1).`,
     `- Parceria: influência de pelo menos ${P.resistenciaBase} + (estabilidade ÷ 25, arredondado para baixo) e ${P.margemParceria} à frente da segunda potência.`,
     `- Reação soberanista com pressão ${P.pressaoReacao}; a pressão cai ${P.pressaoQueda} por Balanço.`,
     `- Estoque máximo de ${P.estoqueMax} de cada recurso; acima de ${P.vendeAcima}, o excedente é vendido.`,

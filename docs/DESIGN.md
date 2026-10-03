@@ -7,7 +7,7 @@
 
 ## 1. O objetivo do jogo: Missão 2050
 
-Cada jogador (ou equipe) governa uma das **seis potências** do mundo de **2026 a 2050**. Cada rodada é um
+Cada jogador (ou equipe) governa uma das **treze potências** do mundo de **2026 a 2050**. Cada rodada é um
 mandato de alguns anos. Todos querem que a própria nação prospere, mas todos dividem o mesmo planeta: clima, paz,
 comércio e crises humanitárias são **bens comuns**. Quem só pensa em si empurra o mundo para o colapso, e num
 planeta em colapso **ninguém vence**.
@@ -57,9 +57,9 @@ acerto nem porcentagem de acertos. O vocabulário da BNCC aparece na manchete e 
 - **Tempo-alvo por vez de jogador:** ~75 s (dilema 25 s + ações 50 s). Opção de cronômetro de decisões.
 - **Ritmo:** uma partida de 6 rodadas tem de 60 a 120 decisões (ações, dilemas e decisões nos eventos; §13).
 
-## 3. As seis potências
+## 3. As treze potências
 
-Sempre existem as seis. As não escolhidas por jogadores ficam com o computador (§11). Cada uma tem **cor e forma**
+Sempre existem as treze (as seis de sempre mais Reino Unido, Japão, Austrália, Nova Zelândia, África do Sul, Nigéria e Egito). As não escolhidas por jogadores ficam com o computador (§11). Cada uma tem **cor e forma**
 fixas (guia de arte; a forma garante que nada dependa só da cor), uma **força** e uma **fraqueza** reais, descritas com
 respeito e sem caricatura. Valores 0–100 são uma **aproximação didática** de dados reais (fontes em conteudo/).
 
@@ -71,6 +71,13 @@ respeito e sem caricatura. Valores 0–100 são uma **aproximação didática** 
 | União Europeia | roxo `#9645EE` · ★ estrela | **Mercado comum e regulação:** acordos comerciais e climáticos rendem +1 de cooperação; a França (país da UE) tem assento permanente | Dependência de energia importada (⚡ 0 de produção) | sim (veto, via França) |
 | Índia | laranja `#FF9C0A` · ◆ losango | **Maior população e serviços digitais:** +1 💻; autonomia estratégica (alianças com qualquer um sem aumentar a tensão) | Calor extremo: vulnerabilidade climática alta | não |
 | Rússia | rosa `#F2248F` · ⬢ hexágono | **Energia e território:** +2 ⚡/mandato; ganha com o preço alto da energia | Economia dependente de petróleo e gás; sanções a atingem mais | sim (veto) |
+| Reino Unido | turquesa `#00B3A4` · ✚ cruz | **Diplomacia e Commonwealth:** Missões diplomáticas rendem +1 de influência, e o Reino Unido tem assento permanente e veto no Conselho de Segurança. | Fora da União Europeia: Depois do Brexit, o comércio com a UE atrita mais quando as relações azedam. | sim (veto) |
+| Japão | cinza-azulado `#6C7A96` · ◎ anel | **Tecnologia e indústria:** +1 💻 por mandato, e a cooperação para o desenvolvimento rende +1 de influência. | Envelhecimento e energia importada: A economia cresce devagar e depende de comprar ⚡ do exterior. | não |
+| Austrália | verde-limão `#9CCB1F` · 💧 gota | **Minerais e energia:** Exportadora de minério, carvão e gás: ganha quando a energia fica cara e produz +1 💎 por mandato. | Dependência da China: Mais de um terço do que vende vai para a China: se a relação azedar, a economia australiana sofre. | não |
+| Nova Zelândia | vinho `#8E1B3A` · ⬟ pentágono | **Energia limpa e boa reputação:** Quase toda a eletricidade é renovável e o país é visto como neutro: mediações de paz ganham +10% de chance. | Pequena e distante: Economia pequena: choques de comércio e sanções pesam mais, e o exército é modesto. | não |
+| África do Sul | marrom `#9A5B2E` · ⯃ octógono | **Voz da África e do BRICS:** Cartas de cooperação ganham +1 de influência na África, e a África do Sul produz platina e manganês (💎). | Apagões e desigualdade: Falta energia e a desigualdade é uma das maiores do mundo: o bem-estar e o apoio sobem mais devagar. | não |
+| Nigéria | coral `#FF7A66` · ⛊ escudo | **Petróleo e população jovem:** Exportadora de petróleo (ganha quando a energia fica cara) e com a maior população da África: cresce rápido. | Instabilidade e dependência do petróleo: Conflitos no Sahel e no Golfo da Guiné pesam mais na segurança, e a economia sofre quando a energia barateia. | não |
+| Egito | azul-claro `#4DB6FF` · ⏢ trapézio | **Canal de Suez e mediação:** Vive de ser ponte entre África, Ásia e Europa: mediações de paz ganham +15% de chance e o exército é o maior da região. | Água e pão importado: Depende do Nilo e importa trigo: a fome pesa e o clima extremo castiga a economia. | não |
 
 **Indicadores de cada potência (0–100):** 💰 Economia · ❤️ Bem-estar (≈ IDH × 100) · 🌳 Ambiente ·
 🛡️ Segurança · 🗳️ Apoio popular. Mais: ⚡ **Energia limpa** (% da matriz), **emissões** (Gt CO₂/ano,
@@ -82,10 +89,17 @@ Valores iniciais ⚙ (escala do jogo; os textos da ficha citam os dados reais co
 |---|---|---|---|---|---|---|---|---|---|
 | Brasil | 55 | 79 | 62 | 58 | 55 | 50 | 0,5 | 0,9 | 30 |
 | EUA | 85 | 92 | 50 | 85 | 50 | 18 | 4,9 | 0 | 90 |
-| China | 78 | 80 | 38 | 80 | 60 | 20 | 12,0 | 0 | 75 |
+| China | 78 | 80 | 38 | 80 | 60 | 20 | 12 | 0 | 75 |
 | UE | 80 | 90 | 68 | 70 | 55 | 40 | 2,5 | 0 | 50 |
 | Índia | 58 | 69 | 35 | 65 | 65 | 12 | 3,1 | 0 | 55 |
 | Rússia | 52 | 83 | 50 | 72 | 60 | 14 | 1,8 | 0 | 80 |
+| Reino Unido | 74 | 92 | 66 | 80 | 45 | 45 | 0,33 | 0 | 62 |
+| Japão | 70 | 92 | 58 | 70 | 42 | 28 | 1 | 0 | 52 |
+| Austrália | 58 | 94 | 55 | 70 | 52 | 40 | 0,39 | 0 | 40 |
+| Nova Zelândia | 42 | 93 | 78 | 75 | 55 | 62 | 0,033 | 0 | 15 |
+| África do Sul | 40 | 72 | 50 | 50 | 50 | 12 | 0,43 | 0 | 28 |
+| Nigéria | 33 | 55 | 42 | 40 | 50 | 15 | 0,13 | 0 | 30 |
+| Egito | 36 | 70 | 40 | 55 | 62 | 10 | 0,26 | 0 | 45 |
 
 ## 4. Recursos e mercado (interdependência)
 
@@ -98,9 +112,16 @@ terras raras, níquel) · 💻 **Tecnologia** (chips, software, pesquisa). Estoq
 | Brasil | 4 | 2 | 2 | 1 | 1 | 1 |
 | EUA | 2 | 3 | 1 | 4 | 1 | 2 |
 | China | 1 | 1 | 3 | 3 | 2 | 2 |
-| UE | 2 | 0 | 1 | 3 | 1 | 2 |
+| UE | 2 | 0 | 1 | 3 | 1 | 1 |
 | Índia | 2 | 1 | 1 | 3 | 2 | 1 |
-| Rússia | 2 | 6 | 2 | 1 | 1 | 1 |
+| Rússia | 2 | 5 | 2 | 1 | 1 | 1 |
+| Reino Unido | 1 | 1 | 0 | 3 | 1 | 1 |
+| Japão | 1 | 0 | 0 | 4 | 2 | 2 |
+| Austrália | 3 | 3 | 4 | 1 | 1 | 1 |
+| Nova Zelândia | 3 | 1 | 0 | 1 | 0 | 1 |
+| África do Sul | 2 | 1 | 4 | 1 | 1 | 1 |
+| Nigéria | 3 | 4 | 1 | 0 | 2 | 1 |
+| Egito | 1 | 2 | 1 | 1 | 2 | 1 |
 
 Territórios parceiros (§7.3) somam a produção deles à da potência parceira.
 
@@ -172,6 +193,23 @@ escalam mais; acordo na COP baixa 2, fracasso sobe 1.
 - **Apoio popular:** `+ 0,5 × Δeconomia + 0,5 × Δbem-estar + 0,3 × Δsegurança + efeitos de política
   + (apoio de 2026 − apoio) × 0,1` (nos EUA, a queda vale 1,5 ×: polarização). Apoio < 30: **crise política** (−1 CP na próxima vez e evento de protesto).
   Apoio ≥ 70: +1 CP.
+
+### 5.6 Relações bilaterais (diplomacia viva)
+Cada par de potências tem uma **relação** de −100 (hostil) a +100 (aliada), partindo do retrato de 2026 em
+`RELACOES` (`conteudo/potencias.js`: EUA×China −35, EUA×Rússia −55, UE×Rússia −60, EUA×Japão 70, Reino Unido×Austrália 65…).
+Rótulos: Aliada ≥ 70 · Amiga 40–69 · Cordial 10–39 · Fria −24 a 9 · Tensa −59 a −25 · Hostil ≤ −60.
+- **O que mexe nela:** ações com alvo (sanção, tarifa, embargo, acordo, aliança, missão diplomática), dilemas e
+  decisões de eventos (efeitos `rel.china`, `rel.alvo`, `rel.local`, `rel.rivais`, `rel.aliados`, `rel.todos`; em eventos,
+  o par explícito `rel.china.eua`), disputa por influência num território onde outra potência tem laços, alianças e
+  sanções, guerras por procuração e incidentes.
+- **Volta ao ponto de 2026:** 12% da distância por mandato (`retornoRelacao` ⚙).
+- **Contágio e atrito (balanço):** `COMERCIO` dá a fatia da economia de cada potência exposta a cada parceiro. A economia
+  muda com (fatia × quanto o parceiro cresceu acima da média do mundo × 0,8) e com (fatia × mudança da relação
+  desde 2026 × 1,2), multiplicadas pela `exposicao` da potência (Austrália 1,4 · Nova Zelândia 1,6 · Reino Unido 1,2).
+- **Reações do computador:** o alvo reage; amigos e aliados do alvo tomam partido e furam sanções; o computador
+  pode retaliar tarifas e sanções (chance 15% + 60% × hostilidade); quem não é aliado se arma em resposta à corrida
+  armamentista; pares abaixo de −50 podem ter incidente ou guerra comercial; pares acima de 55 às vezes cooperam.
+- **Escala:** com mais de 8 potências, cada decisão pesa um pouco menos nos números do mundo (√(8 / nº de potências)).
 
 ## 6. Decisões: ações de governo
 
@@ -266,7 +304,7 @@ potência no território alvo; `local.` = o lugar do evento ou do dilema; `cp` =
 ## 7. Territórios neutros e influência (o "War sem guerra")
 
 ### 7.1 Atributos
-Cada um dos 33 territórios neutros tem: população (milhões), **desenvolvimento** (0–100, ≈ IDH × 100),
+Cada um dos 32 territórios neutros (31 mais a Antártida, que não aceita influência) tem: população (milhões), **desenvolvimento** (0–100, ≈ IDH × 100),
 **estabilidade** (0–100), **vulnerabilidade climática** (0–100), **recursos** que produz (ex.: Península Arábica
 ⚡⚡⚡), **floresta** (Gt de desmatamento possível, se houver), **conflito** (0–3), **emissões** (Gt), **influência**
 de cada potência (0–10) e **pressão** (0–100, ressentimento contra interferência externa). Ficha com texto
@@ -305,7 +343,7 @@ Protegida pelo Tratado da Antártida (1959): não aceita influência nem bases; 
 ## 8. Eventos, Assembleia da ONU e Cúpula do Clima
 
 ### 8.1 Plantão Global (eventos)
-`conteudo/eventos.js`, 40 eventos declarativos:
+`conteudo/eventos.js`, 48 eventos declarativos:
 ```js
 { id: 'crise_petroleo', titulo: 'Crise no Estreito de Ormuz', texto: '…', local: 'golfo', icone: '🛢️',
   peso: .9, condicoes: [ { v: 'global.tensao', min: 75, x: 2 } ], efeitos: [ … ],
@@ -334,8 +372,8 @@ Olimpíada, acordo comercial). Cada evento traz "Você sabia?" com fato datado e
 ### 8.2 Assembleia da ONU (estilo reunião de emergência)
 Aberta pela carta "Propor resolução" ou por evento. Resoluções: Missão de paz em [território]; Sanções contra
 [potência]; Acordo climático global; Fundo humanitário; Tratado de desarmamento; Fundo de vacinas.
-- **Conselho de Segurança** (missão de paz, sanções): votam as 6 potências + Reino Unido (território, vota com o
-  parceiro ou pelo computador). EUA, China, Rússia, UE (França) e Reino Unido têm **veto**. Aprovação: maioria sem veto.
+- **Conselho de Segurança** (missão de paz, sanções): votam as potências da partida. EUA, China, Rússia, UE (França) e
+  Reino Unido têm **veto**. Aprovação: pelo menos 57% de votos sim (`maioriaConselho`) e nenhum veto.
 - **Assembleia Geral** (clima, fundos, desarmamento): 1 voto por potência e 1 por território neutro (os parceiros
   votam com a potência; os demais votam por interesse: vulneráveis votam a favor do clima, etc.). Maioria simples.
 - Tela: faixa "REUNIÃO NA ONU" com som de reunião; grade com os bonecos; o proponente pode fazer um discurso de 30 s;
@@ -343,13 +381,13 @@ Aberta pela carta "Propor resolução" ou por evento. Resoluções: Missão de p
 
 ### 8.3 Cúpula do Clima (COP)
 Rodadas pares. Cada potência escolhe em segredo: **compromisso alto** (limpa +12, −3 💰), **médio** (+6, −1 💰)
-ou **nenhum**. Revelação simultânea. Soma dos compromissos ≥ 30 ⚙: **acordo histórico** (cooperação +6,
+ou **nenhum**. Revelação simultânea. Soma dos compromissos ≥ meta da mesa ⚙ (`copPorPotencia` = 7/6 ponto por potência: 7 com seis, 15 com treze): **acordo histórico** (cooperação +6,
 transferência tecnológica +0,15, deslocados −4); senão "cúpula fracassa" (cooperação −3). Quem não se comprometeu
 paga menos agora e se beneficia do esforço alheio: a turma vive a **tragédia dos comuns**.
 
 ## 9. Dilemas de governo (a BNCC vivida)
 
-No começo de cada vez, a potência enfrenta **um dilema de governo** (`conteudo/dilemas.js`, 48 situações): um caso
+No começo de cada vez, a potência enfrenta **um dilema de governo** (`conteudo/dilemas.js`, 66 situações, 18 delas próprias das sete potências da segunda onda): um caso
 datado e verificado, com 2 ou 3 saídas e **nenhuma resposta certa**. Cada saída é uma troca real — ganha aqui e perde
 ali, agora ou depois, em casa ou no mundo — e a consequência aparece no mapa, nos indicadores e na manchete, com o
 porquê e o conceito de geopolítica que a turma acabou de viver.
@@ -436,7 +474,7 @@ exposto; a turma vence se cumprir as metas e não deixar a agenda se cumprir.
 - Cada potência do computador tem pesos de prioridade (ex.: EUA: segurança 1,2 · economia 1,2 · influência 1,0
   · ambiente 0,6; UE: ambiente 1,2 · cooperação 1,2 · economia 1,0; China: economia 1,3 · influência 1,2;
   Rússia: segurança 1,3 · energia 1,2; Índia: economia 1,2 · bem-estar 1,1; Brasil: ambiente 1,0 · economia 1,0 ·
-  cooperação 1,1) ⚙, descritos de forma neutra.
+  cooperação 1,1) ⚙, descritos de forma neutra. As sete potências da segunda onda têm pesos próprios em `potencias.js` (ex.: Nova Zelândia: ambiente 1,4 · cooperação 1,4; Japão: economia 1,2 · cooperação 1,1; Nigéria: economia 1,2 · segurança 1,1).
 - Utilidade de uma carta = Σ peso × efeito esperado (imediato + 0,7 × atrasado) − custo + ruído ±10% +
   reações: tensão ≥ 80 → diplomacia +50% (e militar +30% para quem se sente ameaçado); T ≥ 1,9 → clima +50%;
   deslocados ≥ 150 → ajuda +40%; apoio próprio < 40 → medidas populares +40%.
@@ -454,7 +492,7 @@ jogo, nos créditos de estilo ou nos comentários.
 
 1. **Início:** o mapa de peças ao fundo com a câmera passeando; logotipo "GEOGRAFIA IRADA" em letras de bloco e o
    mascote 3D Globo Irado acenando; botões Jogar, Continuar, Manual do Diplomata, Para o professor.
-2. **Lobby das delegações:** (1) Modo; (2) Delegações: as 6 potências lado a lado como bonecos 3D numa plataforma,
+2. **Lobby das delegações:** (1) Modo; (2) Delegações: as 13 potências lado a lado como bonecos 3D numa plataforma,
    cada uma marcada "Equipe" ou "Computador", com cor e forma; nome da equipe; **editor de avatar** com prévia 3D
    girando (chapéu, tom de pele, cabelo, acessório); (3) Ajustes. Botão grande "Começar".
 3. **Revelação secreta:** tela escura, o boneco da equipe em destaque e o papel em letras grandes ("DIPLOMATA" ou
@@ -496,29 +534,32 @@ jogo, nos créditos de estilo ou nos comentários.
 decisões, votações, doações, Cúpulas do Clima, dilemas e ações como a interface faria, e verifica:
 - Nenhum NaN, nenhum valor fora da faixa (inclusive CP 0–20 e contadores); partidas sempre terminam; nenhum dilema
   repete na partida; nenhuma jogada de briefing; todo dilema e toda decisão de evento geram manchete e porquê.
-- **IA padrão (competitivo, 6 rodadas):** colapso entre 2% e 25%; temperatura mediana em 2050 entre 1,85 e 2,25 °C;
-  tensão mediana entre 60 e 80; deslocados medianos entre 100 e 160 milhões; nenhuma potência vence mais de 30% das
-  partidas e todas vencem pelo menos 5%; 60 a 120 decisões por partida (ações + dilemas + decisões em eventos).
+- **IA padrão (competitivo, 6 rodadas):** colapso entre 1% e 25%; temperatura mediana em 2050 entre 1,85 e 2,25 °C;
+  tensão mediana entre 60 e 80; deslocados medianos entre 100 e 160 milhões; nenhuma potência vence mais de 22% das
+  partidas e todas vencem pelo menos 1%; 110 a 320 decisões por partida (13 potências: ações + dilemas + decisões em eventos).
 - **IA gananciosa** (só economia): colapso em pelo menos 50% (a tragédia dos comuns tem de doer).
 - **IA cooperativa, modo cooperativo:** colapso abaixo de 5% e vitória cooperativa (4 de 5 metas) entre 40% e 80%.
 - **Dilemas sem resposta certa:** aviso se alguma saída for escolhida pelo computador em mais de 90% das vezes ou nunca.
+- **Diplomacia:** relações sempre entre −100 e +100; contrato de `relacoesDe`, reações e efeitos `rel.*` conferido no começo do teste.
 
-Resultado em out/2026 (300 partidas por cenário, sementes 1000–1299):
+Resultado em out/2026, com as **treze** potências e o motor de relações (300 partidas por cenário, sementes 1000–1299):
 
 | Cenário | Colapso | T 2050 | Tensão | Deslocados | Decisões | Vitórias |
 |---|---|---|---|---|---|---|
-| Padrão, 6 rodadas | 4% | 2,12 °C | 72 | 116 mi | 119 | Brasil 19%, UE 19%, China 16%, Índia 16%, EUA 15%, Rússia 15% |
-| Gananciosa | 93% | 2,23 °C | 92 | 142 mi | 117 | — |
-| Cooperativa (modo cooperativo) | 0% | 2,00 °C | 53 | 90 mi | 117 | vitória cooperativa 50% |
-| Padrão, 4 rodadas | 19% | 2,16 °C | 78 | 142 mi | 78 | — |
-| Padrão, 8 rodadas | 7% | 2,08 °C | 67 | 99 mi | 156 | — |
+| Padrão, 6 rodadas | 1% | 2,11 °C | 75 | 109 mi | 273 | de 4% (África do Sul) a 16% (Brasil); IGI médio de 99 a 103 em todas |
+| Gananciosa | 94% | 2,44 °C | 86 | 138 mi | 275 | — |
+| Cooperativa (modo cooperativo) | 0% | 2,01 °C | 40 | 69 mi | 264 | vitória cooperativa 56% |
+| Padrão, 4 rodadas | 11% | 2,17 °C | 76 | 134 mi | 178 | — |
+| Padrão, 8 rodadas | 0% | 2,06 °C | 79 | 88 mi | 366 | — |
 
-Decisões de uma partida de 6 rodadas (média): 74,5 ações + 35,4 dilemas + 7,5 decisões em eventos. A margem para o
-limite de 120 é pequena: dilemas ou eventos com decisão a mais pedem conferir o ritmo de novo.
+Em média, uma partida de 6 rodadas tem 166 ações + 78 dilemas + 30 decisões em eventos. As equipes humanas dividem a lista de
+dilemas (cada um aparece uma vez na mesa); cada potência do computador usa a sua, para não gastar o estoque dos alunos.
+Uma jogada do computador em ~6 por partida é hostil (sanção, tarifa, embargo, espionagem), mais retaliações, incidentes e
+cooperações espontâneas (`iaRivalidade`, `incidente`, `cooperacaoEspontanea` em `PARAM`).
 
 Ajustes desta calibragem (todos marcados com comentário em `js/simulacao.js` e `conteudo/potencias.js`): CP base 3
 sem bônus de acerto; dilemas e decisões escolhidos por sorteio ponderado (`variedadeIA` 1,2); preço da energia menos
 sensível a conflitos (0,5 por nível) e à economia (÷ 25), para que exportar petróleo não decida a partida; segurança,
 gasto militar e apoio medidos em relação ao próprio 2026; conflitos vizinhos pesam 0,5; polarização dos EUA só nas
-quedas; crescimento-base recalibrado (§5.5); `tcre` 0,00068 e retroalimentação 0,15 acima de 2,1 °C; tensão volta
-para 74 e conflitos acima de 17 níveis esquentam; 12% dos deslocados voltam por mandato; acordo na COP baixa a tensão.
+quedas; crescimento-base recalibrado para as 13 potências (§5.5); `tcre` 0,00069 e retroalimentação 0,15 acima de 2,1 °C; tensão volta
+para 64 e conflitos acima de 19 níveis esquentam; 12% dos deslocados voltam por mandato; acordo na COP baixa a tensão.

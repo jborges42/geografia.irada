@@ -5,7 +5,6 @@
    Telas.professor(), Telas.creditos(). Usa Mapa3D, Cenas3D, Bonecos e Mascote pelos contratos (todos opcionais). */
 
 const Telas = (() => {
-  const PIDS = ['brasil', 'eua', 'china', 'ue', 'india', 'russia'];
   const tenta = fn => { try { return fn(); } catch { return undefined; } };   // módulos 3D são opcionais (sem WebGL, a tela segue)
   const ico = (e, px = 40) => imgIcone(e, px);
   const icoBtn = nome => `<img class="ico-btn" src="${ICONES_BOTAO[nome]}" alt="" draggable="false">`;
@@ -15,15 +14,16 @@ const Telas = (() => {
   const painelAberto = () => !!document.querySelector('#camada > .painel');
 
   // ============================== DADOS DAS TELAS ==============================
+  const porExtenso = n => ['zero', 'uma', 'duas', 'três', 'quatro', 'cinco', 'seis', 'sete', 'oito', 'nove', 'dez', 'onze', 'doze', 'treze'][n] ?? String(n);
   const MODOS = [
-    { id: 'competitivo', nome: 'Cada nação por si', arte: 'trofeu', cor: 'ouro', quem: '2 a 6 equipes',
+    { id: 'competitivo', nome: 'Cada nação por si', arte: 'trofeu', cor: 'ouro', quem: `2 a ${PIDS.length} equipes`,
       texto: 'Cada equipe puxa para o seu lado. Vence o maior índice em 2050 — se o planeta aguentar.' },
-    { id: 'blocos', nome: 'Em blocos', arte: 'aperto-maos', cor: 'cat-diplomacia', quem: '2 a 6 equipes',
+    { id: 'blocos', nome: 'Em blocos', arte: 'aperto-maos', cor: 'cat-diplomacia', quem: `2 a ${PIDS.length} equipes`,
       texto: 'Alianças de equipes somam forças. Vence o bloco com a melhor média.' },
-    { id: 'cooperativo', nome: 'Todos pelo planeta', arte: 'globo', cor: 'cat-natureza', quem: '1 a 6 equipes',
+    { id: 'cooperativo', nome: 'Todos pelo planeta', arte: 'globo', cor: 'cat-natureza', quem: `1 a ${PIDS.length} equipes`,
       texto: 'A turma inteira contra a crise: cumpram 4 das 5 Metas 2050 juntos.' },
     { id: 'solo', nome: 'Solo', arte: 'maleta', cor: 'cat-ciencia', quem: '1 equipe',
-      texto: 'Uma equipe governa; as outras cinco potências ficam com o computador.' },
+      texto: `Uma equipe governa; as outras ${porExtenso(PIDS.length - 1)} potências ficam com o computador.` },
   ];
   const RODADAS = [
     { n: 4, nome: 'Rápida', anos: 6, min: 30 }, { n: 6, nome: 'Aula', anos: 4, min: 45 }, { n: 8, nome: 'Completa', anos: 3, min: 60 },
@@ -188,11 +188,18 @@ const Telas = (() => {
   const avatares = () => S.avatares.map(a => ({ ...a, humano: vaga(a.pid).humano, nome: nomeDe(vaga(a.pid)) }));
   const modoAtual = () => MODOS.find(m => m.id === S.modo);
   // faixa do palco 3D em frações da altura, casada com o layout em u (16:9, 16:10 e 4:3)
-  const faixaLobby = () => [8.6 * uPx() / innerHeight, 48 * uPx() / innerHeight];
+  const faixaLobby = () => {
+    const u = uPx() / innerHeight, passo2 = S?.passo === 2;   // passo 1: bonecos mais baixos, acima dos cartões de modo; passo 2: palco curto, o carrossel ocupa o meio
+    return retratoTela() ? (passo2 ? [12.6 * u, 24.4 * u] : [11 * u, 27 * u]) : (passo2 ? [3.4 * u, 31 * u] : [8.6 * u, 46 * u]);
+  };
+  // celular e tablet em pé: o lobby troca a unidade por uma que segue a largura (css/telas.css, html.retrato)
+  const retratoTela = () => innerWidth / innerHeight <= .9;
+  const ajustarRetrato = () => document.documentElement.classList.toggle('retrato', retratoTela());
 
   function lobby() {
     sairDoInicio();
     estadoLobby();
+    ajustarRetrato();
     S.passo = 1;
     const t = $('#tela-lobby');
     t.innerHTML = `<div class="lob" data-passo="1">
@@ -206,7 +213,14 @@ const Telas = (() => {
         </ol>
       </header>
       <section class="lob-modos" aria-label="Modos de jogo">${MODOS.map(cartaoModo).join('')}</section>
-      <section class="lob-vagas" aria-label="Delegações">${PIDS.map(cartaoVaga).join('')}</section>
+      <section class="lob-vagas" aria-roledescription="carrossel" aria-label="Delegações: uma nação por vez">
+        <div class="car-fichas" role="tablist" aria-label="Escolha a nação (setas do teclado passam de uma para outra)">${PIDS.map(fichaMini).join('')}</div>
+        <div class="car-palco">
+          <button class="car-seta car-ant btn-seta peca" data-acao="anterior" data-teste="nacao-anterior" aria-label="Nação anterior">${GLIFOS.voltar}</button>
+          <div class="car-trilho">${PIDS.map(cartaoVaga).join('')}</div>
+          <button class="car-seta car-prox btn-seta peca" data-acao="proxima" data-teste="nacao-proxima" aria-label="Próxima nação">${GLIFOS.seta}</button>
+        </div>
+      </section>
       <section class="lob-bancada" aria-label="Duração, ajustes e começar">
         <div class="banc-grupo" role="radiogroup" aria-labelledby="banc-rod">
           <h2 class="banc-rotulo letra-bolha" id="banc-rod">Duração da partida</h2>
@@ -229,11 +243,11 @@ const Telas = (() => {
     mostrarTela('lobby');
     lob = { tela: t };
     document.addEventListener('keydown', lob.tecla = teclaLobby);
-    addEventListener('resize', lob.redim = () => requestAnimationFrame(alinharVagas));
+    addEventListener('resize', lob.redim = () => requestAnimationFrame(() => { ajustarRetrato(); atualizarCena(); centrar(false); }));
     if ((typeof Cenas3D !== 'undefined')) tenta(() => Cenas3D.lobby(avatares(), { faixa: faixaLobby() }));
     PIDS.forEach(pintarVaga);
     pintarModos(); pintarRodadas(); pintarResumo(); validar();
-    alinharVagas();
+    ligarCarrossel();
     irPara(1, { primeira: true });
     if ((typeof Som !== 'undefined')) tenta(() => Som.musica('menu'));
   }
@@ -241,6 +255,7 @@ const Telas = (() => {
     if (!lob) return;
     document.removeEventListener('keydown', lob.tecla);
     removeEventListener('resize', lob.redim);
+    document.documentElement.classList.remove('retrato');
     lob = null;
   }
 
@@ -254,15 +269,30 @@ const Telas = (() => {
       aria-label="${r.nome}: ${r.n} mandatos de ${r.anos} anos, cerca de ${r.min} minutos">
       <span class="rod-nome">${r.nome}</span><span class="rod-num"><b class="num">${r.n}</b>mandatos</span>
       <span class="rod-tempo num">≈ ${r.min} min</span></button>`;
+  // Ficha pequena da fileira de cima: cor + forma da equipe e, embaixo, quem joga (ícone de pessoas = equipe, de computador = computador)
+  function fichaMini(pid) {
+    return `<button class="ficha-mini peca" role="tab" id="ficha-${pid}" data-pid="${pid}" data-acao="nacao" data-teste="nacao-${pid}" data-equipe="${pid}" aria-controls="vaga-${pid}" aria-selected="false" tabindex="-1">
+      ${formaDe(pid, { branca: true, classe: 'ficha-forma' })}<span class="ficha-quem" aria-hidden="true"></span><span class="so-leitor ficha-txt"></span></button>`;
+  }
+  // Ficha grande da nação: boneco, força e fraqueza (de conteudo/potencias.js) e os controles de quem joga
   function cartaoVaga(pid) {
-    return `<article class="vaga" data-pid="${pid}">
-      <div class="vaga-peca peca" data-equipe="${pid}">
-        <header class="vaga-aba" data-equipe="${pid}">${formaDe(pid, { branca: true, classe: 'vaga-forma' })}<h2 class="vaga-pais letra-bolha">${nomeCurto(pid)}</h2></header>
+    const d = POTENCIAS.find(p => p.id === pid) || {};
+    return `<article class="vaga" id="vaga-${pid}" role="tabpanel" aria-labelledby="ficha-${pid}" aria-roledescription="nação" data-pid="${pid}" data-atual="false">
+      <div class="vaga-peca peca pinos" data-equipe="${pid}">
+        <header class="vaga-aba" data-equipe="${pid}">${formaDe(pid, { branca: true, classe: 'vaga-forma' })}<h2 class="vaga-pais letra-bolha">${esc(nomePais(pid))}</h2>
+          <span class="vaga-pos pilula num" aria-hidden="true">${PIDS.indexOf(pid) + 1} de ${PIDS.length}</span></header>
         <div class="vaga-corpo">
-          <button class="vaga-nome" data-acao="editar"><span class="vaga-nome-txt"></span>${icoBtn('editar')}</button>
-          <button class="vaga-quem peca" data-teste="potencia-${pid}" data-acao="quem"></button>
-          <div class="vaga-blocos" role="radiogroup" aria-label="Bloco: ${nomePais(pid)}">${BLOCOS.map(b =>
-            `<button class="vaga-bloco" role="radio" data-acao="bloco" data-bloco="${b.id}" aria-checked="false" aria-label="${b.nome}">${ico(b.icone, 32)}<span>${b.nome.replace('Bloco ', '')}</span></button>`).join('')}</div>
+          <span class="vaga-foto" data-equipe="${pid}">${formaDe(pid, { classe: 'vaga-foto-forma' })}</span>
+          <div class="vaga-info">
+            <p class="vaga-ponto vaga-forca"><b>Força: ${comIcones(d.forca?.titulo || '')}.</b> ${comIcones(d.forca?.texto || '')}</p>
+            <p class="vaga-ponto vaga-fraqueza"><b>Fraqueza: ${comIcones(d.fraqueza?.titulo || '')}.</b> ${comIcones(d.fraqueza?.texto || '')}</p>
+          </div>
+          <div class="vaga-controles">
+            <button class="vaga-nome" data-acao="editar"><span class="vaga-nome-txt"></span>${icoBtn('editar')}</button>
+            <button class="vaga-quem peca" data-teste="potencia-${pid}" data-acao="quem"></button>
+            <div class="vaga-blocos" role="radiogroup" aria-label="Bloco: ${nomePais(pid)}">${BLOCOS.map(b =>
+              `<button class="vaga-bloco" role="radio" data-acao="bloco" data-bloco="${b.id}" aria-checked="false" aria-label="${b.nome}">${ico(b.icone, 32)}<span>${b.nome.replace('Bloco ', '')}</span></button>`).join('')}</div>
+          </div>
         </div>
       </div>
     </article>`;
@@ -277,8 +307,16 @@ const Telas = (() => {
     nome.setAttribute('aria-label', v.humano ? `${nomeDe(v)}: editar o nome e o boneco (${nomePais(pid)})` : `${nomePais(pid)}: o computador decide sozinho`);
     quem.setAttribute('aria-pressed', v.humano);
     quem.setAttribute('aria-label', `${nomePais(pid)}: ${v.humano ? 'jogado por uma equipe' : 'jogado pelo computador'}. Clique para trocar.`);
-    quem.innerHTML = v.humano ? `${ico('👥', 40)}<span>Equipe</span>${icoBtn('trocar')}` : `<span>Computador</span>${icoBtn('trocar')}`;
+    quem.innerHTML = v.humano ? `${ico('👥', 40)}<span>Equipe</span>${icoBtn('trocar')}` : `${ico('💻', 40)}<span>Computador</span>${icoBtn('trocar')}`;
     el.querySelectorAll('.vaga-bloco').forEach(b => b.setAttribute('aria-checked', b.dataset.bloco === v.bloco));
+    const f = lob.tela.querySelector(`.ficha-mini[data-pid="${pid}"]`);
+    if (f) {
+      f.dataset.humano = v.humano;
+      f.querySelector('.ficha-quem').innerHTML = ico(v.humano ? '👥' : '💻', 32);
+      f.querySelector('.ficha-txt').textContent = `${nomePais(pid)}: ${v.humano ? 'equipe' : 'computador'}`;
+      f.setAttribute('aria-label', `${nomePais(pid)}: ${v.humano ? 'equipe' : 'computador'}`);
+    }
+    if (el.dataset.atual === 'true') pintarFoto(pid);
   }
   function pintarModos() {
     lob?.tela.querySelectorAll('.modo').forEach(b => b.setAttribute('aria-pressed', b.dataset.modo === S.modo));
@@ -324,34 +362,99 @@ const Telas = (() => {
       if (i + 1 === passo) b.setAttribute('aria-current', 'step');
     });
     raiz.querySelector('.lob-voltar span').textContent = passo === 1 ? 'Início' : 'Modo';
-    const entram = passo === 1 ? raiz.querySelectorAll('.modo') : raiz.querySelectorAll('.vaga, .lob-bancada');
+    if (!primeira) atualizarCena();   // a faixa do palco 3D muda de um passo para o outro
+    const entram = passo === 1 ? raiz.querySelectorAll('.modo') : raiz.querySelectorAll('.car-fichas, .car-palco, .lob-bancada');
     const u = uPx();
-    if (passo === 2) requestAnimationFrame(alinharVagas);
+    if (passo === 2) requestAnimationFrame(() => { centrar(false); tenta(() => Cenas3D.focoLobby(PIDS[S.atual ?? 0], { animar: antes !== 2 })); });
+    else tenta(() => Cenas3D.focoLobby(null));
     if (RM) gsap.fromTo(entram, { opacity: 0 }, { opacity: 1, duration: .18 });
     else gsap.fromTo(entram, { y: 7 * u, opacity: 0 }, { y: 0, opacity: 1, duration: .42, stagger: .06, ease: 'back.out(1.6)', delay: primeira ? .5 : 0, clearProps: 'transform' });
     if (!primeira && antes !== passo) { efeitoSom('whoosh'); titulo.focus({ preventScroll: true }); }
     anunciar(passo === 1 ? 'Passo 1: escolha o modo de jogo.' : `Passo 2: delegações e ajustes. Modo ${modoAtual().nome}.`);
   }
 
-  // Cartões das vagas embaixo de cada boneco (posição do boneco na tela: Cenas3D.ancora)
-  function alinharVagas() {
-    const cont = lob?.tela.querySelector('.lob-vagas');
-    if (!cont) return;
-    const pts = (typeof Cenas3D !== 'undefined') ? PIDS.map(pid => tenta(() => Cenas3D.ancora(pid))) : [];
-    if (pts.length !== 6 || pts.some(p => !p || !isFinite(p.x))) { cont.classList.remove('alinhadas'); return; }
-    const passo = (pts[5].x - pts[0].x) / 5, larg = Math.min(passo - uPx() * .7, uPx() * 27);
-    cont.classList.add('alinhadas');
-    cont.style.setProperty('--larg-vaga', larg + 'px');
-    cont.querySelectorAll('.vaga').forEach((v, i) => (v.style.left = pts[i].x - larg / 2 + 'px'));
+  // ---------- Carrossel de nações: uma em destaque, as vizinhas menores dos lados (rolagem horizontal com encaixe) ----------
+  // Rolar com o dedo, ◀ ▶, setas do teclado ou clicar numa ficha da fileira de cima: tudo leva ao mesmo S.atual.
+  const trilho = () => lob?.tela.querySelector('.car-trilho');
+  const cartaoDe = pid => lob?.tela.querySelector(`.vaga[data-pid="${pid}"]`);
+  function centrar(animar = true) {
+    const t = trilho(), c = cartaoDe(PIDS[S.atual ?? 0]);
+    if (!t || !c || !t.clientWidth) return;
+    const alvo = c.offsetLeft - (t.clientWidth - c.offsetWidth) / 2;
+    if (Math.abs(t.scrollLeft - alvo) < 2) return;
+    t.scrollTo({ left: alvo, behavior: animar && !RM && !RAPIDO ? 'smooth' : 'instant' });
   }
+  function selecionarNacao(i, { rolar = true, anunciando = true, foco = null } = {}) {
+    i = (i + PIDS.length) % PIDS.length;
+    const pid = PIDS[i], mudou = S.atual !== i;
+    S.atual = i;
+    lob?.tela.querySelectorAll('.vaga').forEach(c => {
+      const eh = c.dataset.pid === pid;
+      c.dataset.atual = eh;
+      c.querySelector('.vaga-peca').inert = !eh;   // as vizinhas só enfeitam: nada nelas recebe foco nem clique até virarem a central
+    });
+    lob?.tela.querySelectorAll('.ficha-mini').forEach(f => { const eh = f.dataset.pid === pid; f.setAttribute('aria-selected', eh); f.tabIndex = eh ? 0 : -1; if (eh) { if (foco) f.focus({ preventScroll: true }); f.parentElement.scrollTo?.({ left: f.offsetLeft - (f.parentElement.clientWidth - f.offsetWidth) / 2, behavior: RM || RAPIDO ? 'instant' : 'smooth' }); } });
+    pintarFoto(pid);
+    if (S.passo === 2) tenta(() => Cenas3D.focoLobby(pid));   // a câmera anda até o boneco, ele sobe no pedestal e ganha o holofote
+    if (rolar) centrar();
+    if (mudou && anunciando) { efeitoSom('clique'); anunciar(`${nomePais(pid)}, nação ${i + 1} de ${PIDS.length}: ${vaga(pid).humano ? 'jogada por uma equipe' : 'jogada pelo computador'}.`); }
+  }
+  // Rolou (dedo, roda do mouse, teclado): a central é a que estiver mais perto do meio do trilho
+  function ligarCarrossel() {
+    const t = trilho();
+    if (!t) return;
+    let espera = 0;
+    t.addEventListener('scroll', () => {
+      clearTimeout(espera);
+      espera = setTimeout(() => {
+        const meio = t.scrollLeft + t.clientWidth / 2, cartoes = [...t.children];
+        const perto = cartoes.reduce((m, c, i) => (Math.abs(c.offsetLeft + c.offsetWidth / 2 - meio) < Math.abs(cartoes[m].offsetLeft + cartoes[m].offsetWidth / 2 - meio) ? i : m), 0);
+        if (perto !== S.atual) selecionarNacao(perto, { rolar: false });
+      }, 90);
+    }, { passive: true });
+    if (typeof ResizeObserver !== 'undefined') new ResizeObserver(() => centrar(false)).observe(t);   // o trilho nasce escondido (passo 1): centra quando ganhar largura
+    selecionarNacao(Math.min(S.atual ?? 0, PIDS.length - 1), { rolar: false, anunciando: false });
+    requestAnimationFrame(() => centrar(false));
+  }
+  // Retrato do boneco na ficha central (só da nação em destaque: cada retrato é uma foto 3D)
+  function pintarFoto(pid) {
+    const el = cartaoDe(pid)?.querySelector('.vaga-foto');
+    if (!el || typeof Cenas3D === 'undefined' || !Cenas3D.retrato) return;
+    const av = avatares().find(a => a.pid === pid);
+    if (!av) return;
+    const chave = chaveAv(av);
+    if (el.dataset.chave === chave) return;
+    el.dataset.chave = chave;
+    tenta(() => Cenas3D.retrato(av, { tamanho: 120, enquadramento: 'rosto' })).then?.(url => {
+      if (!url || el.dataset.chave !== chave) return;
+      let img = el.querySelector('img');
+      if (!img) { img = document.createElement('img'); img.alt = ''; img.draggable = false; el.prepend(img); }
+      img.src = url;
+      el.classList.add('pronta');
+    }, () => {});
+  }
+  const chaveAv = a => JSON.stringify([a.cor, a.forma, a.pele, a.cabelo, a.penteado, a.chapeu, a.acessorio, a.humano]);
 
   // ---------- ações do lobby ----------
   function cliqueLobby(ev) {
+    if (S.passo === 2 && !ev.target.closest?.('button, .car-palco, .lob-bancada, .car-fichas, .lob-topo')) {   // clique no boneco: o mais perto do toque, dentro da faixa do palco 3D
+      const [topo, base] = faixaLobby(), y = ev.clientY / innerHeight;
+      if (y >= topo && y <= base) {
+        const pts = PIDS.map((pid, i) => [i, tenta(() => Cenas3D.ancora(pid))]).filter(([, a]) => a?.visivel);
+        const [melhor] = pts.sort((a, b) => Math.abs(a[1].x - ev.clientX) - Math.abs(b[1].x - ev.clientX))[0] || [];
+        if (melhor !== undefined && Math.abs(pts.find(([i]) => i === melhor)[1].x - ev.clientX) < 6 * uPx()) return selecionarNacao(melhor);
+      }
+    }
+    const vizinha = ev.target.closest?.('.vaga[data-atual="false"]');
+    if (vizinha) return selecionarNacao(PIDS.indexOf(vizinha.dataset.pid), { foco: false });
     const b = ev.target.closest('button');
     if (!b || b.disabled) return;
     const acao = b.dataset.acao || (b.dataset.modo && 'modo') || (b.dataset.n && 'rodadas') || b.dataset.teste;
-    const pid = b.closest('.vaga')?.dataset.pid;
+    const pid = b.closest('.vaga')?.dataset.pid || b.dataset.pid;
     if (acao !== 'quem' && acao !== 'comecar') efeitoSom('clique');
+    if (acao === 'anterior') return selecionarNacao(S.atual - 1);
+    if (acao === 'proxima') return selecionarNacao(S.atual + 1);
+    if (acao === 'nacao') return selecionarNacao(PIDS.indexOf(pid), { foco: true });
     if (acao === 'voltar') return S.passo === 2 ? irPara(1) : inicio();
     if (acao === 'passo-1') return S.passo !== 1 && irPara(1);
     if (acao === 'passo-2') return S.passo !== 2 && irPara(2);
@@ -371,6 +474,11 @@ const Telas = (() => {
   function teclaLobby(ev) {
     if (document.body.dataset.tela !== 'lobby' || painelAberto() || digitando(ev)) return;
     if (ev.key === 'Escape') { ev.preventDefault(); S.passo === 2 ? irPara(1) : inicio(); }
+    else if (S.passo === 2 && ['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(ev.key) && !ev.target.closest?.('.vaga-blocos, .ajustes, [role="dialog"]')) {
+      ev.preventDefault();
+      const d = { ArrowLeft: S.atual - 1, ArrowRight: S.atual + 1, Home: 0, End: PIDS.length - 1 }[ev.key];
+      selecionarNacao(d, { foco: !!ev.target.closest?.('.ficha-mini') });
+    }
     else if (ev.key.toLowerCase() === 'f') telaCheia();
   }
   function escolherModo(id) {
@@ -450,6 +558,8 @@ const Telas = (() => {
       efeitoSom('erro');
       aviso(p.texto, { tipo: 'ruim' });
       const alvo = lob.tela.querySelector(p.alvo);
+      const dono = alvo?.closest('.vaga')?.dataset.pid;
+      if (dono && PIDS.indexOf(dono) !== S.atual) { selecionarNacao(PIDS.indexOf(dono), { anunciando: false }); await new Promise(r => setTimeout(r, RM || RAPIDO ? 30 : 380)); }
       if (alvo) { alvo.focus({ preventScroll: true }); if (!RM) gsap.fromTo(alvo, { x: -1.2 * uPx() }, { x: 0, duration: .5, ease: 'elastic.out(1.2, .3)', clearProps: 'transform' }); }
       return;
     }
@@ -467,7 +577,7 @@ const Telas = (() => {
     const avs = avatares();
     // as delegações comemoram e o mapa volta para o jogo
     tenta(() => Object.values(Cenas3D.palco?.bonecos || {}).forEach((b, i) => setTimeout(() => tenta(() => b.acao('comemorar')), i * 70)));
-    if (!RM) gsap.to(lob.tela.querySelectorAll('.vaga, .lob-bancada, .lob-topo'), { y: 3 * uPx(), opacity: 0, duration: .3, stagger: .03, delay: .45, ease: 'power2.in' });
+    if (!RM) gsap.to(lob.tela.querySelectorAll('.car-fichas, .car-palco, .lob-bancada, .lob-topo'), { y: 3 * uPx(), opacity: 0, duration: .3, stagger: .03, delay: .45, ease: 'power2.in' });
     await new Promise(r => setTimeout(r, RAPIDO ? 80 : RM ? 400 : 950));
     sairDoLobby();
     tenta(() => Cenas3D.esconder());
@@ -682,7 +792,7 @@ const Telas = (() => {
     raiz.style.setProperty('--brilho', '#FFFFFF');
     topo.innerHTML = `<span class="pilula escura rev-conta"><b class="num">${i + 1}</b>&nbsp;de&nbsp;<b class="num">${total}</b></span>
       <p class="rev-chamada letra-bolha relevo">${formaDe(pid, { classe: 'rev-forma' })}Só a ${equipe} olha!</p>
-      <p class="rev-sub letra-bolha">Delegação ${artigoDe(pid)} ${nomePais(pid)}${nome}, venha até o computador. Turma: olhos no professor!</p>`;
+      <p class="rev-sub letra-bolha">Delegação ${prepDe(pid)} ${nomePais(pid)}${nome}, venha até o computador. Turma: olhos no professor!</p>`;
     base.innerHTML = `<button class="rev-segurar peca pinos" data-teste="revelacao-ok" aria-describedby="rev-dica">
         <svg class="rev-anel" viewBox="0 0 48 48" aria-hidden="true"><circle class="trilho" cx="24" cy="24" r="20"/><circle class="enche" cx="24" cy="24" r="20" pathLength="100"/></svg>
         ${icoBtn('olho')}<span>Segure para ver</span></button>
@@ -690,7 +800,7 @@ const Telas = (() => {
     tenta(() => Cenas3D.revelacao({ ...av, humano: true }, 'chamada'));
     if (i > 0) await cortina(t, null);   // a cortina sobe e mostra a próxima equipe
     entrar(raiz.querySelectorAll('.rev-topo > *, .rev-base > *'));
-    anunciar(`Só a ${equipe} olha! Delegação ${artigoDe(pid)} ${nomePais(pid)}: segure o botão para ver o segredo.`);
+    anunciar(`Só a ${equipe} olha! Delegação ${prepDe(pid)} ${nomePais(pid)}: segure o botão para ver o segredo.`);
     await segurar(base.querySelector('.rev-segurar'), RAPIDO ? 0 : 2000);
 
     // revelado: mesmo som, mesmo tempo e mesmo layout para qualquer papel
@@ -715,8 +825,6 @@ const Telas = (() => {
     efeitoSom('clique');
     await cortina(t, 'Guardado!', i + 1 < total ? 'Passe o computador para a próxima equipe.' : '', false);
   }
-  const ARTIGOS = { brasil: 'do', eua: 'dos', china: 'da', ue: 'da', india: 'da', russia: 'da' };
-  const artigoDe = pid => ARTIGOS[pid] || 'de';
   function entrar(els) {
     if (RM) return gsap.fromTo(els, { opacity: 0 }, { opacity: 1, duration: .18 });
     return gsap.fromTo(els, { y: 3 * uPx(), opacity: 0 }, { y: 0, opacity: 1, duration: .38, stagger: .07, ease: 'back.out(1.6)' });
@@ -792,7 +900,7 @@ const Telas = (() => {
     p.setAttribute('aria-labelledby', 'prof-titulo');
     const habs = typeof BNCC !== 'undefined' ? BNCC.habilidades || [] : [];
     const passos = [
-      ['0 a 5 min', 'Preparação', 'mapa-enrolado', 'Divida a turma em até 6 equipes, uma por potência. Nomes, bonecos e a revelação das missões secretas.'],
+      ['0 a 5 min', 'Preparação', 'mapa-enrolado', `Divida a turma em equipes (de 1 a ${PIDS.length}), uma por potência; as outras ficam com o computador. Nomes, bonecos e a revelação das missões secretas.`],
       ['5 a 35 min', 'Partida Rápida', 'globo', '4 mandatos de 6 anos. A equipe da vez lê o dilema em voz alta e diz, numa frase, por que escolheu aquela saída.'],
       ['35 a 50 min', 'Conversa final', 'jornal', 'O relatório de 2050 traz gráficos, manchetes e as habilidades da BNCC vividas. Cada equipe explica uma decisão que mudou o mundo.'],
     ];

@@ -88,15 +88,26 @@
    ===================================================================================================== */
 .hud-menu, .hud-mapa { position: absolute; right: calc(1.5 * var(--u)); display: grid; gap: calc(1.1 * var(--u)); }
 .hud-menu { top: calc(13.4 * var(--u)); }
-.hud-mapa { top: calc(37 * var(--u)); }
+.hud-mapa { top: calc(42 * var(--u)); }
 :is(.hud-menu, .hud-mapa) .btn-ic { width: calc(5.9 * var(--u)); height: calc(5.9 * var(--u)); }
 :is(.hud-menu, .hud-mapa, .doca-trocar) .btn-ic > img { width: 56%; height: 56%; }
 
 /* =====================================================================================================
    COLUNA: placar + painel da vez (guia §5.8)
    ===================================================================================================== */
-.hud-coluna { position: absolute; left: calc(1.5 * var(--u)); top: calc(14.6 * var(--u)); width: calc(31.1 * var(--u)); }
+/* a coluna rola (13 potências não cabem): o painel da vez fica grudado no alto e as outras passam por baixo; as folgas deixam o "VEZ", a medalha e o IGI aparecerem */
+.hud-coluna { position: absolute; left: calc(.2 * var(--u)); top: calc(10.6 * var(--u)); bottom: calc(22.4 * var(--u)); width: calc(35 * var(--u)); box-sizing: border-box; padding: calc(4 * var(--u)) calc(3.4 * var(--u)) calc(1.4 * var(--u)) calc(1.3 * var(--u));
+  overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; mask-image: linear-gradient(#000 calc(100% - 3.4 * var(--u)), transparent); scrollbar-color: rgb(255 255 255 / .55) transparent; pointer-events: none; }
+.hud-coluna > * { pointer-events: auto; }
+.hud-coluna:focus-visible { outline: var(--anel-foco-largura, calc(.5 * var(--u))) solid #fff; outline-offset: calc(-.5 * var(--u)); }
 .coluna-lista { display: grid; gap: calc(.9 * var(--u)); margin: 0; padding: 0; list-style: none; }
+.coluna-lista > .vez { position: sticky; top: 0; z-index: 4; }
+.coluna-lista[data-denso="true"] { gap: calc(.6 * var(--u)); }
+/* só o computador encolhe; as equipes humanas mantêm o nome da equipe embaixo */
+.coluna-lista[data-denso="true"] .linha[data-humano="false"] { height: calc(4.9 * var(--u)); grid-template-columns: calc(5.4 * var(--u)) minmax(0, 1fr) auto; }
+.coluna-lista[data-denso="true"] .linha[data-humano="false"] .retrato { --tam: calc(4.1 * var(--u)); }
+.coluna-lista[data-denso="true"] .linha[data-humano="false"] .linha-nome small { display: none; }
+.coluna-lista[data-denso="true"] .linha[data-humano="false"] .igi-n { font-size: calc(2.2 * var(--u)); }
 .linha { --lado: calc(.7 * var(--u)); --raio: calc(1.2 * var(--u)); display: grid; grid-template-columns: calc(6.6 * var(--u)) minmax(0, 1fr) auto; align-items: center;
   height: calc(6.4 * var(--u)); }
 .linha > .igi { margin-right: calc(-3 * var(--u)); z-index: 2; }
@@ -389,3 +400,39 @@ html.rm .hud-encerrar.chamando { outline: calc(.5 * var(--u)) solid var(--amarel
 .jornal-lista .soquete { width: calc(4.2 * var(--u)); box-shadow: none; }
 .jornal-vazio { padding: calc(3 * var(--u)) 0; text-align: center; font: 800 var(--fs-corpo) / 1.3 var(--f-texto); }
 .hud[aria-busy="true"] .doca-acoes .tijolo { cursor: progress; }   /* ação anterior ainda animando */
+
+/* ===== Diplomacia: painel "Relações" (R) e "O que o mundo fez" ===== */
+.hud-relacoes { --larg: calc(122 * var(--u)); --alt-max: calc(86 * var(--u)); }
+.hud-relacoes > .painel-cab { padding-right: calc(8 * var(--u)); }
+.rel-fechar { position: absolute; right: calc(2 * var(--u)); top: calc(2 * var(--u)); z-index: 3; }
+.rel-tela { padding: calc(1 * var(--u)) calc(1.6 * var(--u)) calc(1.4 * var(--u)); }
+.rel-legenda { margin: 0 0 calc(.8 * var(--u)); font: 800 var(--fs-min) / 1.15 var(--f-texto); color: var(--tinta-suave); }
+.rel-lista { display: grid; gap: calc(.4 * var(--u)); margin: 0; padding: 0; list-style: none; }
+.rel-linha { display: grid; grid-template-columns: calc(25 * var(--u)) minmax(0, 1fr) calc(21 * var(--u)) calc(27 * var(--u)); align-items: center; gap: calc(1.2 * var(--u)); width: 100%; min-height: calc(4.7 * var(--u)); padding: calc(.3 * var(--u)) calc(1 * var(--u));
+  background: #fff; border: var(--b-fino) solid var(--tinta); border-radius: calc(1.1 * var(--u)); box-shadow: var(--sombra-chip); font: inherit; color: var(--tinta); text-align: left; cursor: pointer; }
+.rel-linha:hover { background: var(--amarelo-claro); }
+.rel-quem { display: flex; align-items: center; gap: calc(.7 * var(--u)); min-width: 0; }
+.rel-quem .forma { flex: none; width: calc(3.4 * var(--u)); height: calc(3.4 * var(--u)); }
+.rel-quem b { font: 700 var(--fs-corpo) / 1 var(--f-titulo); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rel-barra { position: relative; height: calc(2.4 * var(--u)); border: var(--b-fino) solid var(--tinta); border-radius: 99px; background: var(--placa-escura); overflow: hidden; }
+.rel-fill { position: absolute; top: 0; bottom: 0; background: var(--verde-ok); }
+.rel-linha[data-nivel^="-"] .rel-fill { background: repeating-linear-gradient(-45deg, var(--vermelho-alerta) 0 calc(.7 * var(--u)), #A3141F calc(.7 * var(--u)) calc(1.4 * var(--u))); }
+.rel-zero { position: absolute; left: 50%; top: 0; bottom: 0; width: calc(.3 * var(--u)); translate: -50% 0; background: #fff; }
+.rel-rotulo { display: flex; align-items: baseline; gap: calc(.5 * var(--u)); font: 700 var(--fs-min) / 1.05 var(--f-titulo); white-space: nowrap; }
+.rel-sinal { min-width: calc(3.2 * var(--u)); font: 900 var(--fs-min) / 1 var(--f-texto); color: #0E6A33; }
+.rel-linha[data-nivel^="-"] .rel-sinal { color: #A3141F; }
+.rel-valor { margin-left: auto; font-weight: 900; color: var(--tinta-suave); }
+.rel-selos { display: flex; flex-wrap: wrap; gap: calc(.4 * var(--u)); justify-content: flex-end; min-width: 0; }
+.rel-selo { padding: calc(.1 * var(--u)) calc(.6 * var(--u)); gap: calc(.3 * var(--u)); font-size: var(--fs-min); }
+.rel-selo .ico { width: calc(2.2 * var(--u)); }
+.rel-selo.sancao { --cor: var(--pessego-alerta); }
+.hud-reacoes { position: absolute; right: calc(7 * var(--u)); top: calc(10.8 * var(--u)); z-index: 6; width: calc(52 * var(--u)); --cor: var(--ladrilho); --cor-lado: var(--ladrilho-lado); --lado: calc(.8 * var(--u)); --raio: var(--raio-balao); padding: calc(1 * var(--u)) calc(1.4 * var(--u)) calc(1.2 * var(--u)); }
+.hud-reacoes > header { display: flex; align-items: center; justify-content: space-between; gap: calc(1 * var(--u)); margin-bottom: calc(.6 * var(--u)); }
+.hud-reacoes > header b { font: 700 var(--fs-corpo) / 1 var(--f-titulo); }
+.hud-reacoes > header .btn { min-height: 0; width: calc(4.2 * var(--u)); height: calc(4.2 * var(--u)); padding: calc(.5 * var(--u)); }
+.hud-reacoes ul { display: grid; gap: calc(.6 * var(--u)); margin: 0; padding: 0; list-style: none; }
+.hud-reacoes li { display: grid; grid-template-columns: calc(3 * var(--u)) calc(3.2 * var(--u)) minmax(0, 1fr); align-items: start; gap: calc(.6 * var(--u)); font: 800 var(--fs-min) / 1.15 var(--f-texto); }
+.hud-reacoes li:not(:has([data-equipe])) { grid-template-columns: calc(3.2 * var(--u)) minmax(0, 1fr); }
+.hud-reacoes li .forma { width: calc(3 * var(--u)); height: calc(3 * var(--u)); }
+.hud-reacoes li .ico { width: calc(3.2 * var(--u)); }
+.hud-reacoes li[data-tipo="retaliacao"] > span:last-child { color: #A3141F; }

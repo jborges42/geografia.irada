@@ -63,9 +63,9 @@
 <script src="js/relatorios.js"></script>
 <script>
 'use strict';
-const Q = new URLSearchParams(location.search), S = Simulacao, PIDS = ['brasil', 'eua', 'china', 'ue', 'india', 'russia'];
+const Q = new URLSearchParams(location.search), S = Simulacao;   // PIDS vem de js/ui.js
 gsap.ticker.lagSmoothing(0);
-const HUMANOS = ['brasil', 'ue', 'india', 'russia'];   // duas potências ficam com o computador
+const HUMANOS = ['brasil', 'ue', 'india', 'russia'];   // as outras nove ficam com o computador
 
 // Um mandato só com o computador (como teste-simulacao.mjs): eventos, decisões, COP, vezes e balanço. Devolve o rel do balanço.
 function mandato(e) {

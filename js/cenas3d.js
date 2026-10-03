@@ -159,6 +159,8 @@ const Cenas3D = (() => {
       }
       cam.position.copy(centro).addScaledVector(dir, hi); cam.lookAt(centro);
       p.camBase = p.camGeral = { pos: cam.position.clone(), alvo: centro.clone() };
+      p.ajusteGeral = { centro: centro.clone(), dir, d: hi };   // o foco do lobby anda e dá zoom a partir deste enquadramento
+      if (p.camFoco?.k) aplicarCamFoco(p);
     }
     cam.setViewOffset(w, faixaH, 0, -h * topo, w, h);   // a faixa ocupa o pedaço certo do canvas
     cam.updateProjectionMatrix();
@@ -351,7 +353,19 @@ const Cenas3D = (() => {
 
   // ---------- Estúdio fora da tela (retratos, foto, objetos): mesmo renderizador, tudo no mesmo instante ----------
   function fotografar(cena, camera, w, h) {
-    const r = obterRenderer(), antes = r.getSize(new THREE.Vector2()), pr = r.getPixelRatio();
+    const r = obterRenderer(), antes = r.getSize(new THREE.Vector2()), pr = r.getPixelRatio(), tela = r.domElement;
+    // Desempenho: se cabe no canvas atual, desenha num canto dele (viewport + tesoura) em vez de redimensioná-lo duas vezes:
+    // cada setSize realoca o framebuffer (era ~30% do custo de cada retrato no PC fraco)
+    if (w <= tela.width && h <= tela.height) {
+      r.setViewport(0, 0, w / pr, h / pr); r.setScissor(0, 0, w / pr, h / pr); r.setScissorTest(true);
+      r.setClearColor(0x000000, 0); r.clear();
+      r.render(cena, camera);
+      const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+      cv.getContext('2d').drawImage(tela, 0, tela.height - h, w, h, 0, 0, w, h);
+      r.setScissorTest(false); r.setViewport(0, 0, antes.x, antes.y);
+      if (palco && rodando) renderer.render(palco.cena, palco.camera);   // a cena visível volta no mesmo quadro
+      return cv;
+    }
     r.setPixelRatio(1); r.setSize(w, h, false);
     r.setClearColor(0x000000, 0); r.clear();
     r.render(cena, camera);
@@ -376,7 +390,8 @@ const Cenas3D = (() => {
     return out;
   }
   // Renderiza um objeto com a receita do estúdio e devolve dataURL PNG transparente (retratos, mascote, miniaturas)
-  function estudio(obj, { tamanho = 256, centroY = 0, meia = 1.6, giro = -15, elev = 8, fov = 20, contorno = true } = {}) {
+  const estudio = (obj, opcoes) => estudioCanvas(obj, opcoes).toDataURL('image/png');
+  function estudioCanvas(obj, { tamanho = 256, centroY = 0, meia = 1.6, giro = -15, elev = 8, fov = 20, contorno = true } = {}) {
     obterRenderer();
     const cena = new THREE.Scene();
     luzes(cena, { raio: meia * 3, centro: new THREE.Vector3(0, centroY, 0), sombras: false });
@@ -387,7 +402,7 @@ const Cenas3D = (() => {
     const lado = Math.min(1024, tamanho * 2);
     const cv = fotografar(cena, cam, lado, lado);
     cena.remove(obj);
-    return (contorno ? adesivo(cv, { w: tamanho, h: tamanho }) : cv).toDataURL('image/png');
+    return contorno ? adesivo(cv, { w: tamanho, h: tamanho }) : cv;
   }
 
   // Retrato do boneco (guia §7.7): 'rosto' (placar, chips), 'busto' (conselheiros, tablet, âncora) ou 'corpo' (provador)
@@ -402,7 +417,7 @@ const Cenas3D = (() => {
     // Cache com teto (o provador gera dezenas de miniaturas a cada troca): sai o retrato mais antigo, cada um ~50 KB de PNG
     if (cacheRetratos.size >= 240 && !cacheRetratos.has(chave)) cacheRetratos.delete(cacheRetratos.keys().next().value);
     if (!cacheRetratos.has(chave)) cacheRetratos.set(chave, Promise.resolve().then(() => {
-      const b = Bonecos.criar(avatar, { contorno: true });
+      const b = Bonecos.criar(avatar, { contorno: true, mesclar: false });   // desenhado uma vez só: juntar as peças não compensa
       b.posar(acao, POSE_T[acao] ?? .4, expressao);
       b.traverse(o => { if (o.isMesh) o.castShadow = false; });
       b.children.forEach(o => { if (o.isMesh && o.material?.map && o.material.transparent && o.renderOrder === -1) o.visible = false; });   // sem a bolha de sombra
@@ -412,9 +427,9 @@ const Cenas3D = (() => {
         const cx = new THREE.Box3().setFromObject(b), alt = cx.max.y - Math.min(0, cx.min.y), larg = Math.max(cx.max.x - cx.min.x, 2.4);
         quadro = { ...quadro, centroY: (cx.max.y + Math.min(0, cx.min.y)) / 2, meia: Math.max(alt / 2 + .25, larg / 2 + .2, 1.9) };
       }
-      const url = estudio(b, { tamanho, ...quadro });
+      const cv = estudioCanvas(b, { tamanho, ...quadro });
       b.descartar();
-      return url;
+      return cv.toDataURL('image/png');
     }));
     return cacheRetratos.get(chave);
   }
@@ -423,16 +438,65 @@ const Cenas3D = (() => {
   const POSES_LOBBY = ['acenar', 'bracos-cruzados', 'pular', 'palmas', 'acenar', 'girar'], ESC_LOBBY = 1.3;
   const chaveAvatar = a => JSON.stringify([a.cor, a.forma, a.pele, a.cabelo, a.penteado, a.chapeu, a.acessorio, a.humano]);
   function vagasLobby(n) { const passo = 4.1; return Array.from({ length: n }, (_, i) => { const x = (i - (n - 1) / 2) * passo; return [x, -Math.abs(x) * .12]; }); }
+  // ---------- Foco no lobby: a câmera anda e dá zoom no boneco da vez; ele sobe no pedestal e ganha o holofote, os vizinhos encolhem e escurecem ----------
+  // Só move câmera, escala, altura e luz (nenhum boneco é recriado). Sem movimento (reduzido, ?rapido): vai direto ao fim.
+  const _alvoFoco = new THREE.Vector3();
+  function aplicarCamFoco(p) {
+    const g = p.ajusteGeral, f = p.camFoco;
+    if (!g || !f) return;
+    const alvo = _alvoFoco.copy(g.centro).lerp(_v.set(f.x, 4.3, 0), f.k), cam = p.camera;
+    const razao = cam.aspect < 4.5 ? Math.min(p.razaoFoco ?? 1, 20 / (p.largura || 53)) : p.razaoFoco ?? 1;   // faixa pouco larga (celular em pé): chega mais perto
+    cam.position.copy(alvo).addScaledVector(g.dir, g.d * THREE.MathUtils.lerp(1, razao, f.k));
+    cam.lookAt(alvo);
+    p.camBase = { pos: cam.position.clone(), alvo: alvo.clone() };
+  }
+  function focoLobby(pid, { animar = true } = {}) {
+    const p = palco;
+    if (!p || p.nome !== 'lobby') return;
+    p.foco = pid || null;
+    if (p.tl && p.tl.progress() < 1) { p.tl.then(() => p.foco === (pid || null) && focoLobby(pid, { animar })); return; }   // os bonecos ainda estão caindo nos pedestais
+    const sel = pid && p.pedestais[pid], dur = REDUZ || rapido() || !animar ? 0 : .7;
+    p.tlFoco?.kill();
+    const tl = p.tlFoco = gsap.timeline();
+    p.camFoco ||= { x: 0, k: 0 };
+    const alvoCam = sel ? { x: sel.position.x, k: 1 } : { k: 0 };
+    if (dur) tl.to(p.camFoco, { ...alvoCam, duration: dur, ease: 'power2.inOut', onUpdate: () => aplicarCamFoco(p) }, 0); else { Object.assign(p.camFoco, alvoCam); aplicarCamFoco(p); }
+    const alt = (alvo, props, t = 0) => { if (dur) tl.to(alvo, { ...props, duration: dur, ease: 'power2.inOut' }, t); else Object.assign(alvo, props); };
+    for (const [id, b] of Object.entries(p.bonecos)) {
+      const ped = p.pedestais[id], eh = id === pid, s = eh ? 1.12 : pid ? .88 : 1, y0 = eh ? .55 : 0;
+      if (!ped) continue;
+      const k = s;
+      if (dur) {
+        tl.to(ped.scale, { x: k, y: k, z: k, duration: dur, ease: 'power2.inOut' }, 0).to(ped.position, { y: y0, duration: dur, ease: 'power2.inOut' }, 0)
+          .to(b.scale, { x: ESC_LOBBY * k, y: ESC_LOBBY * k, z: ESC_LOBBY * k, duration: dur, ease: 'power2.inOut' }, 0).to(b.position, { y: ped.userData.topo * k + y0, duration: dur, ease: 'power2.inOut' }, 0);
+      } else { ped.scale.setScalar(k); ped.position.y = y0; b.scale.setScalar(ESC_LOBBY * k); b.position.y = ped.userData.topo * k + y0; }
+    }
+    // quem não está em foco fica na penumbra: baixa a luz geral e acende o holofote
+    alt(p.luz.hemi, { intensity: p.base.hemi * (pid ? .22 : 1) }); alt(p.luz.chave, { intensity: p.base.chave * (pid ? .22 : 1) }); alt(p.luz.recorte, { intensity: p.base.recorte * (pid ? .2 : 1) });
+    alt(p.cena, { environmentIntensity: pid ? .06 : .35 });
+    if (p.spot) {
+      if (sel) { alt(p.spot.position, { x: sel.position.x }); alt(p.spot.target.position, { x: sel.position.x, y: 3, z: 0 }); }
+      alt(p.spot, { intensity: pid ? 170 : 0 });
+    }
+    if (sel && p.bonecos[pid] && !REDUZ) p.bonecos[pid].acao('pular');
+  }
   async function lobby(avatares = [], opcoes = {}) {
     if (palcoFundo?.nome === 'lobby' && palco?.nome === 'previa') { const p = palcoFundo; palcoFundo = null; abrir(p); }
-    if (palco?.nome === 'lobby' && !opcoes.el) return atualizarLobby(palco, avatares);
+    if (palco?.nome === 'lobby' && !opcoes.el) {
+      if (opcoes.faixa && (opcoes.faixa[0] !== palco.faixa?.[0] || opcoes.faixa[1] !== palco.faixa?.[1])) { palco.faixa = opcoes.faixa; redimensionar(); }   // a janela mudou de formato
+      return atualizarLobby(palco, avatares);
+    }
     const cena = new THREE.Scene(), camera = new THREE.PerspectiveCamera(26, 1, .5, 400);
     const vagas = vagasLobby(avatares.length);
-    luzes(cena, { raio: 16, centro: new THREE.Vector3(0, 2, 0) });
+    const luz = luzes(cena, { raio: 16, centro: new THREE.Vector3(0, 2, 0) });
     chaoDeSombra(cena);
-    const p = { nome: 'lobby', cena, camera, fundo: opcoes.fundo === undefined ? 'mesa' : opcoes.fundo, el: opcoes.el, faixa: opcoes.faixa || (opcoes.el ? [0, 1] : [.07, .58]),
+    const p = { nome: 'lobby', luz, base: { hemi: luz.hemi.intensity, chave: luz.chave.intensity, recorte: luz.recorte.intensity }, cena, camera, fundo: opcoes.fundo === undefined ? 'mesa' : opcoes.fundo, el: opcoes.el, faixa: opcoes.faixa || (opcoes.el ? [0, 1] : [.07, .58]),
       elev: 12, margem: .9, bonecos: {}, chaves: {}, pedestais: {}, vagas, avatares };
     const tl = p.tl = gsap.timeline();
+    if (!window.PC_FRACO) {   // holofote sobre quem está em foco (nasce apagado: acender é só mudar a intensidade, sem recompilar nada)
+      p.spot = new THREE.SpotLight('#FFF3C8', 0, 60, .3, .7, 1.2); p.spot.position.set(0, 18, 9);
+      cena.add(p.spot, p.spot.target);
+    }
     avatares.forEach((av, i) => {
       const [x, z] = vagas[i], ped = pedestal(av.pid);
       ped.position.set(x, 0, z); ped.rotation.y = -x * .025; cena.add(ped);
@@ -444,6 +508,7 @@ const Cenas3D = (() => {
     tijolosSoltos(cena, [[-ponta - 2.3, 1.6, 1, .5], [-ponta - 1.9, 2.9, 0, .2], [ponta + 2.2, 1.9, 0, -.4], [ponta + 2.5, .6, 1, 1.1]],
       [AMARELO, '#FFF4DC', AMARELO, '#FFF4DC']);
     const largura = Math.max(10, vagas.length * 4.1);
+    p.largura = largura; p.razaoFoco = THREE.MathUtils.clamp(40 / largura, .3, 1);   // zoom do foco: cabem uns 3 pedestais
     p.caixa = new THREE.Box3(new THREE.Vector3(-largura / 2 - 1.6, 0, -2), new THREE.Vector3(largura / 2 + 1.6, 6.6, 2));
     let proxima = 3;
     p.tique = (dt, t) => {   // de vez em quando, um boneco faz a pose da personalidade (um foco por vez)
@@ -477,7 +542,7 @@ const Cenas3D = (() => {
       p.bonecos[av.pid]?.descartar();
       const b = colocarNoLobby(p, av, i, tl, 0);
       tl.call(() => som('pop'), null, 0);
-      if (b) b.acao('surpreso');
+      if (b) { b.acao('surpreso'); if (p.foco) tl.call(() => focoLobby(p.foco, { animar: false }), null, .5); }
     });
     p.tl = tl;
     return fimTl(tl);
@@ -565,7 +630,8 @@ const Cenas3D = (() => {
     }
   }, 512, 256);
 
-  const SALA = { raio: 9.6, mesaIn: 2.3, mesaOut: 3.55, mesaY: 2.15, assento: 5.4, telaoZ: -8.4, esc: 1.3 };
+  // assentos em dois arcos (13 delegações): fila da frente (assento, mais perto da mesa) e fila de trás (assentoAtras, em pedestal mais alto)
+  const SALA = { raio: 11.6, mesaIn: 2.3, mesaOut: 3.55, mesaY: 2.15, assento: 5.4, assentoAtras: 8.1, telaoZ: -10.4, esc: 1.3 };
   function montarSala(cena, emergencia) {
     const pc = P(), sala = new THREE.Group(); cena.add(sala);
     // plataforma do diorama: lateral índigo, fileira de pinos creme na borda, piso xadrez creme
@@ -623,14 +689,16 @@ const Cenas3D = (() => {
     chaoDeSombra(cena, 120, .25);
     const { sala, globo } = montarSala(cena, emergencia);
     contato(cena, 0, 0, SALA.raio, SALA.raio, .003);
-    const n = avatares.length, angulos = Array.from({ length: n }, (_, i) => THREE.MathUtils.degToRad(n === 1 ? -90 : -160 + i * 140 / (n - 1)));
+    // até 6 delegações cabem num arco só; com mais, as pares ficam atrás (arco maior, pedestal mais alto) e as ímpares na frente, intercaladas
+    const n = avatares.length, duas = n > 7, abertura = duas ? 150 : 140, ini = duas ? -165 : -160;
+    const angulos = Array.from({ length: n }, (_, i) => THREE.MathUtils.degToRad(n === 1 ? -90 : ini + i * abertura / (n - 1)));
     const p = { nome: 'salaONU', cena, camera, fundo: opcoes.fundo === undefined ? (emergencia ? 'crise' : 'mesa') : opcoes.fundo, el: opcoes.el,
       faixa: opcoes.faixa || [0, 1], elev: 27, margem: .94, bonecos: {}, assentos: {}, votosMostrados: [], globo };
     const tl = p.tl = gsap.timeline();
     const permanente = pid => { try { return !!POTENCIAS.find(x => x.id === pid)?.permanente; } catch { return false; } };
     avatares.forEach((av, i) => {
-      const a = angulos[i], R = SALA.assento, x = Math.cos(a) * R, z = Math.sin(a) * R, olha = Math.atan2(-x, -z);
-      const ped = pedestal(av.pid, { raio: .95, altura: .45 });
+      const atras = duas && i % 2 === 0, a = angulos[i], R = atras ? SALA.assentoAtras : SALA.assento, x = Math.cos(a) * R, z = Math.sin(a) * R, olha = Math.atan2(-x, -z);
+      const ped = pedestal(av.pid, { raio: .95, altura: atras ? 1.15 : .45 });
       ped.position.set(x, 1.2, z); ped.rotation.y = olha; sala.add(ped);
       const b = Bonecos.criar(av); b.scale.setScalar(SALA.esc);
       b.position.set(x, 1.2 + ped.userData.topo, z); b.rotation.y = olha;
@@ -639,6 +707,7 @@ const Cenas3D = (() => {
       // plaquinha da delegação sobre a mesa (tijolo na cor, forma branca) + pino amarelo de quem tem veto (P5)
       const pl = new THREE.Group(); const rp = (SALA.mesaIn + SALA.mesaOut) / 2 + .35;
       pl.position.set(Math.cos(a) * rp, SALA.mesaY + .45, Math.sin(a) * rp); pl.rotation.y = olha; sala.add(pl);
+      if (duas) pl.scale.setScalar(.55);   // 13 plaquinhas no mesmo anel: cada uma encolhe para não encostar na vizinha
       const t = malha(P().bloco(2, .6, 1), P().plastico(equipe(av.pid).cor, .3), pl);
       t.add(new THREE.Mesh(P().casca(t.geometry, .025), P().tinta(TINTA)));
       if (equipe(av.pid).forma) {
@@ -649,12 +718,15 @@ const Cenas3D = (() => {
       cair(tl, b, .1 + i * .1, b.position.y, { som: 'pop' });
     });
     const pids = avatares.map(a => a.pid);
-    [-1, 1].forEach(s => [0, 1, 2].forEach(k => {
-      const pid = pids[(s < 0 ? k : k + 3) % Math.max(1, pids.length)] || 'brasil', bd = bandeirola(pid);
-      bd.position.set(s * (6.6 + k * 1.05), 1.2, -6.6 + k * 1.9); bd.rotation.y = -s * (.5 + k * .18);
+    // bandeirolas nos cantos da frente (as potências ao longo da lista); com duas filas de assentos, o fundo fica livre
+    const flag = duas ? [[-1, 0], [1, 0], [-1, 1], [1, 1]] : [-1, 1].flatMap(s => [0, 1, 2].map(k => [s, k]));
+    flag.forEach(([s, k], j) => {
+      const pid = pids[(duas ? j * 3 : (s < 0 ? k : k + 3)) % Math.max(1, pids.length)] || PIDS[0], bd = bandeirola(pid);
+      if (duas) { bd.position.set(s * (10.1 - k * .3), 1.2, 1.4 + k * 2.6); bd.rotation.y = -s * (.5 + k * .18); }
+      else { bd.position.set(s * (6.6 + k * 1.05), 1.2, -6.6 + k * 1.9); bd.rotation.y = -s * (.5 + k * .18); }
       sala.add(bd);
-    }));
-    p.caixa = new THREE.Box3(new THREE.Vector3(-8.6, 1, -9), new THREE.Vector3(8.6, 7.8, 6.5));
+    });
+    p.caixa = duas ? new THREE.Box3(new THREE.Vector3(-10.4, 1, -11.6), new THREE.Vector3(10.4, 8.6, 7)) : new THREE.Box3(new THREE.Vector3(-8.6, 1, -9), new THREE.Vector3(8.6, 7.8, 6.5));
     p.tique = dt => { if (!REDUZ) globo.rotation.y += dt * .25; };
     abrir(p);
     return fimTl(tl);
@@ -837,8 +909,9 @@ const Cenas3D = (() => {
     });
     // 4º a 6º: na mesa, aplaudindo ("também brilharam" é o HTML de quem chama)
     pids.slice(3).forEach((pid, k) => {
-      const x = (k % 2 ? 1 : -1) * (7.6 + Math.floor(k / 2) * 2.6), z = -1.2;
-      const ped = pedestal(pid, { raio: 1.05, altura: .5 }); ped.position.set(x, 0, z); cena.add(ped);
+      // 4º em diante: dois lados, em colunas de duas fileiras (a de trás num pedestal mais alto)
+      const trasF = Math.floor(k / 2) % 2, x = (k % 2 ? 1 : -1) * (7.6 + Math.floor(k / 4) * 2.6), z = -1.2 - trasF * 2.4;
+      const ped = pedestal(pid, { raio: 1.05, altura: .5 + trasF * .7 }); ped.position.set(x, 0, z); cena.add(ped);
       contato(cena, x, z, 1.1, 1.1);
       const b = Bonecos.criar(avDe(pid)); b.scale.setScalar(1.2); b.position.set(x, ped.userData.topo, z); b.rotation.y = -Math.sign(x) * .3; b.visible = false; cena.add(b);
       p.bonecos[pid] = b;
@@ -846,7 +919,8 @@ const Cenas3D = (() => {
       tl.call(() => b.acao('palmas', 0), null, 7.2);
     });
     tl.to({}, { duration: 1.2 }, 8.4);
-    p.caixa = new THREE.Box3(new THREE.Vector3(pids.length > 3 ? -10.5 : -6, 0, -2), new THREE.Vector3(pids.length > 3 ? 10.5 : 6, 11, 2));
+    const meia = pids.length > 9 ? 13.6 : pids.length > 3 ? 10.5 : 6;
+    p.caixa = new THREE.Box3(new THREE.Vector3(-meia, 0, -2), new THREE.Vector3(meia, 11, 2));
     p.tique = dt => chuvaAtiva?.tique(dt);
     p.limpar = () => chuvaAtiva?.parar();
     abrir(p);
@@ -859,7 +933,7 @@ const Cenas3D = (() => {
     const luz = luzes(cena, { raio: 14, centro: new THREE.Vector3(0, 2, 0), chave: vitoria ? 2.4 : 1.7 });
     if (!vitoria) { luz.hemi.color.set('#C9D2E8'); luz.recorte.intensity = .9; }
     chaoDeSombra(cena, 100, .22);
-    const n = avatares.length, passo = 2.7, largura = Math.max(1, n) * passo + 1.2;
+    const n = avatares.length, duas = n > 7, passo = duas ? 1.5 : 2.7, largura = Math.max(1, n) * passo + (duas ? 3.4 : 1.2);   // 13 delegações: duas fileiras intercaladas
     const palcoT = malha(pc.bloco(Math.round(largura), .4, 4), pc.plastico(vitoria ? CREME : '#D5DAE6', .32), cena, 0, 0, 0);
     palcoT.add(new THREE.Mesh(pc.casca(palcoT.geometry, .03), pc.tinta(TINTA)));
     contato(cena, 0, 0, largura / 2 + .4, 2.4);
@@ -868,7 +942,7 @@ const Cenas3D = (() => {
     const tl = p.tl = gsap.timeline();
     let chuvaAtiva = null, globo = null;
     avatares.forEach((av, i) => {
-      const b = Bonecos.criar(av); b.position.set((i - (n - 1) / 2) * passo, .6, .4); b.visible = false; cena.add(b);
+      const b = Bonecos.criar(av); b.position.set((i - (n - 1) / 2) * passo, .6, duas && i % 2 ? -1.8 : .4); b.visible = false; cena.add(b);
       p.bonecos[av.pid] = b;
       cair(tl, b, .1 + i * .1, .6, { som: 'pop' });
       tl.call(() => (vitoria ? b.acao(av.comemoracao || 'comemorar') : b.acao('triste', 0)), null, .9 + i * (vitoria ? .14 : .08));
@@ -962,7 +1036,7 @@ const Cenas3D = (() => {
   function renderizador() { return obterRenderer(); }
 
   return {
-    lobby, previa, salaONU, votos, fala, revelacao, podio, fim, foto, retrato, esconder, pular, ancora,
+    lobby, focoLobby, previa, salaONU, votos, fala, revelacao, podio, fim, foto, retrato, esconder, pular, ancora,
     graficos, estudio, abrir, fechar, renderizador, luzes, chaoDeSombra,
     get ativa() { return palco?.nome || null; },
     get palco() { return palco; },
