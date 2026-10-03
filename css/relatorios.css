@@ -5,7 +5,7 @@
 /* =====================================================================================================
    GRÁFICOS (Relatorios.linha / Relatorios.barras): <figure> com SVG, legenda e tabela alternativa
    ===================================================================================================== */
-.rel-fig { display: grid; gap: calc(.8 * var(--u)); margin: 0; min-width: 0; }
+.rel-fig { display: grid; grid-template-columns: minmax(0, 1fr); gap: calc(.8 * var(--u)); margin: 0; min-width: 0; }
 .rel-svg { display: block; width: 100%; height: auto; overflow: visible; }
 .rel-svg.linhas text { font-family: var(--f-texto); font-weight: 900; font-size: 26px; fill: var(--tinta); font-variant-numeric: tabular-nums; }
 .rel-svg .eixo { font-size: 24px; fill: var(--tinta-suave); }
@@ -118,14 +118,14 @@
 .rb-nota > .ico { width: calc(3.2 * var(--u)); }
 
 /* ---------- passo 3: nações ---------- */
-.rb-nacoes-cab { display: grid; grid-template-columns: calc(4 * var(--u)) calc(6.8 * var(--u)) calc(15 * var(--u)) auto calc(11 * var(--u)) minmax(0, 1fr) calc(10 * var(--u));
+.rb-nacoes-cab { display: grid; grid-template-columns: calc(4 * var(--u)) calc(6.8 * var(--u)) calc(17.4 * var(--u)) auto calc(11 * var(--u)) minmax(0, 1fr) calc(10 * var(--u));
   column-gap: calc(1.1 * var(--u)); padding: 0 calc(1.2 * var(--u)) calc(.5 * var(--u)) calc(2 * var(--u)); font: 700 var(--fs-min) / 1 var(--f-titulo); color: var(--tinta-suave); }
 .rb-nacoes-cab.sem-placar { grid-template-columns: calc(6.8 * var(--u)) calc(17 * var(--u)) auto calc(11 * var(--u)) minmax(0, 1fr); }
 .rb-nacoes-cab .dir { text-align: right; }
 .rb-cab-chips { display: flex; gap: calc(.5 * var(--u)); }
 .rb-cab-chips > span { width: calc(11.4 * var(--u)); text-align: center; white-space: nowrap; }
 .rb-nacoes { display: grid; grid-auto-rows: 1fr; gap: calc(.8 * var(--u)); height: calc(100% - 8.4 * var(--u)); margin: 0 0 calc(1 * var(--u)); padding: 0; list-style: none; }
-.rb-nacao { --lado: calc(.6 * var(--u)); position: relative; display: grid; grid-template-columns: calc(4 * var(--u)) calc(6.8 * var(--u)) calc(15 * var(--u)) auto calc(11 * var(--u)) minmax(0, 1fr) calc(10 * var(--u));
+.rb-nacao { --lado: calc(.6 * var(--u)); position: relative; display: grid; grid-template-columns: calc(4 * var(--u)) calc(6.8 * var(--u)) calc(17.4 * var(--u)) auto calc(11 * var(--u)) minmax(0, 1fr) calc(10 * var(--u));
   align-items: center; column-gap: calc(1.1 * var(--u)); min-height: 0; padding: 0 calc(1.2 * var(--u)) 0 calc(.8 * var(--u));
   background: #fff; border: var(--b-fino) solid var(--tinta); border-left: calc(1.2 * var(--u)) solid var(--cor); border-radius: var(--raio);
   box-shadow: 0 calc(.45 * var(--u)) 0 var(--tinta); }
@@ -368,8 +368,9 @@
 
 /* quem fez o quê */
 .rf-quem-fez { display: grid; grid-template-columns: minmax(0, 92fr) minmax(0, 68fr); gap: calc(2.4 * var(--u)); height: 100%; min-height: 0; }
-.rf-contrib { --cor: #fff; --cor-lado: var(--ladrilho-lado); --lado: calc(.7 * var(--u)); display: grid; grid-template-rows: auto minmax(0, 1fr); gap: calc(2.4 * var(--u)); padding: calc(1.2 * var(--u)) calc(2 * var(--u)) calc(1.4 * var(--u)); min-height: 0; }
-.rf-metricas { padding-top: calc(.8 * var(--u)); grid-auto-columns: 1fr; }
+.rf-contrib { --cor: #fff; --cor-lado: var(--ladrilho-lado); --lado: calc(.7 * var(--u)); display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: calc(2.4 * var(--u)); padding: calc(1.2 * var(--u)) calc(2 * var(--u)) calc(1.4 * var(--u)); min-height: 0; }
+.rf-metricas { display: flex; flex-wrap: wrap; gap: calc(.8 * var(--u)); padding-top: calc(.8 * var(--u)); min-width: 0; }
+.rf-metricas > [role="tab"] { flex: 1 1 auto; }
 .rf-metricas [role="tab"] { font-size: var(--fs-min); padding: 0 calc(.8 * var(--u)); }
 .rf-contrib [role="tabpanel"] { display: grid; align-content: center; min-height: 0; }
 
@@ -437,7 +438,7 @@
 /* =====================================================================================================
    TELAS MENORES (1280×720, tablet deitado): os mesmos layouts encolhem com --u; só o que vaza muda
    ===================================================================================================== */
-@media (max-aspect-ratio: 3/2) {
+@media (max-aspect-ratio: 3/2), (max-width: 1250px) {
   .rf-abas [role="tab"] span { display: none; }
   .rf-abas [role="tab"][aria-selected="true"] span { display: inline; }
 }
@@ -460,3 +461,49 @@
 [data-k="comercio"] { --tom: var(--cat-economia-lado); } [data-k="cooperacao"] { --tom: var(--cat-diplomacia-lado); }
 [data-k="temperatura"] { --tom: var(--cat-seguranca-lado); } [data-k="tensao"] { --tom: var(--cat-ciencia-lado); }
 [data-k="deslocados"] { --tom: var(--cat-pessoas-lado); } [data-k="energia"] { --tom: var(--cat-natureza-lado); }
+
+/* ===== Balanço: passo Diplomacia (relatorio.diplomacia) ===== */
+.rb-diplo { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1fr); gap: calc(2 * var(--u)); align-items: start; padding: 0 calc(.4 * var(--u)) calc(1 * var(--u)) 0; }
+.rb-diplo > .peca { --cor: #fff; --cor-lado: var(--ladrilho-lado); --lado: calc(.7 * var(--u)); padding: calc(1.2 * var(--u)) calc(1.6 * var(--u)) calc(1.4 * var(--u)); }
+.rb-diplo h3 { display: flex; align-items: center; gap: calc(.6 * var(--u)); margin: 0 0 calc(.6 * var(--u)); font: 700 var(--fs-cartao) / 1 var(--f-titulo); }
+.rb-diplo h3 .ico { width: calc(3.6 * var(--u)); }
+.rb-diplo ul { display: grid; gap: calc(.7 * var(--u)); margin: 0; padding: 0; list-style: none; }
+.rb-diplo li { font: 800 var(--fs-min) / 1.15 var(--f-texto); }
+.rb-diplo svg.forma { width: calc(3 * var(--u)); height: calc(3 * var(--u)); }
+.rb-diplo .rb-rel { display: grid; grid-template-columns: calc(7 * var(--u)) minmax(0, 1fr) auto; align-items: center; gap: calc(.8 * var(--u)); padding: calc(.5 * var(--u)) calc(.9 * var(--u)); background: var(--ladrilho-2); border-radius: var(--raio-chip); }
+.rb-rel-par { display: flex; }
+.rb-rel-par > span + span { margin-left: calc(-.8 * var(--u)); }
+.rb-rel-txt { display: grid; gap: calc(.1 * var(--u)); min-width: 0; }
+.rb-rel-txt b { font: 700 var(--fs-min) / 1.1 var(--f-titulo); }
+.rb-rel-txt small { font: 800 var(--fs-min) / 1.1 var(--f-texto); color: var(--tinta-suave); }
+.rb-rel .num { font: 900 var(--fs-min) / 1 var(--f-texto); }
+.rb-diplo .sobe { color: var(--verde-texto); } .rb-diplo .desce { color: var(--vermelho-texto); }
+.rb-diplo .rb-cont { display: grid; grid-template-columns: calc(3 * var(--u)) minmax(0, 1fr) auto; align-items: center; gap: calc(.8 * var(--u)); }
+.rb-diplo .rb-inc { display: grid; grid-template-columns: calc(3.6 * var(--u)) minmax(0, 1fr); align-items: start; gap: calc(.8 * var(--u)); }
+.rb-diplo .rb-inc .ico { width: calc(3.6 * var(--u)); }
+.rb-diplo .rb-inc[data-tipo="alianca_rompida"] b, .rb-diplo .rb-inc[data-tipo="incidente"] b, .rb-diplo .rb-inc[data-tipo="guerra_comercial"] b { color: var(--vermelho-texto); }
+.rb-diplo .rb-inc[data-tipo="cooperacao"] b { color: var(--verde-texto); }
+.rb-diplo .rb-calmo { margin: calc(.8 * var(--u)) 0 0; }
+
+/* legenda das 13 potências nos gráficos: forma + cor + nome (+ valor) */
+.rel-leg { display: flex; flex-wrap: wrap; justify-content: center; gap: calc(.5 * var(--u)) calc(1.2 * var(--u)); margin: calc(.8 * var(--u)) 0 0; padding: 0; list-style: none; font: 800 var(--fs-min) / 1 var(--f-texto); }
+.rel-leg li { display: inline-flex; align-items: center; gap: calc(.4 * var(--u)); white-space: nowrap; }
+.rel-leg svg.forma { width: calc(2.6 * var(--u)); height: calc(2.6 * var(--u)); }
+.rel-leg b { font: 700 var(--fs-min) / 1 var(--f-titulo); }
+.rel-leg .num { color: var(--tinta-suave); }
+
+.rb-6 .rb-passos .ico { display: none; }
+
+/* 13 nações: linhas baixas e a lista rola (o computador perde a linha do "quem joga") */
+.rb-nacoes.denso { grid-auto-rows: minmax(calc(5.2 * var(--u)), 1fr); gap: calc(.45 * var(--u)); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; padding: 0 calc(.6 * var(--u)) calc(.6 * var(--u)) 0; }
+.rb-nacoes.denso .rb-nacao { min-height: calc(5.2 * var(--u)); }
+.rb-nacoes.denso .rb-nacao .retrato { --tam: calc(4.2 * var(--u)); }
+.rb-nacoes.denso .rb-nome b { font-size: calc(2.5 * var(--u)); }
+.rb-nacoes.denso .rb-nacao[data-humano="false"] .rb-nome small { display: none; }
+.rb-nacoes.denso .rb-chip { height: calc(3.9 * var(--u)); }
+.rb-nacoes.denso .rb-merc, .rb-nacoes.denso .rb-parc { overflow: hidden; white-space: nowrap; }
+.rb-nacoes.denso :is(.rb-parc, .rb-igi) b { font-size: var(--fs-corpo); }
+.rb-nacoes.denso :focus-visible { outline: none; }
+.rb-nacoes.denso .rb-nacao[data-humano="true"] { min-height: calc(6.6 * var(--u)); }
+.rb-nacoes.denso .rb-merc-l { flex-wrap: nowrap; overflow: hidden; }
+.rb-cab-chips > span { font-size: calc(var(--fs-min) * .92); letter-spacing: -.02em; }

@@ -191,6 +191,13 @@ Estado `e` é JSON puro (salva com `JSON.stringify`). Funções:
 - Fim: `verificarFim(e)` · `resultado(e)` → `{ fim, placar, metas, vencedor | vitoria, blocos, infiltrado, contribuicoes, missoes, selos }` ·
   `placar(e)` · `metas(e)` · `igi(e, pid)` · `selos(e, pid)` · `emissoesDe(p)` · `parceirosDe(e, pid)` · `liderancas(e)` · `nome(id)`
 - `mudancas` = `[{ quem, v, antes, depois, motivo }]`: a interface mostra números saltando e o porquê.
+- Diplomacia (13 potências, relações −100..+100; DESIGN §5.6): `relacao(e, a, b)` · `rotuloRelacao(v)` → `{ texto: 'Aliada'|'Amiga'|'Cordial'|'Fria'|'Tensa'|'Hostil', nivel }` ·
+  `relacoesDe(e, pid)` → `[{ id, valor, rotulo, aliada, sancionada, comercio }]` (do maior ao menor) · `metaCop(e)` (pontos mínimos na COP).
+  `jogarCarta` devolve também `reacoes: [{ quem, para?, tipo: 'relacao'|'aliados'|'apoio'|'furaram'|'retaliacao'|'corrida', texto }]`,
+  `relacoes: [{ a, b, antes, depois }]` e, nas cartas de acordo/aliança, `aceita`; em `mudancas` entram `{ quem: a, v: 'relacao', de: b, antes, depois, motivo }`.
+  `balanco` devolve `diplomacia: { relacoes: [{ a, b, antes, depois, motivo }], contagio: [{ de, para, valor }], incidentes: [{ tipo, a, b, texto }] }`.
+  Cartas com alvo potência: `cupula_bilateral`, `acordo_bilateral`, `exercicio_conjunto`, `espionagem`, `embargo_tecnologico` (além de sanções, tarifas e aliança); o campo `diplomacia` de cada carta (conteudo/politicas.js) diz como o mundo reage.
+  Partida salva com `estado.versao < 3` (6 potências) é descartada ao carregar.
 - `e.historico` = foto de cada ano (global e potências) para os gráficos; `e.manchetes` = Jornal Mundial;
   `e.bncc` = contagem de habilidades trabalhadas; `e.construcoes` = `[{ carta, potencia, alvo, ano }]` (o mundo 3D
   monta um objeto por ação e reconstrói tudo ao carregar uma partida salva).
@@ -198,7 +205,7 @@ Estado `e` é JSON puro (salva com `JSON.stringify`). Funções:
 ## Conteúdo (formatos)
 
 - `conteudo/dilemas.js`: `const DILEMAS = [{ id, titulo, texto, icone, conceito, local?, condicoes?, potencias?, bncc, opcoes: [{ texto, resumo, categoria, efeitos }] }]` (formato final no cabeçalho do arquivo).
-- `conteudo/fichas.js`: `const FICHAS = { [id]: { resumo, fatos: [{ texto, fonte }] } }` para as 6 potências e os 33 territórios
+- `conteudo/fichas.js`: `const FICHAS = { [id]: { resumo, fatos: [{ texto, fonte }] } }` para as 13 potências e os 32 territórios (a Antártida incluída)
   (potências também: `emissoesPerCapita`, `emissoesHistoricas` com fonte, para não culpar ninguém de forma simplista).
 - `conteudo/manual.js`: `const MANUAL = [{ id, titulo, icone, html }]` (com marcadores `{{colapso.temperatura}}` etc.,
   trocados pelos valores de `Simulacao.PARAM`) e `const GLOSSARIO = [{ termo, definicao }]`.
@@ -212,6 +219,7 @@ Estado `e` é JSON puro (salva com `JSON.stringify`). Funções:
 - Eventos: `escolha = { tipo: 'decisao', opcoes: [{ texto, resumo, categoria }] }` — todas as potências escolhem um índice ·
   `resolverDecisao(e, idEvento, local, { pid: indice })` → `{ mudancas, manchetes: [texto] }` · `iaDecisao(e, pid, idEvento)` → índice.
 - Mediação: `chanceMediacao(e, pid, alvo)` → `{ chance, fatores: [{ texto, valor }] }` (prévia na tela); `jogarCarta` não recebe `acertou`.
+- Relações bilaterais: efeitos `rel.china`, `rel.alvo`, `rel.local`, `rel.rivais`, `rel.aliados`, `rel.todos` (dilemas e decisões de eventos) e `rel.china.eua` (par explícito, em eventos); o motor aplica em `efeitoRelacao` e a relação de fábrica vem de `RELACOES` em `conteudo/potencias.js` (veja DESIGN §5.6).
 - `categoria` ∈ diplomacia, economia, natureza, seguranca, pessoas, ciencia (cor da categoria e conselheiro com o chapéu do tema).
 - Interface: `Dilemas.vez(e, pid)` → Promise; `Dilemas.mostrarIA(e, pid, { id, opcao })` → Promise curta; data-teste `opcao-<n>`.
 - Saem do motor: temasDoBriefing, registrarBriefing, registrarDesafio, ESPECIALIDADE, resolverDesinformacao, especialista,

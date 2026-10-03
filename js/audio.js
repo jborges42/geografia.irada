@@ -312,15 +312,20 @@ const Som = (() => {
     ultimoTique = t0;
     const alvoDuck = discurso || t0 < abaixarAte ? .4 : 1;   // ducking: desce em 0,15 s, volta em 0,8 s
     duck = alvoDuck < duck ? Math.max(alvoDuck, duck - dt * 4) : Math.min(alvoDuck, duck + dt * .75);
+    let ocupado = duck !== alvoDuck;
     for (const tr of Object.values(TRILHAS)) {
       const pronto = !tr.el || tr.el.readyState >= 3 || tr.alvo < tr.p;   // conexão lenta: o fade só sobe quando o áudio chega
       if (t0 >= tr.inicio && tr.p !== tr.alvo && pronto) tr.p = tr.alvo > tr.p ? Math.min(tr.alvo, tr.p + dt * tr.vel) : Math.max(tr.alvo, tr.p - dt * tr.vel);
+      if (tr.p !== tr.alvo || t0 < tr.inicio) ocupado = true;
       const quer = (tr.p > 0 || (tr.alvo > 0 && t0 >= tr.inicio)) && ganhoMusica() > 0 && (tr.el || tr.ganho);
       if (quer && !tr.tocando) comecar(tr);
       else if (!quer && tr.tocando) pausar(tr, tr.alvo === 0);
       if (tr.tocando) aplicar(tr);
     }
+    return ocupado;
   }
+  // Desempenho: 100 Hz só durante fades e ducking; parado, 20 Hz (antes eram 100 despertares por segundo o jogo todo)
+  const relogioMix = () => setTimeout(relogioMix, tique() ? 10 : 50);
   // Tempos de troca (s): [saída da trilha atual, entrada da nova]
   function tempos(de, para) {
     if (para === 'assembleia') return [.3, 1];   // depois do alarme
@@ -387,7 +392,7 @@ const Som = (() => {
     removeEventListener('keydown', destravar, true);
     if (Ctx) { try { ctx = new Ctx(); montarMixagem(); } catch { ctx = null; } }
     ultimoTique = agora();
-    setInterval(tique, 10);
+    relogioMix();
     Object.keys(VINHETAS).forEach(n => {
       if (!tocaM4a) { FALHOU['vinheta-' + n] = true; return; }
       const el = VINH[n] = new Audio(`som/vinheta-${n}.m4a`);

@@ -95,7 +95,6 @@
 <script>
 'use strict';
 const Q = new URLSearchParams(location.search), S = Simulacao;
-const PIDS = POTENCIAS.map(p => p.id);
 const humanosPadrao = (Q.get('humanos') ?? 'brasil,china').split(',').filter(p => PIDS.includes(p));
 let e = null, tocando = false;
 

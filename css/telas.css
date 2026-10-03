@@ -105,12 +105,30 @@
 .modo[aria-pressed="true"] .modo-ok { opacity: 1; scale: 1; }
 .modo[aria-pressed="true"]:focus-visible { --anel: var(--anel-foco); }
 
-/* passo 2: vagas embaixo de cada boneco (alinhadas pelo Cenas3D.ancora; sem 3D, em fila no centro) */
-.lob-vagas { position: absolute; left: 0; right: 0; top: calc(48.8 * var(--u)); display: flex; justify-content: center; align-items: flex-start; gap: calc(1.4 * var(--u)); }
-.lob-vagas.alinhadas { display: block; }
-.vaga { width: var(--larg-vaga, calc(18.4 * var(--u))); container-type: inline-size; }
-.lob-vagas.alinhadas .vaga { position: absolute; top: 0; }
-.vaga-peca { --cor: var(--ladrilho); --cor-lado: var(--ladrilho-lado); --raio: calc(1.6 * var(--u)); --lado: calc(1 * var(--u));
+/* passo 2: carrossel de nações (13 potências: uma em destaque, as vizinhas menores; fileira de fichas para pular direto) */
+.lob-vagas { position: absolute; left: 0; right: 0; top: calc(31.6 * var(--u)); bottom: calc(26.2 * var(--u)); display: flex; flex-direction: column; gap: calc(1.2 * var(--u)); }
+.car-fichas { flex: none; display: flex; justify-content: center; align-items: flex-end; gap: calc(.8 * var(--u)); padding-top: calc(.8 * var(--u)); }
+.ficha-mini { --lado: calc(.5 * var(--u)); --raio: calc(1.2 * var(--u)); --sobe: 0px; display: grid; justify-items: center; align-content: center; gap: calc(.2 * var(--u)); width: calc(6.8 * var(--u)); height: calc(7.4 * var(--u));
+  padding: 0; cursor: pointer; translate: 0 calc(-1 * var(--sobe)); transition: translate var(--t-solta) var(--c-quique), filter var(--t-passa), opacity var(--t-passa); }
+.ficha-forma { width: calc(3.8 * var(--u)); height: calc(3.8 * var(--u)); }
+.ficha-quem { display: grid; place-items: center; min-width: calc(3.4 * var(--u)); height: calc(2.5 * var(--u)); padding: 0 calc(.3 * var(--u)); border-radius: 99px; background: #fff; border: var(--b-fino) solid var(--tinta); }
+.ficha-quem .ico { width: calc(2.1 * var(--u)); height: calc(2.1 * var(--u)); }
+.ficha-mini[data-humano="false"] { filter: saturate(.3) brightness(1.08); opacity: .8; }
+.ficha-mini:hover { --sobe: calc(.3 * var(--u)); }
+.ficha-mini[aria-selected="true"] { --sobe: calc(.9 * var(--u)); opacity: 1; filter: none; outline: calc(.55 * var(--u)) solid var(--amarelo); outline-offset: calc(.25 * var(--u)); }
+.ficha-mini:focus-visible { outline: var(--anel-foco-largura, calc(.6 * var(--u))) solid #fff; outline-offset: calc(.35 * var(--u)); box-shadow: 0 0 0 calc(1.1 * var(--u)) var(--tinta); }
+.car-palco { position: relative; flex: 1; min-height: 0; }
+.car-trilho { height: 100%; display: flex; align-items: center; gap: calc(44 * var(--u)); overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain;
+  padding: calc(1.6 * var(--u)) calc(50% - 50 * var(--u)) calc(2 * var(--u)); touch-action: pan-x pinch-zoom; }
+.car-trilho::-webkit-scrollbar { display: none; }
+.car-seta { --lado: calc(.7 * var(--u)); --raio: 50%; position: absolute; top: 50%; z-index: 3; display: grid; place-items: center; width: calc(7 * var(--u)); height: calc(7 * var(--u)); padding: 0; margin-top: calc(-3.8 * var(--u)); cursor: pointer;
+  --cor: var(--amarelo); --cor-lado: var(--amarelo-lado); }
+.car-seta .glifo { width: 62%; height: 62%; }
+.car-ant { left: calc(3 * var(--u)); } .car-prox { right: calc(3 * var(--u)); }
+.car-seta:hover { filter: brightness(1.06); } .car-seta:active { translate: 0 calc(.4 * var(--u)); }
+.vaga { flex: 0 0 calc(100 * var(--u)); height: 100%; scroll-snap-align: center; scroll-snap-stop: always; container-type: inline-size; scale: .8; opacity: .55; cursor: pointer; transition: scale var(--t-solta) var(--c-quique), opacity var(--t-passa); }
+.vaga[data-atual="true"] { scale: 1; opacity: 1; cursor: default; }
+.vaga-peca { --cor: var(--ladrilho); --cor-lado: var(--ladrilho-lado); --raio: calc(1.6 * var(--u)); --lado: calc(1 * var(--u)); height: 100%; box-sizing: border-box;
   display: flex; flex-direction: column; gap: calc(.7 * var(--u)); padding: calc(.5 * var(--u)) calc(.5 * var(--u)) calc(.7 * var(--u)); }
 .vaga-aba { --cor-lado: initial; display: flex; align-items: center; gap: calc(.6 * var(--u)); min-height: calc(5.2 * var(--u)); padding: 0 calc(.5 * var(--u)) 0 calc(.9 * var(--u));
   background: linear-gradient(color-mix(in oklab, var(--cor), #fff 22%), var(--cor) 60%); border: var(--b-fino) solid var(--tinta); border-radius: calc(1 * var(--u));
@@ -118,7 +136,20 @@
 .vaga-aba[data-equipe] { box-shadow: inset 0 calc(.3 * var(--u)) 0 rgb(255 255 255 / .45), inset 0 calc(-.5 * var(--u)) 0 var(--cor-lado); }
 .vaga-forma { width: calc(2.8 * var(--u)); height: calc(2.8 * var(--u)); }
 .vaga-pais { flex: 1; min-width: 0; margin: 0; font: 700 var(--fs-corpo) / 1 var(--f-titulo); white-space: nowrap; }
-.vaga-corpo { display: grid; grid-template-columns: minmax(0, 1fr); gap: calc(.8 * var(--u)); }
+.vaga-pos { margin-left: auto; --cor: #fff; color: var(--tinta); }
+.vaga-corpo { flex: 1; min-height: 0; display: grid; grid-template-columns: calc(10 * var(--u)) minmax(0, 1fr) calc(22 * var(--u)); gap: calc(1.4 * var(--u)); align-items: start; padding: calc(.4 * var(--u)) calc(.8 * var(--u)) 0; }
+.vaga-foto { position: relative; display: grid; place-items: center; width: calc(10 * var(--u)); height: calc(10 * var(--u)); overflow: hidden; border: var(--b) solid var(--tinta); border-radius: calc(1.4 * var(--u));
+  background: var(--cor-clara, var(--cor)); box-shadow: var(--rebaixo); }
+.vaga-foto img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.vaga-foto-forma { width: 58%; height: 58%; }
+.vaga-foto.pronta .vaga-foto-forma { display: none; }
+.vaga-info { display: grid; gap: calc(.9 * var(--u)); align-content: center; align-self: stretch; min-width: 0; font: 800 var(--fs-min) / 1.14 var(--f-texto); color: var(--tinta); }
+.vaga-info p { margin: 0; }
+.vaga-lema { font: 700 var(--fs-corpo) / 1.05 var(--f-titulo); }
+.vaga-ponto b { font-weight: 900; }
+.vaga-forca b { color: #0E6A33; } .vaga-fraqueza b { color: #A3141F; }
+.vaga-info .ico { width: 1.15em; height: 1.15em; vertical-align: -.2em; }
+.vaga-controles { display: grid; gap: calc(.8 * var(--u)); min-width: 0; }
 /* placa do nome: abre o provador (nome + boneco) */
 .vaga-nome { position: relative; display: flex; align-items: center; justify-content: center; min-height: calc(6.2 * var(--u)); min-width: 0; padding: calc(.4 * var(--u)) calc(.6 * var(--u));
   border: var(--b-fino) solid var(--tinta); border-radius: var(--raio-btn); background: #fff; box-shadow: inset 0 calc(.4 * var(--u)) 0 rgb(26 20 51 / .12);
@@ -155,8 +186,6 @@
 .vaga-bloco[aria-checked="true"] { flex: 2.4 1 0; background: linear-gradient(#FFE580, var(--amarelo) 60%); box-shadow: 0 calc(.35 * var(--u)) 0 var(--tinta); color: var(--tinta); translate: 0 calc(-.3 * var(--u)); }
 .vaga-bloco[aria-checked="true"] > span { display: inline; }
 
-/* cartão estreito (1366×768): sem o ícone de troca, para caber a palavra inteira */
-@container (max-width: 170px) { .vaga-quem .ico-btn, .vaga-bloco[aria-checked="true"] > span { display: none; } .vaga-bloco[aria-checked="true"] { flex: 1.4 1 0; } }
 
 /* bancada: duração, ajustes e Começar (área rebaixada sobre a mesa) */
 .lob-bancada { position: absolute; left: calc(3 * var(--u)); right: calc(3 * var(--u)); bottom: calc(2.4 * var(--u)); display: flex; align-items: stretch; gap: calc(2.2 * var(--u));
@@ -402,3 +431,47 @@
 body[data-tela="lobby"] #aviso { inset: calc(9.4 * var(--u)) 0 auto; justify-content: flex-start; }
 /* aviso com objeto do kit (Solo) */
 .aviso .aviso-arte { width: calc(5.4 * var(--u)); height: auto; margin: calc(-1.4 * var(--u)) 0; }
+
+/* =====================================================================================================
+   LOBBY EM RETRATO (celular e tablet em pé: html.retrato, ligado por Telas.lobby). A unidade passa a seguir a largura
+   (52u de largura × 112u de altura), o carrossel mostra uma nação por vez e a bancada empilha. Só o lobby foi adaptado.
+   ===================================================================================================== */
+html.retrato { --u: min(100vw / 52, 100vh / 112); }
+html.retrato .lob-topo { height: auto; grid-template-columns: auto 1fr; row-gap: calc(.8 * var(--u)); }
+html.retrato .lob-titulo { grid-column: 1 / -1; grid-row: 2; white-space: normal; font-size: calc(3.8 * var(--u)); }
+html.retrato .lob-passo span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }   /* só os números; o nome fica para o leitor de tela */
+html.retrato .lob-passo { padding: 0 calc(.6 * var(--u)); }
+html.retrato .lob-trilho { width: calc(3 * var(--u)); }
+html.retrato .lob-vagas { top: calc(24.6 * var(--u)); bottom: calc(35.4 * var(--u)); gap: calc(.8 * var(--u)); }
+html.retrato .car-fichas { justify-content: flex-start; overflow-x: auto; scrollbar-width: none; padding: calc(.8 * var(--u)) calc(2 * var(--u)) calc(.4 * var(--u)); gap: calc(.6 * var(--u)); }
+html.retrato .car-fichas::-webkit-scrollbar { display: none; }
+html.retrato .ficha-mini { flex: none; width: calc(5.6 * var(--u)); height: calc(6.4 * var(--u)); }
+html.retrato .ficha-forma { width: calc(3.2 * var(--u)); height: calc(3.2 * var(--u)); }
+html.retrato .vaga { flex-basis: calc(48 * var(--u)); }
+html.retrato .car-trilho { padding-inline: calc(50% - 24 * var(--u)); }
+html.retrato .car-seta { top: calc(1.9 * var(--u)); margin-top: 0; width: calc(5.2 * var(--u)); height: calc(5.2 * var(--u)); z-index: 4; }
+html.retrato .car-ant { left: calc(50% - 23.4 * var(--u)); } html.retrato .car-prox { right: calc(50% - 23.4 * var(--u)); }
+html.retrato .vaga-aba { padding-inline: calc(6.4 * var(--u)); }
+html.retrato .vaga-pais { font-size: calc(3 * var(--u)); text-align: center; }
+html.retrato .vaga-pos { display: none; }
+html.retrato .vaga-corpo { grid-template-columns: calc(8 * var(--u)) minmax(0, 1fr); overflow-y: auto; overscroll-behavior: contain; padding-inline: calc(.4 * var(--u)); align-content: start; }
+html.retrato .vaga-foto { width: calc(8 * var(--u)); height: calc(8 * var(--u)); }
+html.retrato .vaga-controles { grid-column: 1 / -1; grid-template-columns: 1fr 1fr; align-items: center; }
+html.retrato .vaga-blocos { grid-column: 1 / -1; }
+/* bancada: duração em cima; Mudar ajustes e Começar embaixo */
+html.retrato .lob-bancada { left: calc(1.6 * var(--u)); right: calc(1.6 * var(--u)); bottom: calc(1.6 * var(--u)); display: grid; grid-template-columns: 1fr 1fr; gap: calc(1 * var(--u)); padding: calc(1 * var(--u)) calc(1.4 * var(--u)) calc(1.2 * var(--u)); }
+html.retrato .lob-bancada > .divisoria { display: none; }
+html.retrato .banc-grupo:first-child { grid-column: 1 / -1; }
+html.retrato .banc-rotulo { display: none; }
+html.retrato .banc-tijolos { padding-top: calc(1.2 * var(--u)); justify-content: center; }
+html.retrato .banc-tijolos .tijolo { min-width: 0; flex: 1; }
+html.retrato .banc-ajustes { grid-column: 1; justify-content: center; }
+html.retrato .banc-resumo { display: none; }
+html.retrato .banc-mudar { align-self: stretch; }
+html.retrato .banc-comecar { grid-column: 2; padding: 0; gap: calc(.6 * var(--u)); }
+html.retrato .lob-comecar { min-width: 0; width: 100%; min-height: calc(7.6 * var(--u)); font-size: calc(3.4 * var(--u)); }
+html.retrato .lob-modos { top: calc(25 * var(--u)); bottom: calc(1 * var(--u)); flex-direction: column; justify-content: flex-start; align-items: center; gap: calc(9.4 * var(--u)); overflow-y: auto; padding: calc(8.6 * var(--u)) 0 calc(2 * var(--u)); }
+html.retrato .modo { flex: none; width: calc(44 * var(--u)); }
+html.retrato .modo-texto { font-size: calc(2.6 * var(--u)); }
+html.retrato .banc-mudar { min-width: 0; padding-inline: calc(.8 * var(--u)); white-space: normal; line-height: 1; text-align: center; }
+html.retrato .banc-mudar > span { font-size: calc(2.3 * var(--u)); }

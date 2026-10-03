@@ -10,7 +10,6 @@
    data-teste: voto-<sim|nao|abst|veto>, cop-<0|1|2>, doar-<n>, confirmar, cancelar, continuar-painel, acusar (com data-id). */
 
 const ONU = (() => {
-  const PIDS = ['brasil', 'eua', 'china', 'ue', 'india', 'russia'];
   const RECURSOS = [{ id: 'alimentos', ico: '🌾', nome: 'Alimentos' }, { id: 'energia', ico: '⚡', nome: 'Energia' },
     { id: 'minerais', ico: '💎', nome: 'Minerais' }, { id: 'tecnologia', ico: '💻', nome: 'Tecnologia' }];
   const ARTE_RES = { missao_paz: 'escudo', sancoes_onu: 'cadeado', acordo_climatico: 'termometro', fundo_humanitario: 'caixa-ajuda',
@@ -38,18 +37,18 @@ const ONU = (() => {
 
   // Nomes com artigo e concordância ("a China vetou", "os Estados Unidos vetaram")
   const dado = id => (typeof POTENCIAS !== 'undefined' && POTENCIAS.find(p => p.id === id)) || (typeof TERRITORIOS !== 'undefined' && TERRITORIOS.find(t => t.id === id)) || null;
-  const nome = id => (id === 'reino_unido' ? 'Reino Unido' : dado(id)?.nome || id);
-  const artigo = id => (id === 'reino_unido' ? 'o' : dado(id)?.artigo || '');
+  const nome = id => dado(id)?.nome || id;
+  const artigo = id => dado(id)?.artigo || '';
   const plural = id => /s$/.test(artigo(id));
   const verbo = (id, sing, plur) => (plural(id) ? plur : sing);
   const PREP = { '': { o: 'o', a: 'a', os: 'os', as: 'as' }, de: { o: 'do', a: 'da', os: 'dos', as: 'das' }, por: { o: 'pelo', a: 'pela', os: 'pelos', as: 'pelas' },
     em: { o: 'no', a: 'na', os: 'nos', as: 'nas' } };
   const com = (id, prep = '') => { const a = artigo(id); return a ? `${PREP[prep][a]} ${nome(id)}` : `${prep === 'de' ? 'de ' : prep === 'por' ? 'por ' : prep === 'em' ? 'em ' : ''}${nome(id)}`; };
   const Com = (id, prep = '') => { const t = com(id, prep); return t.charAt(0).toUpperCase() + t.slice(1); };
-  const permanente = pid => pid === 'reino_unido' || !!(typeof POTENCIAS !== 'undefined' && POTENCIAS.find(p => p.id === pid)?.permanente);
+  const permanente = pid => !!(typeof POTENCIAS !== 'undefined' && POTENCIAS.find(p => p.id === pid)?.permanente);
   const pidsDe = e => PIDS.filter(p => e.potencias[p]);
   const humano = (e, pid) => !!e.potencias[pid]?.humano;
-  const quemJoga = (e, pid) => (pid === 'reino_unido' ? 'Território · computador' : humano(e, pid) ? nomeEquipe(pid) : 'Computador');
+  const quemJoga = (e, pid) => (humano(e, pid) ? nomeEquipe(pid) : 'Computador');
 
   // Avatares: os da partida (Jogo.avatarDe) ou um sorteio fixo de reserva (vitrine, testes)
   let reserva = null;
@@ -61,7 +60,6 @@ const ONU = (() => {
   }
   // Retrato do boneco (Cenas3D.retrato): o <img> entra vazio e é preenchido depois (preencherRetratos)
   function retrato(e, pid, { classe = '', expressao = 'feliz', tamanho = 112, enquadramento = '' } = {}) {
-    if (pid === 'reino_unido') return `<span class="retrato ${classe} onu-retrato-territorio"><span class="onu-retrato-ico">${ICO('🏛')}</span></span>`;
     const cpu = humano(e, pid) ? '' : `<span class="cpu">${ICO('💻')}</span>`;
     return `<span class="retrato ${classe}" data-equipe="${pid}"><img alt="" hidden data-retrato="${pid}" data-exp="${expressao}" data-tam="${tamanho}"${enquadramento ? ` data-enq="${enquadramento}"` : ''}>${formaDe(pid)}${cpu}</span>`;
   }
@@ -185,7 +183,7 @@ const ONU = (() => {
       ${numero}<span class="pilula ${bom ? 'ganho' : 'perda'} onu-mud-delta">${esc(deltaTxt(g.v, g.tipo === 'global' ? total : g.d))}</span></li>`;
   }
   const itemTexto = (icone, titulo, sub) => `<li class="onu-mudanca"><span class="soquete">${ICO(icone)}</span><span class="onu-mud-txt"><b>${esc(titulo)}</b><small>${esc(sub)}</small></span></li>`;
-  let pidsN = 6;
+  let pidsN = PIDS.length;
   const nomeCurtoPid = id => (typeof nomeCurto === 'function' ? nomeCurto(id) : nome(id));
   function listaMudancas(mudancas, { max = 4, ocultar = '', quemInfluencia = '' } = {}) {
     const g = agrupar(mudancas);
@@ -371,27 +369,28 @@ const ONU = (() => {
   // ---------- Tablet de votação: regra (Conselho × Assembleia), delegações em linhas e placar ----------
   function linhaDelegacao(e, pid, { proponente, cs, marcas = true } = {}) {
     const p5 = cs && permanente(pid);
-    const territorio = pid === 'reino_unido';
     return `<li class="onu-linha peca" data-pid="${pid}">
-      <span class="onu-linha-aba"${territorio ? '' : ` data-equipe="${pid}"`}>${retrato(e, pid, { tamanho: 96 })}</span>
-      <span class="onu-linha-txt"><span class="onu-linha-nome">${esc(territorio ? 'Reino Unido' : nomeCurtoPid(pid))}</span>
+      <span class="onu-linha-aba" data-equipe="${pid}">${retrato(e, pid, { tamanho: 96 })}</span>
+      <span class="onu-linha-txt"><span class="onu-linha-nome">${esc(nomeCurtoPid(pid))}</span>
         <span class="onu-linha-sub">${esc(quemJoga(e, pid))}</span></span>
       <span class="onu-linha-marcas">${marcas && p5 ? `<span class="onu-p5" title="Membro permanente: tem veto"><svg viewBox="0 0 40 46" aria-hidden="true"><path d="M20 3 36 8v13c0 11-7 19-16 22C11 40 4 32 4 21V8Z"/></svg><b>P5</b><span class="so-leitor">membro permanente, com veto</span></span>` : ''}
         ${marcas && proponente === pid ? `<span class="onu-megafone">${ART('megafone')}<span class="so-leitor">propôs a resolução</span></span>` : ''}</span>
       <span class="onu-linha-estado"><span class="onu-espera">aguardando</span></span></li>`;
   }
+  // “sim” que o Conselho exige (fração de Simulacao.PARAM.maioriaConselho sobre as potências que votam)
+  const necessarios = e => Math.ceil(((typeof Simulacao !== 'undefined' && Simulacao.PARAM?.maioriaConselho) || .57) * pidsDe(e).length - 1e-9);
   function textoRegra(e, cs) {
     const nT = Object.values(e.territorios).filter(t => !t.protegido).length;
     return cs
-      ? { titulo: 'Conselho de Segurança', chip: 'obrigatória', texto: 'EUA, China, Rússia, Reino Unido e França (pela UE) têm veto: o “não” de um deles derruba tudo. Passa com 4 “sim” dos 7.' }
-      : { titulo: 'Assembleia Geral', chip: 'recomendação', texto: `Cada país tem 1 voto e ninguém tem veto: vence a maioria. Votam as 6 potências e ${nT} territórios.` };
+      ? { titulo: 'Conselho de Segurança', chip: 'obrigatória', texto: `${listaNomes(PIDS.filter(permanente).map(p => p === 'ue' ? 'França (pela UE)' : nomeCurtoPid(p)))} têm veto: o “não” de um deles derruba tudo. Passa com ${necessarios(e)} “sim” de ${pidsDe(e).length}.` }
+      : { titulo: 'Assembleia Geral', chip: 'recomendação', texto: `Cada país tem 1 voto e ninguém tem veto: vence a maioria. Votam as ${pidsDe(e).length} potências e ${nT} territórios.` };
   }
   function montarVotacao(s, e, r, res) {
     const cs = r.orgao === 'cs', reg = textoRegra(e, cs);
-    const quem = [...pidsDe(e), ...(cs ? ['reino_unido'] : [])];
+    const quem = pidsDe(e);
     s.tela.innerHTML = `<div class="onu-regra ${cs ? 'onu-cs' : 'onu-ag'}"><span class="soquete">${ICO(cs ? '🛡' : '🏛')}</span>
         <p><b>${reg.titulo}</b> <span class="pilula onu-chip-regra">${reg.chip}</span><br>${esc(reg.texto)}</p></div>
-      <ol class="onu-delegacoes" aria-label="Delegações">${quem.map(pid => linhaDelegacao(e, pid, { proponente: res.proponente, cs })).join('')}</ol>
+      <ol class="onu-delegacoes${quem.length > 8 ? ' compacta' : ''}" aria-label="Delegações">${quem.map(pid => linhaDelegacao(e, pid, { proponente: res.proponente, cs })).join('')}</ol>
       <div class="onu-placar" hidden>
         ${['sim', 'nao', 'abst'].map(v => `<span class="onu-placar-item onu-${v}"><span class="soquete">${VOTO[v].glifo()}</span>
           <span class="onu-placar-rot">${v === 'abst' ? 'Abstenção' : VOTO[v].palavra}</span><b class="num" data-conta="${v}">0</b></span>`).join('')}</div>
@@ -421,7 +420,7 @@ const ONU = (() => {
   function contar(s, pid) {
     const slot = s.rodape.querySelector(`.onu-prog-slots [data-p="${pid}"]`);
     if (!slot) return;
-    slot.innerHTML = pid === 'reino_unido' ? '<i class="onu-tijolinho onu-tijolinho-neutro"></i>' : tijolinho(pid);
+    slot.innerHTML = tijolinho(pid);
     if (!RM) gsap.from(slot.firstElementChild, { y: -3 * uPx(), scaleY: 1.2, duration: .32, ease: 'back.out(2.4)' });
     const b = s.rodape.querySelector('.onu-prog-txt b');
     b.textContent = s.rodape.querySelectorAll('.onu-prog-slots .onu-tijolinho').length;
@@ -483,7 +482,7 @@ const ONU = (() => {
   // ---------- Revelação voto a voto (sala 3D + carimbos no tablet), placar e Assembleia Geral ----------
   async function revelar(s, e, r, res, resultado) {
     const cs = r.orgao === 'cs';
-    const quem = [...pidsDe(e), ...(cs ? ['reino_unido'] : [])];
+    const quem = pidsDe(e);
     const mostrado = p => (cs && permanente(p) && resultado.votos[p] === 'nao' ? 'veto' : resultado.votos[p] || 'abst');
     tituloSessao(s, 'Revelação dos votos');
     s.tela.querySelectorAll('.onu-linha').forEach(l => l.classList.remove('vez'));
@@ -643,7 +642,7 @@ const ONU = (() => {
       const votos = {}, quem = pidsDe(e);
       narrar(s, '🔒', 'Voto secreto: cada equipe vota na sua vez. A tela só mostra quem já votou.');
       tituloSessao(s, 'Votação secreta');
-      progresso(s, [...quem, ...(cs ? ['reino_unido'] : [])]);
+      progresso(s, quem);
       for (const pid of quem) {
         marcarVez(s, pid);
         if (humano(e, pid)) votos[pid] = await votoSecreto(e, pid, r, res);
@@ -652,7 +651,6 @@ const ONU = (() => {
         await carimbarLinha(s, pid, carimboVotou(), { som: 'voto' });
         contar(s, pid);
       }
-      if (cs) { marcarVez(s, 'reino_unido'); await espera(500); await carimbarLinha(s, 'reino_unido', carimboVotou(), { som: 'voto' }); contar(s, 'reino_unido'); }
       const resultado = Simulacao.votacao(e, res, votos);
       await revelar(s, e, r, res, resultado);
       const tipo = await carimboResultado(s, e, r, res, resultado);
@@ -761,7 +759,7 @@ const ONU = (() => {
   const tijolinho = (pid, extra = '') => `<i class="onu-tijolinho${extra}" data-equipe="${pid}">${formaDe(pid, { branca: true })}</i>`;
   async function cop(e) {
     pidsN = pidsDe(e).length;
-    const meta = Simulacao.PARAM?.copSucesso ?? 7, max = pidsDe(e).length * 2, humor = humorAtual(), quem = pidsDe(e);
+    const meta = Simulacao.metaCop?.(e) ?? Math.round(pidsDe(e).length * 7 / 6), max = pidsDe(e).length * 2, humor = humorAtual(), quem = pidsDe(e);
     musica('assembleia');
     await splash({ pre: 'Cúpula do Clima', titulo: 'COP ' + fmtAno(e.ano), sub: 'Compromissos secretos', cor: 'natureza', icone: ART('termometro'), som: 'reuniao' });
     const el = criar(`<section class="painel peca pinos painel-g cat-natureza onu-cop" aria-labelledby="onu-cop-tit">
@@ -771,7 +769,7 @@ const ONU = (() => {
       <div class="tela onu-cop-tela">
         <div class="onu-cop-esq">
           <div class="onu-medidor-caixa"><p class="onu-medidor-tit"><b>Soma das promessas</b> <span class="num onu-soma" aria-live="polite">0</span><span class="num"> de ${max}</span></p>
-            <div class="onu-medidor" style="--total:${max}" role="meter" aria-label="Soma das promessas" aria-valuemin="0" aria-valuemax="${max}" aria-valuenow="0">
+            <div class="onu-medidor${max > 20 ? ' miudo' : ''}" style="--total:${max}" role="meter" aria-label="Soma das promessas" aria-valuemin="0" aria-valuemax="${max}" aria-valuenow="0">
               ${Array.from({ length: max }, (_, i) => `<span class="onu-encaixe${i === meta - 1 ? ' meta' : ''}"></span>`).join('')}
               <span class="onu-bandeira-meta" style="--pos:${meta}"><b>META ${meta}</b></span></div></div>
           <div class="onu-cop-corpo">
@@ -779,7 +777,7 @@ const ONU = (() => {
             <p class="onu-cop-regra">${ICO('🤝')}<span>Se a soma chegar a <b>${meta}</b>, sai o <b>acordo histórico</b>: cooperação +6, deslocados −4 milhões, tensão −2 e tecnologia limpa para todos. Se não chegar, a cúpula fracassa.</span></p>
           </div>
         </div>
-        <div class="onu-cop-dir"><ol class="onu-delegacoes onu-cop-delegs" aria-label="Delegações">${quem.map(p => linhaDelegacao(e, p, { marcas: false })).join('')}</ol></div>
+        <div class="onu-cop-dir"><ol class="onu-delegacoes onu-cop-delegs${quem.length > 8 ? ' compacta' : ''}" aria-label="Delegações">${quem.map(p => linhaDelegacao(e, p, { marcas: false })).join('')}</ol></div>
       </div>
       <footer class="painel-rodape"><span class="dica">${ICO('🔒')} Ninguém vê a promessa dos outros até o fim.</span>
         <button class="btn btn-principal peca pinos" type="button" data-acao="comecar" data-teste="continuar-painel">Começar as promessas ${GLIFOS.seta}</button></footer></section>`);
@@ -897,7 +895,7 @@ const ONU = (() => {
         <h2 class="painel-titulo" id="onu-doa-tit">Pedido de ajuda<small class="painel-sub">${esc(ev.titulo)}${typeof lugar === 'string' && dado(lugar) ? ' · ' + esc(nome(lugar)) : ''}</small></h2>
         <span class="pilula onu-meta-chip">${ICO('🎯')} Meta: ${meta} ${ICO(rec.ico)}</span></header>
       <div class="tela onu-doa-tela">
-        <div class="onu-doa-esq"><ol class="onu-delegacoes" aria-label="Delegações">${quem.map(p => linhaDelegacao(e, p, { marcas: false }).replace('<span class="onu-linha-sub">', `<span class="onu-linha-sub"><span class="onu-tem">tem ${e.potencias[p].recursos[rec.id]} ${ICO(rec.ico)}</span> · `)).join('')}</ol></div>
+        <div class="onu-doa-esq"><ol class="onu-delegacoes${quem.length > 8 ? ' compacta' : ''}" aria-label="Delegações">${quem.map(p => linhaDelegacao(e, p, { marcas: false }).replace('<span class="onu-linha-sub">', `<span class="onu-linha-sub"><span class="onu-tem">tem ${e.potencias[p].recursos[rec.id]} ${ICO(rec.ico)}</span> · `)).join('')}</ol></div>
         <div class="onu-doa-dir">
           <div class="onu-medidor-caixa"><p class="onu-medidor-tit"><b>${esc(rec.nome)} doados</b> <span class="num onu-soma" aria-live="polite">0</span><span class="num"> de ${meta}</span></p>
             <div class="onu-medidor onu-doa-medidor" role="meter" aria-label="${esc(rec.nome)} doados" aria-valuemin="0" aria-valuemax="${meta}" aria-valuenow="0">

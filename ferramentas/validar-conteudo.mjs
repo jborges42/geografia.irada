@@ -48,6 +48,16 @@ function conferirEfeitos(onde, efeitos, quem, local) {
     if (ef.chance !== undefined && !(ef.chance > 0 && ef.chance < 1)) problemas.push(`${ond}: chance entre 0 e 1`);
     if (ef.imune !== undefined && !['ciber', 'desinfo', 'pandemia'].includes(ef.imune)) problemas.push(`${ond}: imune desconhecido`);
     const p = ef.v.split('.');
+    if (p[0] === 'rel') { // relações: 'rel.china' (quem decide × China), 'rel.alvo|local|rivais|aliados|todos' ou 'rel.a.b' (par explícito, em eventos)
+      const ESPECIAIS = ['alvo', 'local', 'rivais', 'aliados', 'todos'];
+      if (p.length === 3) { if (!POT.has(p[1]) || !POT.has(p[2]) || p[1] === p[2]) problemas.push(`${ond}: par de potências inválido`); }
+      else if (p.length === 2) {
+        if (quem !== 'potencia') problemas.push(`${ond}: 'rel.x' precisa de quem decide; num evento sem escolha use o par 'rel.a.b'`);
+        else if (!POT.has(p[1]) && !ESPECIAIS.includes(p[1])) problemas.push(`${ond}: potência ou seletor de relação desconhecido`);
+        else if (p[1] === 'local' || p[1] === 'alvo') { if (tipoLocal(local) !== 'potencia') problemas.push(`${ond}: ${p[1]} não é uma potência`); }
+      } else problemas.push(`${ond}: caminho de relação inválido`);
+      continue;
+    }
     const sel = S.SELETORES.includes(p[0]) && p.length > 1 ? p[0] : '', campo = sel ? p.slice(1).join('.') : ef.v;
     let alvo;
     if (sel === 'global') alvo = 'global';
@@ -106,7 +116,7 @@ function conferirTextos(onde, obj) {
 function conferirDilemas() {
   const D = g('DILEMAS');
   if (!Array.isArray(D)) return problemas.push('dilemas.js sem DILEMAS');
-  if (D.length < 40 || D.length > 48) problemas.push(`dilemas: ${D.length} (esperado de 40 a 48)`);
+  if (D.length < 40 || D.length > 80) problemas.push(`dilemas: ${D.length} (esperado de 40 a 80)`);
   const vistos = new Set(), cobertura = {}, categorias = {}, porPotencia = Object.fromEntries([...POT].map(p => [p, 0]));
   D.forEach((d, i) => {
     const onde = `dilemas[${i}] ${d.id}`;

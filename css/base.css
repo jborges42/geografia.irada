@@ -70,13 +70,20 @@
   --vetada: #B0001A; --sem-maioria: #8A94A6; --pessego-alerta: #FFE3D0;
   --zebra: repeating-linear-gradient(-45deg, var(--amarelo) 0 calc(.8 * var(--u)), var(--tinta) calc(.8 * var(--u)) calc(1.6 * var(--u)));
 
-  /* as 6 potências (§2.3): cor, lado (sombra), clara (xadrez do parceiro), contorno 3D */
+  /* as 13 potências (§2.3; as 7 últimas: reino_unido, japao, australia, nova_zelandia, africa_do_sul, nigeria, egito): cor, lado (sombra), clara (xadrez do parceiro), contorno 3D */
   --cor-brasil: #27B263; --cor-brasil-lado: #0D6E4E; --cor-brasil-clara: #73CD9A; --cor-brasil-contorno: #011C13;
   --cor-eua: #0A32B4;    --cor-eua-lado: #0B2384;    --cor-eua-clara: #3657C2;    --cor-eua-contorno: #00041C;
   --cor-china: #D0180E;  --cor-china-lado: #81001C;  --cor-china-clara: #DB4F48;  --cor-china-contorno: #1C0006;
   --cor-ue: #9645EE;     --cor-ue-lado: #651C94;     --cor-ue-clara: #AD6EF2;     --cor-ue-contorno: #12031C;
   --cor-india: #FF9C0A;  --cor-india-lado: #9E3400;  --cor-india-clara: #FFC267;  --cor-india-contorno: #1C0900;
   --cor-russia: #F2248F; --cor-russia-lado: #960773; --cor-russia-clara: #F66EB5; --cor-russia-contorno: #1C0015;
+  --cor-reino_unido: #00B3A4; --cor-reino_unido-lado: #00666B; --cor-reino_unido-clara: #46E5D7; --cor-reino_unido-contorno: #011917;
+  --cor-japao: #6C7A96; --cor-japao-lado: #414B5A; --cor-japao-clara: #A4ABB8; --cor-japao-contorno: #0E1118;
+  --cor-australia: #9CCB1F; --cor-australia-lado: #507A13; --cor-australia-clara: #BDD776; --cor-australia-contorno: #121705;
+  --cor-nova_zelandia: #8E1B3A; --cor-nova_zelandia-lado: #551027; --cor-nova_zelandia-clara: #CA5A78; --cor-nova_zelandia-contorno: #150509;
+  --cor-africa_do_sul: #9A5B2E; --cor-africa_do_sul-lado: #5C321C; --cor-africa_do_sul-clara: #C49574; --cor-africa_do_sul-contorno: #140C07;
+  --cor-nigeria: #FF7A66; --cor-nigeria-lado: #B53A2B; --cor-nigeria-clara: #FFB0A3; --cor-nigeria-contorno: #2B0803;
+  --cor-egito: #4DB6FF; --cor-egito-lado: #0B69A8; --cor-egito-clara: #9BCEF1; --cor-egito-contorno: #01111C;
   --brasil: var(--cor-brasil); --eua: var(--cor-eua); --china: var(--cor-china); --ue: var(--cor-ue); --india: var(--cor-india); --russia: var(--cor-russia);
 
   /* as 6 categorias de ação (§2.8): pastel, lado "bala de goma", brilho do topo */
@@ -666,6 +673,13 @@ svg.forma { display: inline-block; flex: none; width: 1em; height: 1em; overflow
 [data-equipe="ue"]     { --cor: var(--cor-ue);     --cor-lado: var(--cor-ue-lado);     --cor-clara: var(--cor-ue-clara); }
 [data-equipe="india"]  { --cor: var(--cor-india);  --cor-lado: var(--cor-india-lado);  --cor-clara: var(--cor-india-clara); }
 [data-equipe="russia"] { --cor: var(--cor-russia); --cor-lado: var(--cor-russia-lado); --cor-clara: var(--cor-russia-clara); }
+[data-equipe="reino_unido"] { --cor: var(--cor-reino_unido); --cor-lado: var(--cor-reino_unido-lado); --cor-clara: var(--cor-reino_unido-clara); }
+[data-equipe="japao"] { --cor: var(--cor-japao); --cor-lado: var(--cor-japao-lado); --cor-clara: var(--cor-japao-clara); }
+[data-equipe="australia"] { --cor: var(--cor-australia); --cor-lado: var(--cor-australia-lado); --cor-clara: var(--cor-australia-clara); }
+[data-equipe="nova_zelandia"] { --cor: var(--cor-nova_zelandia); --cor-lado: var(--cor-nova_zelandia-lado); --cor-clara: var(--cor-nova_zelandia-clara); }
+[data-equipe="africa_do_sul"] { --cor: var(--cor-africa_do_sul); --cor-lado: var(--cor-africa_do_sul-lado); --cor-clara: var(--cor-africa_do_sul-clara); }
+[data-equipe="nigeria"] { --cor: var(--cor-nigeria); --cor-lado: var(--cor-nigeria-lado); --cor-clara: var(--cor-nigeria-clara); }
+[data-equipe="egito"] { --cor: var(--cor-egito); --cor-lado: var(--cor-egito-lado); --cor-clara: var(--cor-egito-clara); }
 .cat-diplomacia { --cor: var(--cat-diplomacia); --cor-lado: var(--cat-diplomacia-lado); }
 .cat-economia   { --cor: var(--cat-economia);   --cor-lado: var(--cat-economia-lado); }
 .cat-natureza   { --cor: var(--cat-natureza);   --cor-lado: var(--cat-natureza-lado); }

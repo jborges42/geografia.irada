@@ -16,7 +16,7 @@ const Simulacao = (() => {
       deslocados: 118,     // ACNUR, Tendências Globais: 117,8 milhões de deslocados à força no fim de 2025 (jun/2026)
       energia: 60,         // petróleo caro em 2026: Brent perto de US$ 109 no início de setembro, com a guerra do Irã (Wikipedia, “2026 Iran war fuel crisis”); 50 = normal
       transferencia: 0 },
-    tcre: .00068, emissoesResto: 3,                      // °C por Gt (era .00065: o mundo do computador ficava seguro demais); aviação/navegação e o resto
+    tcre: .00069, emissoesResto: 3,                      // °C por Gt (era .00065: o mundo do computador ficava seguro demais); aviação/navegação e o resto
     retroalimentacao: [[1.95, .04], [2.1, .15]],      // temperatura → °C extra por rodada (acima de 2,1: degelo e florestas morrendo aceleram; era .1)
     colapso: { temperatura: 2.2, tensao: 100, deslocados: 200 },
     danoClima: 6,                                      // pontos por rodada a +1 °C acima de 1,4 com vulnerabilidade 100
@@ -28,20 +28,33 @@ const Simulacao = (() => {
     variedadeIA: 1.2,                                  // dilemas e decisões: quanto maior, mais variada a escolha do computador (sem resposta certa)
     pesosIGI: { bemEstar: 2, economia: 1.5, ambiente: 1, seguranca: 1, apoio: .5 },
     igiParceiro: 3, igiLideranca: 6, igiMissao: 12, igiSelo: 4, igiPlaneta: 10,
-    copSucesso: 7,
     metas: { temperatura: 2.0, tensao: 60, deslocados: 100, desenvolvimento: 60 },
     eventosPorRodada: 1, eventosEmCrise: 2,
-    conflitosNormais: 17, calmaBase: .05, crescimentoNeutras: .012, // conflitos acima de 17 níveis esquentam o mundo (eram 20; 2026 começa com 25)
-    tensaoEstrutural: 74,  // a tensão volta devagar para perto do Relógio de 2026 (85 s ≈ 72); era 70
-    retornoDeslocados: .12, // fração dos deslocados que volta para casa (ou se integra) por mandato de 4 anos (era .13)
+    conflitosNormais: 19, calmaBase: .05, crescimentoNeutras: .012, // conflitos acima de 17 níveis esquentam o mundo (eram 20; 2026 começa com 25)
+    tensaoEstrutural: 64,  // a tensão volta devagar para perto do Relógio de 2026 (85 s ≈ 72); era 70
+    retornoDeslocados: .10, // fração dos deslocados que volta para casa (ou se integra) por mandato de 4 anos (era .13)
     energiaConflito: .5,   // preço da energia por nível de conflito em região produtora (era 1,2: travava o preço no teto e decidia a partida)
     energiaEconomia: 25,   // (preço − 50) / isto = ganho do exportador e perda do importador por mandato (era 15)
+    // ---- diplomacia viva: relações bilaterais, reações, contágio e incidentes (−100 hostil … +100 aliada)
+    potenciasRef: 8,       // com mais potências que isto, cada decisão pesa um pouco menos nos números do mundo: escala = √(isto / nº de potências)
+    retornoRelacao: .12,   // fração da distância até a relação "de fábrica" que se desfaz por mandato (o mundo esquece devagar)
+    atrito: 1.2,           // pontos de economia por mandato: fatia de comércio × (relação − relação de 2026)/100
+    contagio: .8,          // fatia de comércio × quanto o parceiro cresceu (ou caiu) acima da média do mundo
+    acordoBonus: 25, sancaoPeso: 40, // acordo bilateral soma isto à relação "para o comércio"; sanções entre dois países tiram isto
+    retaliacao: { base: .15, porHostilidade: .6 }, // chance do computador responder a tarifa/sanção: base + hostilidade × isto
+    incidente: { limite: -50, chance: .35 },       // pares com relação abaixo disso podem ter incidente, guerra comercial...
+    cooperacaoEspontanea: { limite: 55, chance: .15 },
+    equilibrioPoder: { razao: 1.25, relacao: -1.5 }, // a potência que passa 25% da média de poder atrai o "equilíbrio" dos outros
+    tensaoRelacoes: 10, coopRelacoes: 25, // quanto a hostilidade/amizade média das relações empurra a tensão e a cooperação do mundo
+    procuracao: { influencia: 3, relacao: -1.5, escalada: 1.6 }, // duas potências rivais com influência em território em conflito
+    copPorPotencia: 7 / 6, // soma de compromissos da COP: 7 com 6 potências
+    iaRivalidade: .35,     // quanto o computador quer "responder" a uma potência hostil com sanção, tarifa ou embargo
+    maioriaConselho: .57,  // fração de "sim" no Conselho de Segurança (4 de 7 antes)
   };
   const INDICADORES = ['economia', 'bemEstar', 'ambiente', 'seguranca', 'apoio'];
   const RECURSOS = ['alimentos', 'energia', 'minerais', 'tecnologia'];
   const TEMAS = ['territorio', 'ordem', 'globalizacao', 'natureza', 'conflitos', 'pessoas']; // temas da aula (foco de eventos e dilemas)
-  const EXPORTADORES_ENERGIA = ['russia', 'eua', 'brasil'];
-  const RIVAIS = { eua: ['china', 'russia'], china: ['eua', 'india'], russia: ['eua', 'ue'], ue: ['russia'], india: ['china'], brasil: [] };
+  const EXPORTADORES_ENERGIA = ['russia', 'eua', 'brasil', 'australia', 'nigeria'];
   const REGIOES_PETROLEO = ['golfo', 'levante', 'ira', 'leste_europeu', 'venezuela_guianas', 'norte_africa'];
   const ROTAS = { sudeste_insular: 'Estreito de Malaca', taiwan: 'Estreito de Taiwan', golfo: 'Estreito de Ormuz e Mar Vermelho', norte_africa: 'Canal de Suez', america_central: 'Canal do Panamá', turquia: 'Estreitos turcos' };
 
@@ -53,6 +66,39 @@ const Simulacao = (() => {
   const dadoPotencia = id => POTENCIAS.find(p => p.id === id);
   const carta = id => POLITICAS.find(c => c.id === id);
   const vizinhosDe = id => (typeof MAPA !== 'undefined' && MAPA.vizinhos[id]) || [];
+  const mod = (id, k, padrao) => dadoPotencia(id)?.mods?.[k] ?? padrao;
+
+  // ============================== RELAÇÕES BILATERAIS ==============================
+  // Cada par de potências tem uma relação de −100 a +100 (e.relacoes['a|b'], ids em ordem alfabética).
+  // A "relação de fábrica" (RELACOES em conteudo/potencias.js) é o retrato de 2026; o mundo volta devagar para ela.
+  const chaveRel = (a, b) => (a < b ? a + '|' + b : b + '|' + a);
+  const relBase = (a, b) => (a === b ? 100 : RELACOES[a]?.[b] ?? RELACOES[b]?.[a] ?? 0);
+  const relacao = (e, a, b) => (a === b ? 100 : e.relacoes[chaveRel(a, b)] ?? relBase(a, b));
+  const rotuloRelacao = v => (v >= 70 ? { texto: 'Aliada', nivel: 3 } : v >= 40 ? { texto: 'Amiga', nivel: 2 } : v >= 10 ? { texto: 'Cordial', nivel: 1 }
+    : v > -25 ? { texto: 'Fria', nivel: -1 } : v > -60 ? { texto: 'Tensa', nivel: -2 } : { texto: 'Hostil', nivel: -3 });
+  const aliadas = (e, a, b) => e.aliancas.some(x => x.includes(a) && x.includes(b));
+  const aliadosDe = (e, pid) => e.aliancas.filter(x => x.includes(pid)).map(x => x.find(y => y !== pid));
+  const sancionados = (e, a, b) => e.sancoes.some(s => s.ate >= e.rodada && ((s.de === a && s.contra === b) || (s.de === b && s.contra === a)));
+  const outras = (e, pid) => Object.keys(e.potencias).filter(q => q !== pid);
+  const rivaisDe = (e, pid) => outras(e, pid).filter(q => relacao(e, pid, q) < -20).sort((x, y) => relacao(e, pid, x) - relacao(e, pid, y));
+  const hostilidade = e => { const ids = Object.keys(e.potencias); let s = 0, n = 0; ids.forEach((a, i) => ids.slice(i + 1).forEach(b => { s += Math.max(0, -relacao(e, a, b)) / 100; n++; })); return s / Math.max(1, n); };
+  const amizade = e => { const ids = Object.keys(e.potencias); let s = 0, n = 0; ids.forEach((a, i) => ids.slice(i + 1).forEach(b => { s += Math.max(0, relacao(e, a, b)) / 100; n++; })); return s / Math.max(1, n); };
+  // Muda a relação entre a e b. `rel` recebe o registro para a interface; e.relLog guarda o mandato para o relatório.
+  function mudarRel(e, a, b, d, motivo = '', rel = null) {
+    if (a === b || !e.potencias[a] || !e.potencias[b] || !d) return 0;
+    const antes = relacao(e, a, b), depois = limitar(Math.round((antes + d) * 10) / 10, -100, 100);
+    if (depois === antes) return 0;
+    e.relacoes[chaveRel(a, b)] = depois;
+    rel?.push({ quem: a, v: 'relacao', de: b, antes: r1(antes), depois: r1(depois), motivo });
+    e.relLog.push({ a, b, d: depois - antes, motivo });
+    return depois - antes;
+  }
+  // Quem sente, entre os outros, o que aconteceu entre a e b: lista de relações de interesse (para as frases de reação)
+  function relacoesDe(e, pid) {
+    return outras(e, pid).map(id => { const valor = relacao(e, pid, id);
+      return { id, valor: r1(valor), rotulo: rotuloRelacao(valor), aliada: aliadas(e, pid, id), sancionada: sancionados(e, pid, id), comercio: COMERCIO[pid]?.[id] || 0 }; })
+      .sort((x, y) => y.valor - x.valor);
+  }
 
   // Gerador de números aleatórios com semente guardada no estado (partidas reproduzíveis e salváveis)
   function sorte(e) {
@@ -85,10 +131,11 @@ const Simulacao = (() => {
   function criarEstado(config = {}) {
     const cfg = { modo: 'competitivo', rodadas: 6, dificuldade: 1, jogadores: [], missoes: true, infiltrado: false, foco: [], ...config };
     const e = {
-      versao: 2, semente: (cfg.semente ?? Math.floor(Math.random() * 2 ** 31)) | 0, config: cfg,
+      versao: 3, semente: (cfg.semente ?? Math.floor(Math.random() * 2 ** 31)) | 0, config: cfg,
       rodada: 1, ano: PARAM.anoInicial, delta: (PARAM.anoFinal - PARAM.anoInicial) / cfg.rodadas,
       global: { ...PARAM.globalInicial }, potencias: {}, territorios: {}, pendentes: [], historico: [], manchetes: [],
-      eventosUsados: [], dilemasUsados: [], desarmaramNaRodada: [], fim: null, bncc: {}, vez: null, aliancas: [], sancoes: [],
+      eventosUsados: [], dilemasUsados: [], desarmaramNaRodada: [], fim: null, bncc: {}, vez: null, aliancas: ALIANCAS_INICIAIS.map(x => [...x].sort()), sancoes: [],
+      relacoes: {}, relLog: [], acordos: [], choques: {}, // diplomacia: relações, o que mudou no mandato, acordos comerciais e choques de economia
       construcoes: [], // o que cada ação construiu no mapa: { carta, potencia, alvo, ano } (o mundo 3D monta e guarda)
     };
     for (const d of potenciasDados()) {
@@ -112,6 +159,10 @@ const Simulacao = (() => {
         influencia: Object.fromEntries(potenciasDados().map(p => [p.id, t.influencia?.[p.id] || 0])),
         parceiro: null, dev0: t.desenvolvimento, mediacoes: 0 };
     }
+    const ids = Object.keys(e.potencias);
+    ids.forEach((a, i) => ids.slice(i + 1).forEach(b => (e.relacoes[chaveRel(a, b)] = relBase(a, b))));
+    e.escala = Math.min(1, Math.sqrt(PARAM.potenciasRef / ids.length));
+    e.hostilidade0 = hostilidade(e); e.amizade0 = amizade(e);
     Object.values(e.territorios).forEach(t => (t.parceiro = calcularParceiro(t)));
     Object.values(e.potencias).forEach(p => (p.emissoesIniciais = emissoesDe(p)));
     if (cfg.missoes && cfg.modo !== 'cooperativo') sortearMissoes(e);
@@ -189,6 +240,7 @@ const Simulacao = (() => {
     for (const ef of efeitos || []) {
       if (ef.atraso) { e.pendentes.push({ rodada: e.rodada + ef.atraso, efeitos: [{ ...ef, atraso: 0 }], ctx: { ...ctx } }); continue; }
       if (ef.chance !== undefined && sorte(e) > ef.chance) continue;
+      if (ef.v.startsWith('rel.')) { efeitoRelacao(e, ef, ctx, rel); continue; }
       const partes = ef.v.split('.');
       let seletor = '', caminho = ef.v;
       if (SELETORES.includes(partes[0]) && partes.length > 1) { seletor = partes[0]; caminho = partes.slice(1).join('.'); }
@@ -198,6 +250,7 @@ const Simulacao = (() => {
       if (ef.max) lista = lista.sort((a, b) => b.obj.vulnerabilidade - a.obj.vulnerabilidade).slice(0, ef.max);
       for (const { obj, nome } of lista) {
         if (obj.protegido && caminho !== 'vulnerabilidade') continue;
+        if (caminho === 'influencia' && !obj.influencia) continue; // influência só existe em território
         if (caminho === 'influencia' && !ctx.potencia) { // evento sem potência: mexe na influência de todas
           for (const quem of Object.keys(obj.influencia)) {
             const antes = obj.influencia[quem], depois = escrever(obj, 'influencia', antes + (ef.d ?? 0), quem);
@@ -209,6 +262,7 @@ const Simulacao = (() => {
         if (ef.escala === 'clima') d *= .6 + Math.max(0, e.global.temperatura - 1.4);
         if (ef.vuln && obj.vulnerabilidade !== undefined) d *= obj.vulnerabilidade / 70;
         if (ctx.fator) d *= ctx.fator;
+        if (seletor === 'global' && ctx.potencia) d *= e.escala ?? 1; // muitas potências: cada decisão pesa um pouco menos no mundo
         if (ef.imune && obj.imune?.[ef.imune] > 0) d *= ef.imune === 'pandemia' ? .5 : 0;
         const antes = ler(obj, caminho, ctx.potencia);
         let novo = ef.m !== undefined ? antes * ef.m : antes + d;
@@ -216,12 +270,39 @@ const Simulacao = (() => {
         const depois = escrever(obj, caminho, novo, ctx.potencia);
         if (Math.abs(depois - antes) > 1e-9) {
           rel.push({ quem: nome, v: caminho, antes: r2(antes), depois: r2(depois), motivo: ctx.motivo || '' });
+          if (caminho === 'economia' && e.potencias[nome]) e.choques[nome] = (e.choques[nome] || 0) + (depois - antes); // vira contágio no balanço
+          if (caminho === 'influencia' && ctx.potencia && depois > antes && e.territorios[nome]) disputa(e, ctx.potencia, e.territorios[nome], depois - antes, ctx, rel);
           if (caminho === 'tensao' && ctx.potencia && depois > antes && e.potencias[ctx.potencia]) e.potencias[ctx.potencia].tensaoGerada += depois - antes;
         }
       }
     }
     if (efeitos?.some(ef => /influencia|estabilidade/.test(ef.v))) atualizarParcerias(e, rel);
     return rel;
+  }
+
+  // 'rel.china' (quem decide × China) · 'rel.alvo' · 'rel.local' · 'rel.rivais' · 'rel.aliados' · 'rel.todos' · 'rel.china.eua' (par explícito, em eventos)
+  function efeitoRelacao(e, ef, ctx, rel) {
+    const partes = ef.v.split('.'), d = (ef.d ?? 0) * (ctx.fator ?? 1);
+    let pares = [];
+    if (partes.length === 3) pares = [[partes[1], partes[2]]];
+    else if (ctx.potencia) {
+      const a = ctx.potencia, x = partes[1];
+      const alvoP = e.potencias[ctx.alvo] ? ctx.alvo : e.potencias[ctx.local] ? ctx.local : null;
+      const lista = x === 'alvo' || x === 'local' ? [alvoP] : x === 'rivais' ? rivaisDe(e, a) : x === 'aliados' ? aliadosDe(e, a) : x === 'todos' ? outras(e, a) : [x];
+      pares = lista.filter(Boolean).map(b => [a, b]);
+    }
+    pares.forEach(([a, b]) => mudarRel(e, a, b, d, ctx.motivo || '', rel));
+  }
+  // Ganhar influência num território incomoda quem já tem laços ali (esfera de influência): relação cai em proporção ao que o outro tem em jogo
+  function disputa(e, pid, t, n, ctx, rel) {
+    const extra = ctx.disputaExtra || 0;
+    for (const q of outras(e, pid)) {
+      const stake = t.influencia[q] || 0, dono = t.parceiro === q;
+      if (stake < 2 && !dono) continue;
+      const peso = dono ? 1.5 : Math.min(1, stake / Math.max(2, resistencia(t)));
+      const feito = mudarRel(e, pid, q, -Math.min(6, (n * 1.2 + extra) * peso) * (aliadas(e, pid, q) ? .5 : 1), `disputa ${com(t.id, 'em')}`, rel);
+      if (feito <= -1.5) ctx.reacoes?.push({ quem: q, para: pid, tipo: 'relacao', texto: `${maiuscula(com(q))} não gostou de ver a influência ${com(pid, 'de')} crescer ${com(t.id, 'em')}` });
+    }
   }
 
   // ============================== INFLUÊNCIA E PARCERIAS ==============================
@@ -237,6 +318,7 @@ const Simulacao = (() => {
       const novo = calcularParceiro(t);
       if (novo !== t.parceiro) {
         rel.push({ quem: t.id, v: 'parceiro', antes: t.parceiro, depois: novo, motivo: novo ? `${nome(t.id)}: nova parceria ${com(novo, 'de')}` : `${nome(t.id)}: fim da parceria` });
+        if (novo && t.parceiro) mudarRel(e, novo, t.parceiro, -4, `tomou a parceria ${com(t.id, 'de')}`, rel); // roubar o parceiro de outro custa caro
         t.parceiro = novo;
       }
     }
@@ -370,6 +452,7 @@ const Simulacao = (() => {
       || e.construcoes.some(c => c.carta === 'base_militar' && c.potencia === pid && c.alvo === alvo);
     if (parte) somar('Você é parte do conflito: um dos lados desconfia', -m.parte);
     else if (vizinhosDe(pid).includes(alvo)) somar('Vizinho com interesses diretos na região', -m.vizinho);
+    somar('Reputação de mediador', mod(pid, 'mediacao', 0));
     return { chance: r2(limitar(fatores.reduce((s, f) => s + f.valor, 0), m.min, m.max)), fatores };
   }
 
@@ -385,11 +468,14 @@ const Simulacao = (() => {
     p.jogadasNaVez.push(cid);
     if (!c.fixa) p.mao = p.mao.filter(x => x !== cid);
     contarBncc(e, c.bncc);
-    const ctx = { potencia: pid, alvo: Array.isArray(alvo) ? null : alvo, escolhidos: Array.isArray(alvo) ? alvo.slice(0, 3) : null, motivo: c.nome };
+    const ctx = { potencia: pid, alvo: Array.isArray(alvo) ? null : alvo, escolhidos: Array.isArray(alvo) ? alvo.slice(0, 3) : null, motivo: c.nome,
+      reacoes: [], disputaExtra: c.diplomacia?.disputaExtra || 0 };
     let efeitos = c.efeitos || [];
     if (c.alvo === 'territorios3') efeitos = efeitos.map(ef => (ef.v === 'influencia' ? { ...ef, v: 'escolhidos.influencia' } : ef));
-    const extra = c.extra?.[pid] || [];
-    const resultado = { ok: true, carta: cid, alvo, mudancas: rel };
+    let extra = c.extra?.[pid] || [];
+    const regiao = mod(pid, 'influenciaRegional', {})[e.territorios[alvo]?.continente]; // ponto forte regional (ex.: África do Sul na África)
+    if (regiao && efeitos.some(x => x.v === 'influencia')) extra = [...extra, { v: 'influencia', d: regiao }];
+    const resultado = { ok: true, carta: cid, alvo, mudancas: rel, reacoes: ctx.reacoes };
 
     switch (c.especial) {
       case 'votacao': resultado.abrirVotacao = true; break;
@@ -406,6 +492,21 @@ const Simulacao = (() => {
         resultado.aceita = aceita;
         if (!aceita) { efeitos = []; break; }
         e.aliancas.push([pid, alvo].sort());
+        break;
+      }
+      case 'bilateral': { // cúpula, acordo, exercício: o outro lado precisa aceitar (quanto pior a relação, menos chance)
+        const aceita = opcoes.aceita ?? iaAceitaBilateral(e, alvo, pid, c);
+        resultado.aceita = aceita;
+        if (!aceita) { efeitos = []; break; }
+        if (cid === 'acordo_bilateral') e.acordos.push({ a: pid, b: alvo, ate: e.rodada + 2 });
+        break;
+      }
+      case 'espionagem': { // sorte pesa, mas quem tem mais tecnologia espiona melhor; ser descoberto custa a relação
+        const t = e.potencias[alvo];
+        resultado.chance = r2(limitar(.5 + (p.producao.tecnologia - t.producao.tecnologia) * .04 - (t.imune.ciber > 0 ? .2 : 0), .15, .85));
+        resultado.sucesso = sorte(e) < resultado.chance;
+        resultado.descoberta = sorte(e) < (resultado.sucesso ? .25 : .75);
+        efeitos = resultado.sucesso ? c.seSucesso : c.seFracasso;
         break;
       }
       case 'sancao': e.sancoes.push({ de: pid, contra: alvo, ate: e.rodada + 2 }); break;
@@ -432,11 +533,63 @@ const Simulacao = (() => {
     }
     if (cid === 'ajuda_humanitaria') { p.contadores.solidariedade++; p.contadores.alimentosCedidos += 2; }
     aplicarEfeitos(e, [...efeitos, ...extra], ctx, rel);
-    if (c.especial !== 'votacao' && !(c.especial === 'alianca' && !resultado.aceita) && !(c.especial === 'mediacao' && !resultado.sucesso))
+    reagirCarta(e, pid, c, alvo, resultado, ctx, rel);
+    resultado.relacoes = rel.filter(x => x.v === 'relacao').map(x => ({ a: x.quem, b: x.de, antes: x.antes, depois: x.depois }));
+    if (c.especial !== 'votacao' && !((c.especial === 'alianca' || c.especial === 'bilateral') && !resultado.aceita) && !(c.especial === 'mediacao' && !resultado.sucesso))
       e.construcoes.push({ carta: cid, potencia: pid, alvo: Array.isArray(alvo) ? alvo : alvo || pid, ano: e.ano });
     resultado.manchete = manchete(e, pid, c, alvo, resultado);
     e.manchetes.push({ ano: e.ano, texto: resultado.manchete, potencia: pid, carta: cid });
     return resultado;
+  }
+
+  /* O mundo reage a uma carta jogada contra (ou com) outra potência: a relação muda, os amigos e inimigos do alvo tomam partido,
+     o computador pode responder na mesma moeda, os amigos do alvo furam sanções e quem se sente ameaçado se arma.
+     As frases vão em ctx.reacoes (resultado.reacoes) para a interface contar o que aconteceu. Os números são de js/PARAM e de c.diplomacia. */
+  function reagirCarta(e, pid, c, alvo, res, ctx, rel) {
+    const dp = c.diplomacia, R = ctx.reacoes;
+    if (!dp) return;
+    const alvoP = e.potencias[alvo] ? alvo : null, hostil = (dp.alvo || 0) < 0, rot = (a, b) => rotuloRelacao(relacao(e, a, b)).texto;
+    const dizer = (quem, tipo, texto) => R.push({ quem, para: pid, tipo, texto });
+    if (alvoP) {
+      if (res.aceita === false) { mudarRel(e, pid, alvoP, -3, `${c.nome} recusado`, rel); return; }
+      if (c.especial === 'espionagem' && !res.descoberta) return; // sabotagem sem testemunhas
+      const antes = rot(pid, alvoP);
+      mudarRel(e, pid, alvoP, dp.alvo, c.nome, rel);
+      dizer(alvoP, 'relacao', `${maiuscula(com(alvoP))} ${hostil ? 'reagiu mal' : 'gostou'}: a relação com ${com(pid)} ${antes === rot(pid, alvoP) ? (hostil ? 'piorou' : 'melhorou') : `foi de ${antes} para ${rot(pid, alvoP)}`}`);
+      const mexidas = [];
+      for (const q of outras(e, pid).filter(x => x !== alvoP)) {
+        const rq = relacao(e, q, alvoP);
+        const d = aliadas(e, q, alvoP) ? dp.aliadosAlvo : rq > 30 ? dp.amigosAlvo : rq < -30 ? dp.inimigosAlvo : 0;
+        const feito = d ? mudarRel(e, pid, q, d, c.nome, rel) : 0;
+        if (Math.abs(feito) >= 1.5) mexidas.push({ q, feito, aliado: aliadas(e, q, alvoP) });
+      }
+      mexidas.sort((x, y) => Math.abs(y.feito) - Math.abs(x.feito)).slice(0, 3).forEach(({ q, feito, aliado }) =>
+        dizer(q, aliado ? 'aliados' : 'relacao', `${maiuscula(com(q))} ${aliado ? `fecha com ${com(alvoP)}` : feito < 0 ? 'olha com desconfiança' : 'aprova'}: a relação com ${com(pid)} ${feito < 0 ? 'esfriou' : 'esquentou'}`));
+      if (dp.alvoApoio) {
+        aplicarEfeitos(e, [{ v: 'apoio', d: dp.alvoApoio }], { potencia: alvoP, motivo: 'união nacional diante da pressão' }, rel);
+        dizer(alvoP, 'apoio', `Sob pressão, ${com(alvoP)} fecha fileiras: o apoio ao governo sobe`);
+      }
+      if (dp.furam) { // quem é amigo do alvo (e não do autor) continua negociando: a sanção perde força
+        const furam = outras(e, pid).filter(q => q !== alvoP && relacao(e, q, alvoP) >= 30 && relacao(e, q, pid) < 60 && !aliadas(e, q, pid)).slice(0, 3);
+        if (furam.length) {
+          aplicarEfeitos(e, [{ v: 'alvo.economia', d: furam.length }], { potencia: pid, alvo: alvoP, motivo: 'comércio com países amigos' }, rel);
+          dizer(furam[0], 'furaram', `${furam.map(nome).join(' e ')} continuaram comerciando com ${com(alvoP)}: ${c.nome.toLowerCase()} ${/s$/.test(c.nome) ? 'perderam' : 'perdeu'} força`);
+        }
+      }
+      if (dp.retalia && !e.potencias[alvoP].humano && sorte(e) < PARAM.retaliacao.base + PARAM.retaliacao.porHostilidade * Math.max(0, -relacao(e, pid, alvoP)) / 100) {
+        aplicarEfeitos(e, c.efeitos, { potencia: alvoP, alvo: pid, fator: .6, motivo: `resposta ${com(alvoP, 'de')}: ${c.nome.toLowerCase()}` }, rel);
+        mudarRel(e, pid, alvoP, -4, 'retaliação', rel);
+        dizer(alvoP, 'retaliacao', `${maiuscula(com(alvoP))} respondeu na mesma moeda: ${c.nome.toLowerCase()} contra ${com(pid)}`);
+      }
+    }
+    if (dp.confianca) outras(e, pid).filter(q => relacao(e, pid, q) > -50).forEach(q => mudarRel(e, pid, q, dp.confianca, c.nome, rel));
+    if (dp.corrida) { // dilema de segurança: quem não é aliado e não gosta de você se arma de volta
+      outras(e, pid).filter(q => q !== alvoP && !aliadas(e, q, pid) && relacao(e, q, pid) < 15).sort((x, y) => relacao(e, pid, x) - relacao(e, pid, y)).slice(0, 3).forEach(q => {
+        mudarRel(e, pid, q, -2, 'corrida armamentista', rel);
+        if (e.potencias[q].economia > 30) aplicarEfeitos(e, [{ v: 'militar', d: 2 }, { v: 'economia', d: -.3 }], { potencia: q, motivo: `reação ao armamento ${com(pid, 'de')}` }, rel);
+        dizer(q, 'corrida', `${maiuscula(com(q))} reforçou a defesa em resposta ${com(pid, 'a')}`);
+      });
+    }
   }
 
   function encerrarVez(e, pid) {
@@ -474,9 +627,15 @@ const Simulacao = (() => {
     const perde = RECURSOS.reduce((s, r) => s + (pedido[r] || 0) * valorRecurso(e, pid, r), 0);
     return ganha >= perde * 1.05;
   }
+  // O computador aceita pela relação (com um pouco de acaso); tensão alta e insegurança deixam mais aberto a aliados
   function iaAceitaAlianca(e, pid, de) {
-    if (RIVAIS[pid]?.includes(de)) return false;
-    return e.global.tensao > 60 || e.potencias[pid].seguranca < 70 || sorte(e) < .4;
+    if (sancionados(e, pid, de)) return false;
+    const aberto = (e.global.tensao > 65 ? 10 : 0) + (e.potencias[pid].seguranca < 60 ? 8 : 0);
+    return relacao(e, pid, de) + aberto + (sorte(e) - .5) * 20 >= (carta('alianca').diplomacia.aceitaSe || 10);
+  }
+  function iaAceitaBilateral(e, pid, de, c) {
+    if (sancionados(e, pid, de) && c.id !== 'cupula_bilateral') return false;
+    return relacao(e, pid, de) + (sorte(e) - .5) * 20 >= (c.diplomacia?.aceitaSe ?? 0);
   }
 
   // ============================== EVENTOS ==============================
@@ -612,8 +771,10 @@ const Simulacao = (() => {
   // ============================== DILEMAS DE GOVERNO ==============================
   // Situações sem resposta certa (conteudo/dilemas.js): cada opção é uma troca, e a consequência aparece no mundo.
   const dilema = id => (typeof DILEMAS !== 'undefined' ? DILEMAS : []).find(d => d.id === id);
+  // Equipes humanas dividem uma lista (cada dilema aparece uma vez na mesa); o computador usa a própria, para não gastar o estoque dos alunos
+  const usadosDe = (e, pid) => (e.potencias[pid].humano ? e.dilemasUsados : (e.potencias[pid].dilemasUsados ||= []));
   function pesoDilema(e, pid, d) {
-    if (e.dilemasUsados.includes(d.id)) return 0;              // não repete na partida
+    if (usadosDe(e, pid).includes(d.id)) return 0;             // não repete na partida (para quem decide)
     if (d.potencias && !d.potencias.includes(pid)) return 0;   // dilema específico de algumas potências
     return pesoSorteio(e, d, pid) * (d.potencias ? 1.5 : 1);   // os da própria potência saem um pouco mais
   }
@@ -633,7 +794,7 @@ const Simulacao = (() => {
       const d = sortearPeso(e, itens), local = escolherLocal(e, d, pid);
       if (d.local && !local) { itens.splice(itens.findIndex(x => x.item === d), 1); continue; } // nenhum lugar serve agora
       p.dilema = { id: d.id, local, rodada: e.rodada, opcao: null };
-      e.dilemasUsados.push(d.id);
+      usadosDe(e, pid).push(d.id);
       return dilemaPublico(d, local, pid);
     }
     return null;
@@ -644,7 +805,7 @@ const Simulacao = (() => {
     if (!op) return { mudancas: [], manchete: '', porque: '', conceito: d?.conceito || '' };
     if (p.dilema?.id !== id) { // resolvido sem passar por dilemaDaVez (ex.: partida carregada)
       p.dilema = { id, local: escolherLocal(e, d, pid), rodada: e.rodada, opcao: null };
-      if (!e.dilemasUsados.includes(id)) e.dilemasUsados.push(id);
+      if (!usadosDe(e, pid).includes(id)) usadosDe(e, pid).push(id);
     }
     if (p.dilema.opcao !== null) return { mudancas: [], manchete: '', porque: op.porque, conceito: d.conceito }; // já decidido
     p.dilema.opcao = indice;
@@ -676,7 +837,7 @@ const Simulacao = (() => {
   const PERMANENTES = () => potenciasDados().filter(p => p.permanente).map(p => p.id);
   function votantes(e, res) {
     const r = resolucao(res.id);
-    if (r.orgao === 'cs') return [...Object.keys(e.potencias), 'reino_unido'];
+    if (r.orgao === 'cs') return Object.keys(e.potencias);
     return [...Object.keys(e.potencias), ...Object.values(e.territorios).filter(t => !t.protegido).map(t => t.id)];
   }
   // Voto de um território neutro (ou do Reino Unido no Conselho)
@@ -696,12 +857,13 @@ const Simulacao = (() => {
     const r = resolucao(res.id), p = e.potencias[pid], d = dadoPotencia(pid);
     let u = 0;
     if (r.id === 'missao_paz') { const t = e.territorios[res.alvo]; u = 1 - (t?.parceiro === pid ? 1.5 : 0) + (e.global.tensao > 75 ? .5 : 0); }
-    if (r.id === 'sancoes_onu') u = res.alvo === pid ? -9 : RIVAIS[pid]?.includes(res.alvo) ? 1 : e.aliancas.some(a => a.includes(pid) && a.includes(res.alvo)) ? -2 : -.5;
+    if (r.id === 'sancoes_onu') u = res.alvo === pid ? -9 : -relacao(e, pid, res.alvo) / 50 - (aliadas(e, pid, res.alvo) ? 1.5 : 0) - .3; // vota contra quem não gosta, protege amigos
     if (r.id === 'acordo_climatico') u = d.ia.ambiente * (1 + Math.max(0, e.global.temperatura - 1.7) * 2) - d.ia.economia * .9 + (e.config.modo === 'cooperativo' ? .6 : 0);
     if (r.id === 'fundo_humanitario') u = .5 + (e.global.deslocados > 140 ? .6 : 0) - (p.economia < 40 ? .8 : 0);
     if (r.id === 'tratado_desarmamento') u = (e.global.tensao > 70 ? 1 : .2) - (p.militar > 80 ? .7 : 0) + (d.ia.cooperacao - 1);
     if (r.id === 'fundo_vacinas') u = .8;
     if (res.proponente === pid) u += 2;
+    else if (res.proponente && e.potencias[res.proponente]) u += relacao(e, pid, res.proponente) / 120; // amigos apoiam a proposta de amigos
     u += (sorte(e) - .5) * .6;
     if (u > .15) return 'sim';
     if (u < -.6 && r.orgao === 'cs' && d.permanente) return 'veto';
@@ -712,11 +874,11 @@ const Simulacao = (() => {
   function votacao(e, res, votos) {
     const r = resolucao(res.id), rel = [], todos = { ...votos };
     for (const v of votantes(e, res)) if (!(v in todos)) todos[v] = e.territorios[v] ? votoTerritorio(e, v, res, votos) : iaVoto(e, v, res);
-    const perms = [...PERMANENTES(), 'reino_unido'];
+    const perms = PERMANENTES();
     const vetos = r.orgao === 'cs' ? Object.entries(todos).filter(([q, v]) => (v === 'veto' || (v === 'nao' && perms.includes(q)))).map(([q]) => q) : [];
     const conta = s => Object.values(todos).filter(v => v === s || (s === 'nao' && v === 'veto')).length;
     const sim = conta('sim'), nao = conta('nao'), abst = conta('abst');
-    const aprovada = r.orgao === 'cs' ? !vetos.length && sim >= 4 : sim > nao;
+    const aprovada = r.orgao === 'cs' ? !vetos.length && sim >= Math.ceil(Object.keys(todos).length * PARAM.maioriaConselho) : sim > nao;
     for (const pid of vetos.filter(q => e.potencias[q])) {
       aplicarEfeitos(e, [{ v: 'global.cooperacao', d: -3 }], { potencia: pid, motivo: 'veto' }, rel);
       const algunsT = Object.values(e.territorios).filter(t => t.influencia[pid] > 0).slice(0, 2);
@@ -746,13 +908,14 @@ const Simulacao = (() => {
     return u > 1.2 ? 2 : u > .3 ? 1 : 0;
   }
   // compromissos = { pid: 0|1|2 }
+  const metaCop = e => Math.round(Object.keys(e.potencias).length * PARAM.copPorPotencia);
   function resolverCop(e, compromissos) {
     const rel = [];
     for (const [pid, c] of Object.entries(compromissos)) {
       if (c === 2) aplicarEfeitos(e, [{ v: 'limpa', d: 12 }, { v: 'economia', d: -3 }], { potencia: pid, motivo: 'compromisso alto na COP' }, rel);
       if (c === 1) aplicarEfeitos(e, [{ v: 'limpa', d: 6 }, { v: 'economia', d: -1 }], { potencia: pid, motivo: 'compromisso médio na COP' }, rel);
     }
-    const soma = Object.values(compromissos).reduce((s, c) => s + c, 0), sucesso = soma >= PARAM.copSucesso;
+    const soma = Object.values(compromissos).reduce((s, c) => s + c, 0), sucesso = soma >= metaCop(e);
     aplicarEfeitos(e, sucesso
       ? [{ v: 'global.cooperacao', d: 6 }, { v: 'global.transferencia', d: .15 }, { v: 'global.deslocados', d: -4 }, { v: 'global.tensao', d: -2 }]
       : [{ v: 'global.cooperacao', d: -3 }, { v: 'global.tensao', d: 1 }], { motivo: sucesso ? 'acordo histórico na COP' : 'COP fracassa' }, rel); // acordo também desarma a desconfiança
@@ -785,6 +948,8 @@ const Simulacao = (() => {
   function balanco(e) {
     const antes = snapshot(e), rel = [], causas = { temperatura: [], tensao: [], deslocados: [], energia: [] };
     const D = e.delta, f = D / 4; // f = fração de um mandato de 4 anos
+    const pids = Object.keys(e.potencias), N = pids.length;
+    const diplomacia = { relacoes: [], contagio: [], incidentes: [] };
 
     // 1. efeitos atrasados
     const agora = e.pendentes.filter(x => x.rodada <= e.rodada + 1);
@@ -796,7 +961,7 @@ const Simulacao = (() => {
     for (const p of Object.values(e.potencias)) {
       const prod = { ...p.producao };
       parceirosDe(e, p.id).forEach(t => RECURSOS.forEach(r => (prod[r] = (prod[r] || 0) + (t.recursos[r] || 0))));
-      if (p.id === 'brasil') prod.alimentos += 1;
+      prod.alimentos += mod(p.id, 'agro', 0);
       if (e.sancoes.some(s => s.contra === p.id && s.ate >= e.rodada)) prod.energia = Math.ceil(prod.energia * .6);
       RECURSOS.forEach(r => (p.recursos[r] += prod[r] || 0));
       for (const r of ['alimentos', 'energia']) {
@@ -833,26 +998,49 @@ const Simulacao = (() => {
 
     // 4. dano climático, economia e indicadores das potências
     const excesso = Math.max(0, e.global.temperatura - 1.4);
-    const militarMedio = Object.values(e.potencias).reduce((s, p) => s + p.militar, 0) / 6;
+    const militarMedio = Object.values(e.potencias).reduce((s, p) => s + p.militar, 0) / N;
+    // crescimento de cada potência sozinha; depois soma o que vem dos parceiros (contágio) e do atrito das relações
+    const crescBase = {}, expo = id => mod(id, 'exposicao', 1);
+    for (const p of Object.values(e.potencias)) {
+      const dano = excesso * p.vulnerabilidade / 100 * PARAM.danoClima * f;
+      const exportador = EXPORTADORES_ENERGIA.includes(p.id) && p.producao.energia > (p.consumo.energia || 0);
+      const efEnergia = (exportador ? 1 : -1) * (e.global.energia - 50) / PARAM.energiaEconomia * mod(p.id, 'energia', 1);
+      const sancionada = e.sancoes.filter(s => s.contra === p.id && s.ate >= e.rodada).length;
+      crescBase[p.id] = (p.crescimento + (e.global.comercio - 60) / 20 + efEnergia + .3 * parceirosDe(e, p.id).length
+        + Math.min(1.5, p.producao.tecnologia / 4) - dano / 2 - 1.5 * sancionada * mod(p.id, 'sancao', 1)
+        - (p.militar - p.inicial.militar) / 80 - .05 * Math.max(0, 50 - p.seguranca)) * f; // gasto militar conta pelo que mudou desde 2026
+    }
+    const variacao = id => crescBase[id] + (e.choques[id] || 0); // crescimento + choques das decisões do mandato
+    const mediaVar = pids.reduce((s, id) => s + variacao(id), 0) / N;
+    // relação "para o comércio": a de agora, mais acordos, menos sanções entre os dois; só o que MUDOU desde 2026 pesa (o resto já está no crescimento base)
+    const relComercio = (a, b) => limitar(relacao(e, a, b) + (e.acordos.some(x => x.ate >= e.rodada && ((x.a === a && x.b === b) || (x.a === b && x.b === a))) ? PARAM.acordoBonus : 0)
+      - (sancionados(e, a, b) ? PARAM.sancaoPeso : 0), -100, 100) - relBase(a, b);
+    const efeitoComercio = {};
+    for (const a of pids) {
+      let atrito = 0, contagio = 0;
+      for (const [b, w] of Object.entries(COMERCIO[a] || {})) {
+        if (!e.potencias[b]) continue;
+        atrito += w * relComercio(a, b) / 100 * PARAM.atrito;
+        const c = w * (variacao(b) - mediaVar) * PARAM.contagio;
+        contagio += c;
+        if (Math.abs(c * expo(a)) >= .15) diplomacia.contagio.push({ de: b, para: a, valor: r1(c * expo(a)) });
+      }
+      efeitoComercio[a] = (atrito + contagio) * expo(a) * f;
+    }
+    diplomacia.contagio.sort((x, y) => Math.abs(y.valor) - Math.abs(x.valor)).splice(4);
     for (const p of Object.values(e.potencias)) {
       const d = dadoPotencia(p.id), a = antes.potencias[p.id];
       const dano = excesso * p.vulnerabilidade / 100 * PARAM.danoClima * f;
-      const exportador = EXPORTADORES_ENERGIA.includes(p.id) && p.producao.energia > (p.consumo.energia || 0);
-      const efEnergia = (exportador ? 1 : -1) * (e.global.energia - 50) / PARAM.energiaEconomia * (p.id === 'russia' ? 1.2 : 1);
-      const sancionada = e.sancoes.filter(s => s.contra === p.id && s.ate >= e.rodada).length;
-      const cresc = (p.crescimento + (e.global.comercio - 60) / 20 + efEnergia + .3 * parceirosDe(e, p.id).length
-        + Math.min(1.5, p.producao.tecnologia / 4) - dano / 2 - 1.5 * sancionada * (p.id === 'russia' ? 1.3 : 1)
-        - (p.militar - p.inicial.militar) / 80 - .05 * Math.max(0, 50 - p.seguranca)) * f; // gasto militar conta pelo que mudou desde 2026
+      const cresc = crescBase[p.id] + efeitoComercio[p.id];
       p.economia = faixa('economia', p.economia + cresc);
-      const fBem = p.id === 'brasil' ? .2 : .3;
-      p.bemEstar = faixa('bemEstar', p.bemEstar + fBem * Math.max(-3, cresc) - dano / 2);
+      p.bemEstar = faixa('bemEstar', p.bemEstar + mod(p.id, 'fBem', .3) * Math.max(-3, cresc) - dano / 2);
       p.ambiente = faixa('ambiente', p.ambiente + .5 * (p.limpa - a.limpa) / 10 - p.desmatamento * 3 * f - .5 * Math.max(0, e.global.temperatura - 1.5) * 10 * f + .5);
       const conflitosVizinhos = vizinhosDe(p.id).map(id => e.territorios[id]).filter(t => t && t.conflito >= 2).length; // pesa .5 (era 1: decidia o placar pela geografia)
       // armar-se dá segurança (o arsenal de 2026 já está no valor inicial; antes, quem começava armado subia sozinho todo mandato)
-      p.seguranca = faixa('seguranca', p.seguranca + (p.militar - p.inicial.militar) / 20 * f - (e.global.tensao - 60) / 15 * f - .5 * conflitosVizinhos * f
+      p.seguranca = faixa('seguranca', p.seguranca + (p.militar - p.inicial.militar) / 20 * f - (e.global.tensao - 60) / 15 * f - mod(p.id, 'vizinhos', .5) * conflitosVizinhos * f
         + (e.aliancas.some(x => x.includes(p.id)) ? .5 : 0));
       const humor = .5 * (p.economia - a.economia) + .5 * (p.bemEstar - a.bemEstar) + .3 * (p.seguranca - a.seguranca);
-      const polarizacao = p.id === 'eua' && humor < 0 ? 1.5 : 1; // fraqueza dos EUA: o apoio despenca mais rápido quando as coisas pioram
+      const polarizacao = humor < 0 ? mod(p.id, 'polarizacao', 1) : 1; // fraqueza dos EUA: o apoio despenca mais rápido quando as coisas pioram
       p.apoio = faixa('apoio', p.apoio + polarizacao * humor
         + (p.inicial.apoio - p.apoio) * .1); // o apoio volta devagar ao nível de cada país (era 55 para todos)
       p.crisePolitica = p.apoio < 30;
@@ -863,7 +1051,6 @@ const Simulacao = (() => {
           : [{ v: 'global.cooperacao', d: -3 }, { v: 'apoio', d: -1 }], { potencia: p.id, motivo: cumpriu ? 'cumpriu a meta climática' : 'descumpriu a meta climática' }, rel);
         p.meta = null;
       }
-      RECURSOS.forEach(() => {});
       for (const k of Object.keys(p.imune)) p.imune[k] = Math.max(0, p.imune[k] - 1);
     }
 
@@ -875,7 +1062,12 @@ const Simulacao = (() => {
       t.desenvolvimento = faixa('desenvolvimento', t.desenvolvimento + (1 - t.conflito - dano * .6) * f + (t.parceiro ? .3 : 0));
       const alvoEst = t.desenvolvimento - 10 * t.conflito - (t.pressao > 40 ? 5 : 0);
       t.estabilidade = faixa('estabilidade', t.estabilidade + (alvoEst - t.estabilidade) * .15 * f - dano * .5);
-      const chanceEscalar = (Math.max(0, (e.global.tensao - 65) / 70) * .6 + Math.max(0, (30 - t.estabilidade) / 100)) * f * (t.conflito > 0 ? 1 : .3);
+      // guerra por procuração: duas potências rivais com influência forte num lugar em conflito esquentam o conflito e a rivalidade
+      const fortes = pids.filter(q => t.influencia[q] >= PARAM.procuracao.influencia), rivaisAqui = [];
+      fortes.forEach((x, i) => fortes.slice(i + 1).forEach(y => { if (relacao(e, x, y) < -20) rivaisAqui.push([x, y]); }));
+      const proxy = t.conflito > 0 ? rivaisAqui.length : 0;
+      rivaisAqui.filter(() => proxy).forEach(([x, y]) => mudarRel(e, x, y, PARAM.procuracao.relacao * f, `guerra por procuração ${com(t.id, 'em')}`));
+      const chanceEscalar = (Math.max(0, (e.global.tensao - 65) / 70) * .6 + Math.max(0, (30 - t.estabilidade) / 100)) * f * (t.conflito > 0 ? 1 + (PARAM.procuracao.escalada - 1) * Math.min(1, proxy / 2) : .3);
       const chanceAcalmar = t.conflito > 0 ? Math.max(0, PARAM.calmaBase + (e.global.cooperacao - 40) / 120 + .15 * t.mediacoes + (t.estabilidade - 40) / 200) * f : 0;
       const nivelAntes = t.conflito;
       if (t.conflito < 3 && sorte(e) < chanceEscalar) t.conflito++;
@@ -884,6 +1076,7 @@ const Simulacao = (() => {
       if (t.conflito !== nivelAntes) {
         relConflitos.push({ territorio: t.id, antes: nivelAntes, depois: t.conflito });
         if (t.conflito > nivelAntes) Object.keys(t.influencia).forEach(k => (t.influencia[k] = Math.max(0, t.influencia[k] - 1)));
+        if (t.conflito > nivelAntes && proxy) e.manchetes.push({ ano: e.ano, texto: `Rivais disputam ${com(t.id)}: ${com(rivaisAqui[0][0])} e ${com(rivaisAqui[0][1])} alimentam o conflito` });
       }
       if (t.conflito >= 3) vizinhosDe(t.id).forEach(id => { const v = e.territorios[id]; if (v && !v.protegido) v.estabilidade = faixa('estabilidade', v.estabilidade - 3 * f); });
       t.pressao = Math.max(0, t.pressao - PARAM.pressaoQueda);
@@ -897,16 +1090,20 @@ const Simulacao = (() => {
     }
     atualizarParcerias(e, rel);
 
+    // 5b. relações entre as potências: o mundo esquece devagar, alianças e sanções puxam, e quem cresce demais atrai o "equilíbrio" dos outros
+    dinamicaBilateral(e, f, diplomacia, rel);
+
     // 6. dinâmica global
     const g = e.global, conflitos = Object.values(e.territorios).reduce((s, t) => s + t.conflito, 0);
-    const dTensao = ((conflitos - PARAM.conflitosNormais) * .3 + (militarMedio - 65) * .08 - (g.cooperacao - 45) * .05 + (PARAM.tensaoEstrutural - g.tensao) * .08) * f;
+    const dTensao = ((conflitos - PARAM.conflitosNormais) * .3 + (militarMedio - 65) * .08 - (g.cooperacao - 45) * .05 + (PARAM.tensaoEstrutural - g.tensao) * .08
+      + (hostilidade(e) - e.hostilidade0) * PARAM.tensaoRelacoes) * f; // potências que se afastam esquentam o mundo
     g.tensao = faixa('tensao', g.tensao + dTensao);
     causas.tensao = Object.values(e.territorios).filter(t => t.conflito >= 2).map(t => ({ quem: t.id, valor: t.conflito }));
     const rotasEmConflito = Object.keys(ROTAS).filter(id => e.territorios[id]?.conflito > 0).reduce((s, id) => s + e.territorios[id].conflito, 0);
     g.comercio = faixa('comercio', g.comercio - rotasEmConflito * 1.5 * f + (60 - g.comercio) * .1);
-    g.cooperacao = faixa('cooperacao', g.cooperacao + (45 - g.cooperacao) * .1);
+    g.cooperacao = faixa('cooperacao', g.cooperacao + (45 + (amizade(e) - e.amizade0) * PARAM.coopRelacoes * 4 - g.cooperacao) * .1);
     const petroleo = REGIOES_PETROLEO.reduce((s, id) => s + (e.territorios[id]?.conflito || 0), 0);
-    const limpaMedia = Object.values(e.potencias).reduce((s, p) => s + p.limpa, 0) / 6, limpaMedia0 = Object.values(antes.potencias).reduce((s, p) => s + p.limpa, 0) / 6;
+    const limpaMedia = Object.values(e.potencias).reduce((s, p) => s + p.limpa, 0) / N, limpaMedia0 = Object.values(antes.potencias).reduce((s, p) => s + p.limpa, 0) / N;
     g.energia = faixa('energia', g.energia + petroleo * PARAM.energiaConflito * f - (limpaMedia - limpaMedia0) * .5 + (50 - g.energia) * .2
       + (e.sancoes.some(s => s.contra === 'russia' && s.ate >= e.rodada) ? 4 : 0));
     const dDesl = (conflitos * .9 + excesso * 3) * f - g.deslocados * PARAM.retornoDeslocados * f;
@@ -915,16 +1112,64 @@ const Simulacao = (() => {
 
     // 7. limpezas do mandato
     e.sancoes = e.sancoes.filter(s => s.ate > e.rodada);
+    e.acordos = e.acordos.filter(x => x.ate > e.rodada);
     e.desarmaramNaRodada = [];
+    e.choques = {};
+    // maiores mudanças de relação do mandato (somadas por par)
+    const porPar = {};
+    for (const x of e.relLog) { const k = chaveRel(x.a, x.b), o = (porPar[k] ||= { a: x.a < x.b ? x.a : x.b, b: x.a < x.b ? x.b : x.a, d: 0, motivos: {} }); o.d += x.d; if (x.motivo) o.motivos[x.motivo] = (o.motivos[x.motivo] || 0) + Math.abs(x.d); }
+    diplomacia.relacoes = Object.values(porPar).filter(o => Math.abs(o.d) >= 3).sort((x, y) => Math.abs(y.d) - Math.abs(x.d)).slice(0, 6)
+      .map(o => ({ a: o.a, b: o.b, antes: r1(relacao(e, o.a, o.b) - o.d), depois: r1(relacao(e, o.a, o.b)), motivo: Object.entries(o.motivos).sort((x, y) => y[1] - x[1])[0]?.[0] || '' }));
+    e.relLog = [];
 
     const depois = snapshot(e);
-    const relatorio = { ano: e.ano, proximoAno: Math.round(e.ano + D), antes, depois, causas, mercado, conflitos: relConflitos, mudancas: rel, emissoes: r1(total) };
+    const relatorio = { ano: e.ano, proximoAno: Math.round(e.ano + D), antes, depois, causas, mercado, conflitos: relConflitos, mudancas: rel, emissoes: r1(total), diplomacia };
     e.rodada++;
     e.ano = Math.round(PARAM.anoInicial + (e.rodada - 1) * D);
     registrarHistorico(e);
     e.fim = verificarFim(e);
     relatorio.fim = e.fim;
     return relatorio;
+  }
+
+  // Incidentes, cooperação espontânea, rompimento de alianças e o "equilíbrio de poder"; as relações voltam devagar ao retrato de 2026
+  function dinamicaBilateral(e, f, diplomacia, rel) {
+    const ids = Object.keys(e.potencias), P = PARAM, vezes = (v, n) => v[Math.floor(sorte(e) * n)];
+    const poder = id => { const p = e.potencias[id]; return p.economia * .5 + p.militar * .35 + p.producao.tecnologia * 3; };
+    const media = ids.reduce((s, id) => s + poder(id), 0) / ids.length, lider = ids.slice().sort((x, y) => poder(y) - poder(x))[0];
+    const noticia = (tipo, a, b, texto) => { diplomacia.incidentes.push({ tipo, a, b, texto }); e.manchetes.push({ ano: e.ano, texto, potencia: a }); };
+    if (poder(lider) > media * P.equilibrioPoder.razao) { // ascensão: os que não são amigos do líder se afastam dele
+      const afastam = ids.filter(q => q !== lider && relacao(e, q, lider) < 30 && !aliadas(e, q, lider));
+      afastam.forEach(q => mudarRel(e, q, lider, P.equilibrioPoder.relacao * f, `equilíbrio de poder contra ${com(lider)}`, null));
+      if (afastam.length >= 3) e.manchetes.push({ ano: e.ano, texto: `Com a ascensão ${com(lider, 'de')}, outras potências buscam se equilibrar e se afastam` });
+    }
+    ids.forEach((a, i) => ids.slice(i + 1).forEach(b => {
+      let r = relacao(e, a, b);
+      const base = relBase(a, b), aliada = aliadas(e, a, b);
+      r += (base - r) * P.retornoRelacao * f;                    // volta ao retrato de 2026
+      if (aliada) r += Math.max(0, 60 - r) * .15 * f;            // aliados se aproximam
+      if (sancionados(e, a, b)) r -= 2 * f;                      // sanções azedam
+      e.relacoes[chaveRel(a, b)] = limitar(r, -100, 100);
+      r = relacao(e, a, b);
+      if (aliada && r < 5) { e.aliancas = e.aliancas.filter(x => !(x.includes(a) && x.includes(b))); mudarRel(e, a, b, -5, 'aliança rompida');
+        noticia('alianca_rompida', a, b, `A aliança entre ${com(a)} e ${com(b)} se rompe: a confiança acabou`); return; }
+      if (!aliada && r <= P.incidente.limite && sorte(e) < (-r - 40) / 60 * P.incidente.chance * f) {
+        const comerciais = (COMERCIO[a]?.[b] || 0) + (COMERCIO[b]?.[a] || 0) >= .12;
+        if (comerciais) { [a, b].forEach(x => aplicarEfeitos(e, [{ v: 'economia', d: -1.5 * mod(x, 'exposicao', 1) }], { potencia: x, motivo: 'guerra comercial', fator: 1 }, rel));
+          aplicarEfeitos(e, [{ v: 'global.comercio', d: -2 }], { motivo: 'guerra comercial' }, rel);
+          mudarRel(e, a, b, -4, 'guerra comercial');
+          noticia('guerra_comercial', a, b, `${maiuscula(com(a))} e ${com(b)} entram em guerra comercial: tarifas cruzadas encarecem tudo`); }
+        else { [a, b].forEach(x => aplicarEfeitos(e, [{ v: 'seguranca', d: -1.5 }], { potencia: x, motivo: 'incidente' }, rel));
+          aplicarEfeitos(e, [{ v: 'global.tensao', d: 2 }], { motivo: 'incidente' }, rel);
+          mudarRel(e, a, b, -5, 'incidente');
+          noticia('incidente', a, b, vezes([`Navios de ${nome(a)} e de ${nome(b)} se encaram em águas disputadas`, `${maiuscula(com(a))} e ${com(b)} trocam acusações de espionagem e expulsam diplomatas`, `Caças ${com(a, 'de')} e ${com(b, 'de')} se aproximam perigosamente num exercício`], 3)); }
+      } else if (r >= P.cooperacaoEspontanea.limite && sorte(e) < P.cooperacaoEspontanea.chance * f) {
+        [a, b].forEach(x => aplicarEfeitos(e, [{ v: 'economia', d: .8 }], { potencia: x, motivo: 'cooperação' }, rel));
+        aplicarEfeitos(e, [{ v: 'global.cooperacao', d: 1 }], { motivo: 'cooperação' }, rel);
+        mudarRel(e, a, b, 2, 'cooperação');
+        noticia('cooperacao', a, b, `${maiuscula(com(a))} e ${com(b)} fecham parceria em ciência, comércio e defesa`);
+      }
+    }));
   }
 
   function registrarHistorico(e) {
@@ -936,7 +1181,7 @@ const Simulacao = (() => {
   function verificarColapso(e) {
     const g = e.global, c = PARAM.colapso;
     if (g.temperatura >= c.temperatura) return { tipo: 'colapso', causa: 'clima', texto: `A temperatura chegou a +${g.temperatura.toFixed(2).replace('.', ',')} °C: o planeta passou do ponto de não retorno.` };
-    if (g.tensao >= c.tensao) return { tipo: 'colapso', causa: 'tensao', texto: 'O Relógio do Juízo Final chegou à meia-noite: as potências entraram em guerra.' };
+    if (g.tensao >= c.tensao) return { tipo: 'colapso', causa: 'tensao', texto: 'O Relógio do Juízo Final chegou à meia-noite: as crises saíram do controle e o mundo entrou em colapso.' };
     if (g.deslocados >= c.deslocados) return { tipo: 'colapso', causa: 'humanitaria', texto: `${Math.round(g.deslocados)} milhões de pessoas deslocadas: uma catástrofe humanitária global.` };
     return null;
   }
@@ -969,6 +1214,10 @@ const Simulacao = (() => {
       case 'progresso': return p[c.v] - p.inicial[c.v] >= c.min;
       case 'parceiro': return e.territorios[c.territorio]?.parceiro === pid;
       case 'parceiroUm': return c.territorios.some(id => e.territorios[id]?.parceiro === pid);
+      case 'aliancas': return aliadosDe(e, pid).length >= c.n;
+      case 'relacoes': return outras(e, pid).filter(q => relacao(e, pid, q) >= c.min).length >= c.n;
+      case 'relacoesCom': return c.com.filter(q => q !== pid && relacao(e, pid, q) >= c.min).length >= c.n;
+      case 'semHostis': return outras(e, pid).every(q => relacao(e, pid, q) > c.limite);
       default: return false;
     }
   }
@@ -1044,6 +1293,14 @@ const Simulacao = (() => {
     const crise = { tensao: g.tensao >= 80 ? 1.6 : g.tensao >= 70 ? 1.2 : 1, clima: g.temperatura >= 1.9 ? 1.6 : g.temperatura >= 1.7 ? 1.25 : 1,
       humanit: g.deslocados >= 150 ? 1.5 : 1, coop: e.config.modo === 'cooperativo' ? 1.4 : 1 };
     const [a, b] = v.split('.');
+    if (a === 'rel') { // mudar relações: vale mais com quem já é amigo (e machucar amigo custa); com inimigo, ferir quase não pesa
+      if (v.split('.').length > 2) return 0;
+      if (b === 'todos') return d * .06 * w.cooperacao * 3;
+      if (b === 'aliados') return d * .1;
+      if (b === 'rivais') return d > 0 ? d * .05 * w.cooperacao : -d * .03 * w.seguranca;
+      const x = b === 'alvo' || b === 'local' ? alvo : b, s = e.potencias[x] ? limitar(relacao(e, pid, x) / 50, -1, 1) : 0;
+      return d > 0 ? d * .07 * (.5 + .5 * s) * w.cooperacao : d * .07 * (.4 + .6 * s);
+    }
     if (INDICADORES.includes(v)) return (w[v] ?? 1) * d * (v === 'apoio' && p.apoio < 40 ? 1.4 : 1) * (v === 'ambiente' ? crise.clima : 1);
     if (v === 'limpa') return w.ambiente * .35 * d * crise.clima * crise.coop;
     if (v === 'cp') return 1.4 * d;                                  // vale o mesmo que o custo de uma ação
@@ -1073,7 +1330,11 @@ const Simulacao = (() => {
       }
     }
     if (a === 'alvo' && e.potencias[alvo]) { // efeito sobre outra potência
-      if (b === 'economia') return d < 0 ? (RIVAIS[pid]?.includes(alvo) ? -d * .25 : d * .5) * (e.config.modo === 'cooperativo' ? -1 : 1) : d * .1;
+      if (b === 'economia') {
+        const h = limitar(-relacao(e, pid, alvo) / 60, -1, 1); // hostilidade: 1 = inimiga, −1 = amiga
+        const coop = e.config.modo === 'cooperativo' ? -1 : 1;
+        return d < 0 ? (h > .15 ? -d * .3 * h : d * .5 * (1 - h)) * coop : d * (.1 + .15 * Math.max(0, -h));
+      }
       return d * .05;
     }
     if (a === 'alvo' || ['vizinhos', 'vizinhosCasa', 'territorios', 'emConflito', 'comFloresta', 'vulneraveis', 'escolhidos'].includes(a)) {
@@ -1116,9 +1377,15 @@ const Simulacao = (() => {
     if (c.especial === 'mediacao') { // vale pela chance de dar certo
       const ch = alvo ? chanceMediacao(e, pid, alvo).chance : .3;
       u = ch * utilidadeEfeitos(e, pid, c.seSucesso, alvo) + (1 - ch) * utilidadeEfeitos(e, pid, c.seFracasso, alvo);
-    } else u = utilidadeEfeitos(e, pid, c.efeitos, alvo);
+    } else if (c.especial === 'espionagem') u = .5 * utilidadeEfeitos(e, pid, c.seSucesso, alvo) + .5 * utilidadeEfeitos(e, pid, c.seFracasso, alvo);
+    else u = utilidadeEfeitos(e, pid, c.efeitos, alvo);
     u += utilidadeEfeitos(e, pid, c.extra?.[pid], alvo);
-    if (c.especial === 'defesa') { const ameaca = Object.values(e.potencias).some(o => o.id !== pid && o.armouNaRodada >= e.rodada - 1 && RIVAIS[pid]?.includes(o.id)); if (ameaca) u += 3; }
+    if (c.diplomacia?.alvo && e.potencias[alvo]) { // relação: ataque vale contra quem já é hostil e pesa contra amigo; gesto amistoso vale mais com quem já gosta de você
+      const r = relacao(e, pid, alvo), h = limitar(-r / 60, -1, 1), dl = c.diplomacia.alvo, w = pesosIA(e, pid);
+      u += dl < 0 ? -dl * (.07 * h * (.6 + .4 * w.seguranca) + PARAM.iaRivalidade * Math.max(0, h - .2) * w.seguranca) : dl * .07 * (.5 + .5 * limitar(r / 60, -1, 1)) * (.6 + .4 * w.cooperacao);
+      if (c.especial === 'bilateral') u *= limitar((r - (c.diplomacia.aceitaSe ?? 0)) / 40 + .5, .05, .95); // só vale se o outro lado aceitar
+    }
+    if (c.especial === 'defesa') { const ameaca = Object.values(e.potencias).some(o => o.id !== pid && o.armouNaRodada >= e.rodada - 1 && rivaisDe(e, pid).includes(o.id)); if (ameaca) u += 3; }
     if (c.especial === 'acolher' && e.global.deslocados > 130) u += 1;
     u -= (custo.cp || 0) * 1.4 + (custo.economia || 0) * pesosIA(e, pid).economia * 1.3;
     for (const r of RECURSOS) if (custo[r]) u -= custo[r] * valorRecurso(e, pid, r) * .6;
@@ -1128,11 +1395,15 @@ const Simulacao = (() => {
     const c = carta(cid);
     if (c.alvo === 'nenhum') return { alvo: null, u: utilidadeCarta(e, pid, cid, null) };
     if (c.alvo === 'potencia') {
-      if (e.config.modo === 'cooperativo') return { alvo: null, u: -Infinity };
-      const rivais = (RIVAIS[pid] || []).filter(id => e.potencias[id]);
-      if (!rivais.length || e.global.tensao > 82) return { alvo: null, u: -Infinity };
-      const alvo = rivais[0];
-      return { alvo, u: utilidadeCarta(e, pid, cid, alvo) - 1.5 };
+      const hostilC = (c.diplomacia?.alvo || 0) < 0;
+      if (e.config.modo === 'cooperativo' && hostilC) return { alvo: null, u: -Infinity };
+      if (hostilC && e.global.tensao > 82) return { alvo: null, u: -Infinity };
+      let melhor = { alvo: null, u: -Infinity };
+      for (const id of outras(e, pid)) { // o alvo vem da relação: ataques para quem já é hostil, gestos para quem é próximo
+        const u = utilidadeCarta(e, pid, cid, id) - (hostilC ? 1.5 : 0) + (sorte(e) - .5) * .4;
+        if (u > melhor.u) melhor = { alvo: id, u };
+      }
+      return melhor;
     }
     if (c.alvo === 'territorios3') {
       const cand = alvosValidos(e, pid, cid).map(id => e.territorios[id]).sort((a, b) => (resistencia(a) - a.influencia[pid]) - (resistencia(b) - b.influencia[pid])).slice(0, 3).map(t => t.id);
@@ -1231,8 +1502,9 @@ const Simulacao = (() => {
     sortearEventos, aplicarEvento, resolverDoacao, resolverDecisao, iaDecisao, iaDoacao,
     resolucoesDisponiveis, votacao, iaVoto, iaProposta, votoTerritorio, preencher, com,
     copNestaRodada, resolverCop, iaCop, reuniaoEmergencia,
+    aplicarEfeitos, relacao, rotuloRelacao, relacoesDe, metaCop,
     balanco, verificarFim, metas, placar, placarBlocos, resultado, igi, selos, missaoCumprida,
-    iaJogarVez, emissoesDe, emissoesTotais, parceirosDe, liderancas, resistencia, nome, copia,
+    iaJogarVez, utilidadeCarta, melhorAlvo, emissoesDe, emissoesTotais, parceirosDe, liderancas, resistencia, nome, copia,
   };
 })();
 if (typeof module === 'object') module.exports = Simulacao;

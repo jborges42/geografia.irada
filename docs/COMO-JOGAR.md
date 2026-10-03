@@ -2,7 +2,7 @@
 
 > Versão em documento do manual que aparece no jogo. **Gerado por `ferramentas/gerar-como-jogar.mjs`**: não edite à mão.
 > Edite `conteudo/manual.js` (ou o balanceamento em `js/simulacao.js`) e rode `node ferramentas/gerar-como-jogar.mjs`.
-> Os números abaixo são os valores atuais do motor (`Simulacao.PARAM`), conferidos em 02/10/2026.
+> Os números abaixo são os valores atuais do motor (`Simulacao.PARAM`), conferidos em 03/10/2026.
 
 ## Sumário
 
@@ -13,6 +13,7 @@
 - 🌐 Os indicadores do mundo
 - 🌾 Recursos e mercado mundial
 - 🧱 Influência e parcerias
+- 🧭 Relações entre países
 - 🛠️ Ações de governo
 - 📰 Jornal Mundial
 - 🏛️ ONU: Assembleia Geral e Conselho de Segurança
@@ -28,20 +29,20 @@
 
 ## 🌍 Missão 2050
 
-Bem-vindo, diplomata! Em **Geografia Irada**, cada equipe governa uma das **seis potências** do mapa — Brasil, Estados Unidos, China, União Europeia, Índia e Rússia — de **2026 a 2050**. Cada rodada é um **mandato** de alguns anos, e cada decisão mexe no mundo inteiro.
+Bem-vindo, diplomata! Em **Geografia Irada**, cada equipe governa uma das **treze potências** do mapa — Brasil, Estados Unidos, China, União Europeia, Índia, Rússia, Reino Unido, Japão, Austrália, Nova Zelândia, África do Sul, Nigéria e Egito — de **2026 a 2050**. Cada rodada é um **mandato** de alguns anos, e cada decisão mexe no mundo inteiro.
 
 O desafio é o mesmo da geopolítica de verdade: todo governo quer ver o próprio país prosperar, mas todos dividem **um planeta só**. Um clima estável, a paz e o comércio são **bens comuns**: ninguém consegue tê-los sozinho, e as crises humanitárias afetam todos. Quem só pensa em si empurra o mundo para o colapso — e, num planeta em colapso, **ninguém vence**.
 
 ### Aqui ninguém ataca ninguém
 
-Não existe guerra entre jogadores. A disputa é por **influência**: diplomacia, comércio, investimento, ajuda, cultura e ciência. Os conflitos aparecem no mapa como focos de crise que reagem às decisões de todos e pedem mediação, ajuda humanitária e missões de paz.
+Não existe guerra entre jogadores. A disputa é por **influência**: diplomacia, comércio, investimento, ajuda, cultura e ciência — e cada decisão mexe também na **relação** com os outros países (veja “Relações entre países”). Os conflitos aparecem no mapa como focos de crise que reagem às decisões de todos e pedem mediação, ajuda humanitária e missões de paz.
 
 ### Escolha o modo
 
 - **Cada nação por si (competitivo):** vence quem chegar a 2050 com o maior **Índice Geografia Irada (IGI)** — desde que o planeta sobreviva. Com as **missões secretas** ligadas, cada potência ainda persegue um objetivo escondido.
 - **Em blocos:** as equipes se juntam em 2 ou 3 blocos, e vence o bloco com a maior média de IGI. Aqui também há missões secretas.
 - **Todos pelo planeta (cooperativo):** a turma inteira tenta cumprir as **Metas 2050**. Opcional: um **agente infiltrado** com agenda secreta.
-- **Solo:** uma equipe contra (ou junto com) cinco potências do computador.
+- **Solo:** uma equipe contra (ou junto com) doze potências do computador.
 
 As potências que nenhuma equipe escolher ficam com o **computador**, que joga de forma realista e não sabota ninguém de propósito.
 
@@ -55,9 +56,9 @@ As potências que nenhuma equipe escolher ficam com o **computador**, que joga d
 
 A turma vence se cumprir **pelo menos 4 das 5 metas**, sem colapso. Elas se inspiram no **Acordo de Paris** e nos **Objetivos de Desenvolvimento Sustentável** (ODS) da Agenda 2030 da ONU.
 
-### As seis potências
+### As treze potências
 
-Cada potência tem uma **força** e uma **fraqueza** inspiradas no mundo real: o Brasil é potência ambiental e agrícola, mas desigual; a União Europeia regula e negocia bem, mas importa energia; a Índia tem a maior população do mundo e sofre com o calor extremo… No lobby, toque numa potência para ver os detalhes. Os números do jogo são uma **aproximação didática** de dados reais: servem para o mundo começar parecido com o de verdade, não para dar nota a nenhum país.
+Cada potência tem uma **força** e uma **fraqueza** inspiradas no mundo real: o Brasil é potência ambiental e agrícola, mas desigual; a União Europeia regula e negocia bem, mas importa energia; a Índia tem a maior população do mundo e sofre com o calor extremo; o Reino Unido tem diplomacia e veto na ONU, mas saiu da União Europeia; o Japão tem tecnologia, mas envelhece e importa energia; a Austrália vende minérios, mas depende da China; a Nova Zelândia tem energia limpa, mas é pequena e distante; a África do Sul tem minerais e voz na África, mas sofre com apagões; a Nigéria tem petróleo e muita gente jovem, mas enfrenta violência no norte; o Egito controla o Canal de Suez, mas depende do Nilo e do trigo importado… No lobby, toque numa potência para ver os detalhes. Os números do jogo são uma **aproximação didática** de dados reais: servem para o mundo começar parecido com o de verdade, não para dar nota a nenhum país.
 
 ## 🎮 Como uma partida funciona
 
@@ -75,13 +76,13 @@ Uma faixa anuncia o ano e entra no ar o **Plantão Global**, o telejornal do Jor
 
 ### 2. A vez de cada potência
 
-As potências jogam na ordem do mapa, e a cada mandato começa uma diferente. Na vez da sua equipe:
+As treze potências jogam na ordem do mapa, e a cada mandato começa uma diferente: a ordem gira, para que ninguém jogue sempre por último. Na vez da sua equipe:
 
 - **Dilema de governo:** a vez começa com uma situação real e datada, com 2 ou 3 saídas defendidas pelos seus conselheiros. **Não existe resposta certa**: cada saída ganha numa coisa e perde em outra. A equipe escolhe, e a consequência aparece na hora no mapa e nos indicadores, com a manchete e o porquê (veja “Dilemas de governo”).
 - **Ações:** gaste seu Capital Político (CP) nas ações da barra (veja “Ações de governo”). Quando a ação tem alvo, os alvos válidos brilham no mapa — e também aparecem numa lista.
 - **Encerrar a vez:** até 1 CP que sobrar fica guardado para a próxima.
 
-A vez de cada equipe leva pouco mais de um minuto: uns 25 segundos para o dilema e uns 50 para as ações. As potências do computador também enfrentam dilemas: decidem sozinhas, cada uma do jeito do seu governo, e jogam em poucos segundos. Dá para pular a animação.
+Com treze potências, uma rodada completa é mais longa, e nenhuma decisão sozinha decide o clima ou a paz: por isso as coalizões importam. A vez de cada equipe leva pouco mais de um minuto: uns 25 segundos para o dilema e uns 50 para as ações. As potências do computador também enfrentam dilemas: decidem sozinhas, cada uma do jeito do seu governo, e jogam em poucos segundos. Dá para pular a animação.
 
 ### Capital Político (CP)
 
@@ -276,7 +277,7 @@ Na sua vez, use **Negociar** para propor uma troca direta a outra potência — 
 
 ## 🧱 Influência e parcerias
 
-Além das seis potências, o mapa tem **32 territórios** — países e regiões como o Cone Sul, o Sahel, a Península Arábica ou o Japão e a Coreia do Sul — e a **Antártida**. É um “War” sem guerra: ninguém conquista ninguém. As potências disputam **influência**. Toque num território para ver a ficha dele, com o “Você sabia?”.
+Além das treze potências, o mapa tem **31 territórios** — países e regiões como o Cone Sul, o Sahel, a Península Arábica, a Coreia do Sul ou a Melanésia — e a **Antártida**. É um jogo de conquista sem guerra: ninguém conquista ninguém à força. As potências disputam **influência**. Toque num território para ver a ficha dele, com o “Você sabia?”.
 
 ### 🧱 Influência
 
@@ -316,6 +317,45 @@ A **estabilidade** (0 a 100) mede o quanto o território está calmo e governáv
 ### 🧊 Antártida
 
 Ninguém é dono da Antártida: o **Tratado da Antártida** (1959) reserva o continente para a paz e a ciência, e o **Protocolo de Madri** (1991) proíbe a mineração. No jogo, ela não aceita influência, bases nem obras.
+
+## 🧭 Relações entre países
+
+Além do mapa e dos números, cada par de potências tem uma **relação bilateral**: um valor de **−100** (hostil) a **+100** (aliada) que mostra o quanto dois governos confiam um no outro. Ela muda a cada decisão. O ponto de partida, em 2026, é um retrato aproximado do mundo real: EUA e Japão são aliados, EUA e China vivem uma rivalidade estratégica, Rússia e União Europeia estão rompidas por causa da guerra na Ucrânia, e Brasil e África do Sul têm laços do Sul Global.
+
+### Como ler a relação
+
+- **Aliada** (70 ou mais) e **Amiga** (40 a 69): confiança alta, comércio mais fluido e apoio nas votações.
+- **Cordial** (10 a 39) e **Fria** (−24 a 9): relação normal, sem grandes favores nem grandes brigas.
+- **Tensa** (−59 a −25) e **Hostil** (−60 ou menos): desconfiança, tarifas, sanções e risco de incidentes.
+
+### O que faz a relação subir ou descer
+
+- **Ações com alvo:** acordos, alianças e missões diplomáticas aproximam; sanções, tarifas, embargos e espionagem afastam. Um pedido recusado também custa um pouco.
+- **Dilemas e decisões do Jornal Mundial:** cada saída traz a sua consequência diplomática, explicada no “porquê”. Vender armas, vetar uma resolução, aprofundar uma aliança militar ou aceitar ajuda de uma potência mexem na relação com outros países.
+- **Disputa por influência:** ganhar influência num território onde outra potência já tem laços esfria a relação com ela, e mais ainda se ela é a parceira dele.
+- **Alianças e sanções:** aliados se protegem, e as sanções cortam o comércio entre os dois países.
+- **Incidentes:** pares muito hostis (abaixo de −50) podem entrar em guerra comercial ou protagonizar um incidente. Já pares muito amigos (acima de 55) às vezes cooperam sozinhos.
+- **O mundo esquece devagar:** a cada Balanço, a relação volta cerca de 12% do caminho até o ponto de 2026. Ganhos e perdas pequenos se desfazem; os grandes ficam por mais tempo.
+
+### Contágio econômico
+
+Quem comercia muito com um país sente o que acontece com ele. Se o seu maior parceiro cresce, parte do crescimento chega até você; se entra em crise, a crise também chega. E, quando a relação azeda, o comércio com aquele parceiro perde ritmo e a sua economia paga o atrito. A Austrália vende cerca de 29% de tudo o que exporta para a China (2024–25, DFAT), e a União Europeia é o maior mercado do Reino Unido: por isso brigas e acordos com esses parceiros pesam tanto. É a **interdependência** dos países, vivida na prática.
+
+### Reações do computador
+
+- O país que sofre uma ação **reage**: a relação piora, e quem governa sob pressão costuma fechar fileiras em casa.
+- Os **amigos e aliados do alvo** tomam partido: olham com desconfiança quem o atacou e podem continuar comerciando com ele, o que enfraquece sanções.
+- As potências do computador podem **responder na mesma moeda** a uma tarifa ou a uma sanção. A chance cresce quanto mais hostil já era a relação.
+- Quem não é seu aliado e desconfia de você **se arma de volta** quando você amplia a defesa: é o dilema de segurança, agora com nome e endereço.
+- Duas potências rivais com influência num mesmo território em conflito alimentam a briga por procuração, e a relação entre elas piora.
+
+### A força de cada decisão depende de quem está do outro lado
+
+O mesmo gesto tem efeitos diferentes conforme o parceiro. Uma sanção contra quem quase não comercia com você custa pouco; contra um grande parceiro, custa caro também a você. Um gesto de amizade vale mais para quem já é próximo, e uma ruptura dói mais quando existe muita confiança a perder. Aliados do alvo não ficam parados, e rivais antigos já esperam o pior. Num mundo com treze potências, nenhuma decisão decide sozinha o clima, a paz ou o comércio: as coalizões e as relações é que fazem diferença.
+
+### E no mundo real?
+
+Entre 2020 e 2024, a China barrou produtos australianos, como a cevada e o vinho, depois de um desentendimento diplomático. Em 05/08/2023, retirou as tarifas sobre a cevada e, em 29/03/2024, as do vinho: quando a relação melhorou, o comércio voltou. É o que o jogo quer mostrar: relações são um capital, que se constrói devagar e pode se perder depressa.
 
 ## 🛠️ Ações de governo
 
@@ -417,7 +457,7 @@ Os acordos, fundos e vacinas custam 1 ponto de 💰 a cada potência: cooperar t
 
 ### Conselho de Segurança
 
-Decide sobre paz e sanções. No jogo votam as 6 potências e o Reino Unido. Têm **poder de veto** os EUA, a China, a Rússia, o Reino Unido e a União Europeia, que representa a França. A resolução passa com **pelo menos 4 votos sim e nenhum veto**. Como na ONU de verdade, o voto “não” de um membro permanente já é um veto; a abstenção não é.
+Decide sobre paz e sanções. No jogo votam as potências da partida. Têm **poder de veto** os EUA, a China, a Rússia, o Reino Unido e a União Europeia, que representa a França. A resolução passa com **cerca de 57% de votos sim (4 de 7 numa mesa de sete) e nenhum veto**. Como na ONU de verdade, o voto “não” de um membro permanente já é um veto; a abstenção não é.
 
 Vetar tem preço: a cooperação mundial cai 3, e quem vetou perde influência em até dois territórios.
 
@@ -447,7 +487,7 @@ Cada potência escolhe em segredo o seu compromisso:
 - **Médio:** +6 de energia limpa e −1 de 💰. Vale 1 ponto.
 - **Nenhum:** nada muda em casa. Vale 0.
 
-Os compromissos são revelados juntos. Se a soma chegar a **7 pontos**, sai um **acordo histórico**: a cooperação sobe 6, os países em desenvolvimento recebem tecnologia limpa (e passam a emitir menos) e o número de deslocados cai. Se não chegar, a cúpula fracassa e a cooperação cai 3.
+Os compromissos são revelados juntos. Se a soma chegar à meta da mesa — cerca de **1,2 ponto por potência em jogo**, ou seja, 7 pontos com seis potências e 15 com treze —, sai um **acordo histórico**: a cooperação sobe 6, os países em desenvolvimento recebem tecnologia limpa (e passam a emitir menos) e o número de deslocados cai. Se não chegar, a cúpula fracassa e a cooperação cai 3.
 
 ### A tragédia dos comuns
 
@@ -548,6 +588,8 @@ Na vida real, cientistas estudam os **pontos de não retorno** do clima: limites
 - **Guarde reservas.** Comprar comida e energia no mercado em plena crise sai caro. E não deixe a economia fraca demais: as ações mais caras ficam bloqueadas.
 - **Credibilidade antes de mediar.** Confira a chance na tela. Construa influência no lugar antes, não seja parte do conflito e aproveite quando o mundo estiver mais cooperativo.
 - **Combine antes das decisões de todos.** Nas crises que pedem a escolha de todas as potências, a ação coletiva só acontece se várias escolherem a mesma saída.
+- **Olhe quem está do outro lado.** Uma sanção, uma tarifa ou um gesto de amizade pesa diferente conforme a relação e o comércio entre os dois países: quem depende do vizinho sente a briga no próprio bolso, e os amigos do alvo costumam tomar partido.
+- **Cuide das relações como cuida do caixa.** Confiança leva mandatos para ser construída e pode cair num gesto só. Aliados fortes protegem; rivais em excesso devolvem o golpe.
 - **Olhe o relógio.** Tensão alta deixa todos menos seguros, inclusive você. Às vezes, desarmar junto com outra potência rende mais do que se armar.
 - **Combine na Cúpula do Clima.** Se ninguém se comprometer, todos pagam o preço do calor — principalmente os mais vulneráveis.
 - **Vete com cuidado.** O veto protege seus interesses, mas custa cooperação e influência.
@@ -562,7 +604,7 @@ O Geografia Irada foi feito para o telão da sala, com um computador e um projet
 
 ### Uma aula de 50 minutos
 
-- **0 a 5 minutos — preparação:** divida a turma em até 6 equipes (uma por potência), escolham nomes e avatares e façam a revelação das missões secretas. Combine papéis dentro de cada equipe: quem lê o dilema, quem cuida do mapa, quem fala na ONU.
+- **0 a 5 minutos — preparação:** divida a turma em equipes (uma por potência; as potências que sobrarem ficam com o computador), escolham nomes e avatares e façam a revelação das missões secretas. Combine papéis dentro de cada equipe: quem lê o dilema, quem cuida do mapa, quem fala na ONU.
 - **5 a 35 minutos — partida Rápida** (4 mandatos de 6 anos). A cada dilema, a equipe da vez lê a situação em voz alta e diz, numa frase, por que escolheu aquela saída. Em aula dupla, use a partida Aula (6 mandatos) ou a Completa (8).
 - **35 a 50 minutos — conversa final:** use o relatório de 2050 (gráficos ano a ano, manchetes, dilemas e escolhas de cada equipe, habilidades da BNCC vividas) e as sugestões de debate abaixo. Feche pedindo que cada equipe explique uma decisão que mudou o mundo — e por quê.
 
@@ -586,12 +628,12 @@ Você conduz a partida: lê os dilemas (ou pede que a equipe da vez leia), dá a
 
 Nos ajustes, escolha um ou mais temas para o **foco da aula**: Território e Soberania, Ordem Mundial, Globalização e Economia, Natureza, Clima e Energia, Conflitos e Paz ou Pessoas e Direitos. Os dilemas e os eventos ligados a esses temas passam a sair com muito mais frequência (2,5 vezes mais). Alguns exemplos de dilemas por tema:
 
-- 🗺️ **Território e Soberania:** base militar no vizinho, Essequibo, Ártico, Rota Marítima do Norte, pastores nômades, Antártida, pesca no alto-mar.
-- 🌐 **Ordem Mundial:** vetar uma resolução contra um parceiro, sair de um organismo internacional, escolher entre dois polos, sediar uma cúpula, mandar soldados para uma missão de paz, golpe na região.
-- 🚢 **Globalização e Economia:** tarifa sofrida, proteger a indústria, refinar terras raras, fábrica de chips, robôs no trabalho, primeiro emprego, plataforma que não cumpre a lei, acordo Mercosul–União Europeia.
-- 🌱 **Natureza, Clima e Energia:** soja ou floresta, minas de carvão, águas do Indo, meta climática, fundo das florestas tropicais, cidade alagada, geoengenharia, lixo eletrônico.
-- 🕊️ **Conflitos e Paz:** venda de armas, corrida armamentista, resposta a um atentado, cessar-fogo rápido ou paz completa.
-- 👥 **Pessoas e Direitos:** refugiados na fronteira, abrigos em Roraima, xenofobia, terras indígenas, tesouro colonial, vídeo falso na eleição, censo, promessa eleitoral, surto no vizinho, grãos para quem tem fome.
+- 🗺️ **Território e Soberania:** base militar no vizinho, Essequibo, Ártico, Rota Marítima do Norte, pastores nômades, Antártida, pesca no alto-mar, Chagos e a base de Diego Garcia (Reino Unido), ilhas Senkaku e a rota dos chips (Japão).
+- 🌐 **Ordem Mundial:** vetar uma resolução contra um parceiro, sair de um organismo internacional, escolher entre dois polos, sediar uma cúpula, mandar soldados para uma missão de paz, golpe na região, a China compra e os EUA protegem (Austrália), entre a China e os aliados no Pacífico (Nova Zelândia), BRICS ou Ocidente (África do Sul).
+- 🚢 **Globalização e Economia:** tarifa sofrida, proteger a indústria, refinar terras raras, fábrica de chips, robôs no trabalho, primeiro emprego, plataforma que não cumpre a lei, acordo Mercosul–União Europeia, Brexit e o comércio com a UE, platina para fora ou baterias em casa (África do Sul), pão barato e trigo importado e Suez sem navios (Egito).
+- 🌱 **Natureza, Clima e Energia:** soja ou floresta, minas de carvão, águas do Indo, meta climática, fundo das florestas tropicais, cidade alagada, geoengenharia, lixo eletrônico, religar usinas nucleares (Japão), carvão e a Grande Barreira (Austrália), o metano das vacas (Nova Zelândia), apagões da Eskom (África do Sul), o Nilo e a barragem (Egito).
+- 🕊️ **Conflitos e Paz:** venda de armas, corrida armamentista, resposta a um atentado, cessar-fogo rápido ou paz completa, violência no norte e o Sahel (Nigéria).
+- 👥 **Pessoas e Direitos:** refugiados na fronteira, abrigos em Roraima, xenofobia, terras indígenas, tesouro colonial, vídeo falso na eleição, censo, promessa eleitoral, surto no vizinho, grãos para quem tem fome, envelhecer ou abrir as portas (Japão), subsídio da gasolina e jovens sem vagas (Nigéria).
 
 Você também escolhe o número de mandatos, o modo, as missões secretas e, se quiser, um cronômetro para as decisões.
 
@@ -609,7 +651,7 @@ Todo o texto do jogo fica na pasta **conteudo/**, em arquivos que abrem em qualq
 - **fichas.js** e **territorios.js**: os textos das potências e dos territórios.
 - **manual.js** (este manual e o glossário) e **bncc.js** (o mapa da BNCC).
 
-O jeito mais seguro é copiar um dilema ou um evento que já existe e trocar os textos. Conte a situação com data e fonte e confira se cada saída ganha numa coisa e perde em outra: se uma saída for melhor em tudo, ela vira resposta certa, e o dilema deixa de ser dilema. Use aspas curvas “ ” dentro dos textos e mantenha as vírgulas entre os itens. Se algo quebrar, a tela inicial avisa. Quem tiver o Node instalado pode conferir tudo com **node ferramentas/validar-conteudo.mjs**. Os números do jogo (custos, efeitos e limites) ficam em **politicas.js**, **potencias.js**, **resolucoes.js** e **js/simulacao.js**: mexa só se quiser rebalancear e rode **node teste-simulacao.mjs** depois (ele também avisa se o computador escolhe sempre a mesma saída de um dilema).
+Dilemas e eventos também podem mexer nas **relações entre países**: um efeito como **rel.china** muda a relação de quem decide com a China, e **rel.rivais**, **rel.aliados** e **rel.todos** valem para grupos (o modelo está no começo de dilemas.js e de eventos.js). O jeito mais seguro é copiar um dilema ou um evento que já existe e trocar os textos. Conte a situação com data e fonte e confira se cada saída ganha numa coisa e perde em outra: se uma saída for melhor em tudo, ela vira resposta certa, e o dilema deixa de ser dilema. Use aspas curvas “ ” dentro dos textos e mantenha as vírgulas entre os itens. Se algo quebrar, a tela inicial avisa. Quem tiver o Node instalado pode conferir tudo com **node ferramentas/validar-conteudo.mjs**. Os números do jogo (custos, efeitos e limites) ficam em **politicas.js**, **potencias.js**, **resolucoes.js** e **js/simulacao.js**: mexa só se quiser rebalancear e rode **node teste-simulacao.mjs** depois (ele também avisa se o computador escolhe sempre a mesma saída de um dilema).
 
 ### Sugestões de debate
 
@@ -636,13 +678,16 @@ O mapa completo das habilidades da BNCC está na aba **BNCC**, e o relatório de
 - **Amazônia Azul:** Nome dado pela Marinha às águas jurisdicionais e à plataforma continental do Brasil: cerca de 5,7 milhões de km² reivindicados no Atlântico Sul. Ali estão pesca, petróleo, minérios, rotas de navegação e cabos submarinos.
 - **Apátrida:** Pessoa que não é reconhecida como cidadã por nenhum país e, por isso, pode ficar sem documentos e sem acesso a direitos básicos, como escola, saúde e trabalho formal.
 - **Assembleia Geral da ONU:** Órgão em que todos os países-membros da ONU têm um voto cada. Debate os grandes temas globais; suas resoluções, em geral, são recomendações, não ordens.
+- **AUKUS:** Parceria de defesa entre Austrália, Reino Unido e Estados Unidos, anunciada em 2021, que prevê submarinos de propulsão nuclear para a Austrália e cooperação em tecnologias militares. Em dezembro de 2025, os EUA concluíram uma revisão do pacto e o mantiveram.
 - **Autodeterminação dos povos:** Princípio segundo o qual cada povo pode decidir livremente seu destino político. Pode entrar em choque com a integridade territorial dos Estados, como nos casos de separatismo.
 - **Autoritarismo:** Regime político que concentra o poder, limita a oposição, a imprensa e as liberdades e não aceita a troca livre de governantes por eleições.
 - **Bloco econômico:** Grupo de países que reduzem barreiras ao comércio entre si. Pode ser zona de livre-comércio, união aduaneira (com tarifa externa comum), mercado comum ou união econômica e monetária, como a zona do euro.
+- **Brexit:** Saída do Reino Unido da União Europeia, votada em plebiscito em 2016 (51,9% a favor) e concluída em 31/01/2020. Trouxe fiscalização, papelada e regras diferentes para o comércio com o antigo bloco.
 - **BRICS:** Agrupamento político-diplomático de economias emergentes criado por Brasil, Rússia, Índia e China e ampliado com a África do Sul, com Egito, Etiópia, Irã e Emirados Árabes Unidos (2024) e com a Indonésia (2025). A Arábia Saudita aparece na lista do grupo, mas não confirmou a adesão. Não é bloco comercial nem aliança militar.
 - **Cadeia global de valor:** As etapas da fabricação de um produto (pesquisa, peças, montagem, transporte, marca) espalhadas por vários países. O maior lucro costuma ficar com quem controla a tecnologia e a marca.
 - **Cessar-fogo:** Acordo para suspender os combates. É diferente de um acordo de paz, que trata das causas do conflito e de como os lados vão conviver.
 - **Commodity:** Produto básico e padronizado, como soja, minério de ferro ou petróleo, com preço definido no mercado internacional. Depender da exportação de commodities deixa a economia sujeita às oscilações desse preço.
+- **Commonwealth:** Associação de 56 países, a maioria antigas colônias do Império Britânico, ligados por história, língua e cooperação. Cada membro é independente, e a reunião de chefes de governo de 2024 foi em Samoa.
 - **Conselho de Segurança:** Órgão da ONU responsável pela paz e pela segurança internacionais. Tem 15 membros: 5 permanentes com direito a veto (EUA, Rússia, China, Reino Unido e França) e 10 eleitos para mandatos de dois anos.
 - **Cooperação Sul-Sul:** Parcerias entre países em desenvolvimento para trocar experiências em saúde, agricultura, educação e tecnologia, como as do Brasil com países da África e da América Latina.
 - **COP:** Conferência das Partes: a reunião anual dos países da Convenção-Quadro da ONU sobre Mudança do Clima, de 1992. A COP30 aconteceu em Belém (PA), em novembro de 2025.
@@ -694,6 +739,7 @@ O mapa completo das habilidades da BNCC está na aba **BNCC**, e o relatório de
 - **Protecionismo:** Uso de tarifas, cotas e outras barreiras para proteger produtores nacionais da concorrência estrangeira. Pode proteger empregos no curto prazo, mas encarece produtos e provoca retaliações.
 - **Quilombo:** Na história, comunidade formada sobretudo por pessoas que fugiam da escravidão e resistiam a ela. Hoje, as comunidades quilombolas são grupos com trajetória histórica própria e ancestralidade negra ligada a essa resistência; a Constituição de 1988 (ADCT, art. 68) garante a elas a propriedade definitiva das terras que ocupam.
 - **Refugiado:** Pessoa que deixou seu país por fundado temor de perseguição (por raça, religião, nacionalidade, grupo social ou opinião política) ou, pela lei brasileira de 1997, por grave e generalizada violação de direitos humanos. Não pode ser devolvida ao perigo.
+- **Relações bilaterais:** O nível de confiança entre dois países, que vai da hostilidade à aliança. Muda com acordos, sanções, tarifas, alianças e incidentes, e influencia comércio, votações e segurança.
 - **Sanções econômicas:** Restrições ao comércio, a investimentos e a operações financeiras com um país para pressionar seu governo. Também custam caro a quem sanciona e podem atingir a população comum.
 - **Segurança alimentar:** Quando todas as pessoas têm acesso, o tempo todo, a comida suficiente, segura e nutritiva (FAO). Em 2025, a FAO anunciou que o Brasil havia saído do Mapa da Fome.
 - **Separatismo:** Movimento que busca separar uma região de um Estado para criar um novo país ou se unir a outro. Escócia, Catalunha e Quebec são exemplos de regiões com movimentos desse tipo.
@@ -718,7 +764,7 @@ O mapa completo das habilidades da BNCC está na aba **BNCC**, e o relatório de
 
 Tabelas geradas dos arquivos de dados. Os valores 0–100 são uma aproximação didática de dados reais.
 
-### As seis potências
+### As treze potências
 
 | Potência | Força | Fraqueza | Veto na ONU |
 | --- | --- | --- | --- |
@@ -728,6 +774,13 @@ Tabelas geradas dos arquivos de dados. Os valores 0–100 são uma aproximação
 | ★ União Europeia | **Mercado comum e regulação:** Acordos comerciais e climáticos rendem +1 de cooperação. A França, país da UE, tem assento permanente no Conselho de Segurança. | **Energia importada:** Produz pouca energia fóssil e depende de comprar ⚡. | sim |
 | ◆ Índia | **Gente e serviços digitais:** +1 💻 por mandato e autonomia estratégica: alianças com qualquer um não aumentam a tensão. | **Calor extremo:** Vulnerabilidade climática alta: o aquecimento pesa mais. | não |
 | ⬢ Rússia | **Energia e território:** +2 ⚡ por mandato e ganha mais quando a energia fica cara. | **Dependência do petróleo:** A economia sofre quando a energia barateia, e sanções pesam mais. | sim |
+| ✚ Reino Unido | **Diplomacia e Commonwealth:** Missões diplomáticas rendem +1 de influência, e o Reino Unido tem assento permanente e veto no Conselho de Segurança. | **Fora da União Europeia:** Depois do Brexit, o comércio com a UE atrita mais quando as relações azedam. | sim |
+| ◎ Japão | **Tecnologia e indústria:** +1 💻 por mandato, e a cooperação para o desenvolvimento rende +1 de influência. | **Envelhecimento e energia importada:** A economia cresce devagar e depende de comprar ⚡ do exterior. | não |
+| 💧 Austrália | **Minerais e energia:** Exportadora de minério, carvão e gás (produz muito 💎 e ⚡): ganha quando a energia fica cara, e cartas de influência na Oceania rendem +1. | **Dependência da China:** Mais de um terço do que vende vai para a China: se a relação azedar, a economia australiana sofre. | não |
+| ⬟ Nova Zelândia | **Energia limpa e boa reputação:** Quase toda a eletricidade é renovável e o país é visto como neutro: mediações de paz ganham +10% de chance, e cartas de influência na Oceania rendem +1. | **Pequena e distante:** Economia pequena: choques de comércio e sanções pesam mais, e o exército é modesto. | não |
+| ⯃ África do Sul | **Voz da África e do BRICS:** Cartas que dão influência na África rendem +1, e a África do Sul produz platina e manganês (💎). | **Apagões e desigualdade:** Falta energia e a desigualdade é uma das maiores do mundo: o bem-estar e o apoio sobem mais devagar. | não |
+| ⛊ Nigéria | **Petróleo e população jovem:** Exportadora de petróleo (ganha quando a energia fica cara) e com a maior população da África: cresce rápido. Cartas de influência na África rendem +1. | **Instabilidade e dependência do petróleo:** Conflitos no Sahel e no Golfo da Guiné pesam mais na segurança, e a economia sofre quando a energia barateia. | não |
+| ⏢ Egito | **Canal de Suez e mediação:** Vive de ser ponte entre África, Ásia e Europa: mediações de paz ganham +15% de chance, e cartas de influência na África e na Ásia rendem +1. | **Água e pão importado:** Depende do Nilo e importa trigo: a fome pesa e o clima extremo castiga a economia. | não |
 
 ### Indicadores, produção e consumo em 2026
 
@@ -739,6 +792,13 @@ Tabelas geradas dos arquivos de dados. Os valores 0–100 são uma aproximação
 | União Europeia | 80 | 90 | 68 | 70 | 55 | 40 | 2 🌾 · 0 ⚡ · 1 💎 · 3 💻 | 1 🌾 · 1 ⚡ |
 | Índia | 58 | 69 | 35 | 65 | 65 | 12 | 2 🌾 · 1 ⚡ · 1 💎 · 3 💻 | 2 🌾 · 1 ⚡ |
 | Rússia | 52 | 83 | 50 | 72 | 60 | 14 | 2 🌾 · 5 ⚡ · 2 💎 · 1 💻 | 1 🌾 · 1 ⚡ |
+| Reino Unido | 74 | 92 | 66 | 80 | 45 | 45 | 1 🌾 · 1 ⚡ · 0 💎 · 3 💻 | 1 🌾 · 1 ⚡ |
+| Japão | 70 | 92 | 58 | 70 | 42 | 28 | 1 🌾 · 0 ⚡ · 0 💎 · 4 💻 | 2 🌾 · 2 ⚡ |
+| Austrália | 58 | 94 | 55 | 70 | 52 | 40 | 3 🌾 · 3 ⚡ · 4 💎 · 1 💻 | 1 🌾 · 1 ⚡ |
+| Nova Zelândia | 42 | 93 | 78 | 75 | 55 | 62 | 3 🌾 · 1 ⚡ · 0 💎 · 1 💻 | 0 🌾 · 1 ⚡ |
+| África do Sul | 40 | 72 | 50 | 50 | 50 | 12 | 2 🌾 · 1 ⚡ · 4 💎 · 1 💻 | 1 🌾 · 1 ⚡ |
+| Nigéria | 33 | 55 | 42 | 40 | 50 | 15 | 3 🌾 · 4 ⚡ · 1 💎 · 0 💻 | 2 🌾 · 1 ⚡ |
+| Egito | 36 | 70 | 40 | 55 | 62 | 10 | 1 🌾 · 2 ⚡ · 1 💎 · 1 💻 | 2 🌾 · 1 ⚡ |
 
 ### O mundo em 2026 e os limites
 
@@ -757,7 +817,7 @@ Tabelas geradas dos arquivos de dados. Os valores 0–100 são uma aproximação
 - Capital Político por vez: 3 de base; +1 com apoio de 70 ou mais e −1 abaixo de 30; +1 por liderança continental; até 1 guardado para a vez seguinte.
 - Mediação de paz: chance de 30% + 6% por ponto de influência no lugar (até +30%) + (cooperação − 45) × 0,6% + (estabilidade − 35) × 0,4% − 10% por nível de conflito acima de 1 − 30% se for parte do conflito (ou −10% se for vizinha), sempre entre 5% e 90%.
 - Eventos por mandato: 1 (2 com o mundo em crise).
-- Cúpula do Clima: acordo com 7 pontos ou mais (compromisso alto = 2, médio = 1).
+- Cúpula do Clima: acordo com a meta da mesa, de cerca de 1,2 ponto por potência em jogo (7 com seis potências, 15 com treze) (compromisso alto = 2, médio = 1).
 - Parceria: influência de pelo menos 3 + (estabilidade ÷ 25, arredondado para baixo) e 2 à frente da segunda potência.
 - Reação soberanista com pressão 60; a pressão cai 10 por Balanço.
 - Estoque máximo de 12 de cada recurso; acima de 8, o excedente é vendido.
@@ -772,6 +832,7 @@ Sempre disponíveis: Missão diplomática e Negociar (troca de recursos, sem CP)
 | Ação | Custo | Alvo | Por quê | Conceito |
 | --- | --- | --- | --- | --- |
 | 🧳 Missão diplomática | 1 CP | território | Embaixadas, visitas oficiais e acordos de cooperação aproximam governos e povos. | Diplomacia e política externa |
+| 🥂 Cúpula bilateral | 1 CP | potência | Dois chefes de governo sentados à mesma mesa baixam a desconfiança: quanto pior a relação, mais difícil conseguir o encontro. | Diplomacia bilateral e política externa |
 | 🌍 Cooperação Sul-Sul | 2 CP + 1 💻 | território | Países em desenvolvimento trocam técnicas de saúde, agricultura e educação que já deram certo em realidades parecidas. | Cooperação Sul-Sul e Sul Global |
 | 🏛️ Propor resolução na ONU | 2 CP | — | Na ONU, problemas que nenhum país resolve sozinho são decididos em votação, e cinco países têm poder de veto no Conselho de Segurança. | Organismos internacionais |
 | ⛔ Sanções econômicas | 2 CP | potência | Sanções cortam comércio e crédito para pressionar um governo, mas também custam caro a quem sanciona e esquentam a disputa. | Sanções e poder econômico |
@@ -784,6 +845,7 @@ Sempre disponíveis: Missão diplomática e Negociar (troca de recursos, sem CP)
 | --- | --- | --- | --- | --- |
 | 🚢 Acordo de livre-comércio | 2 CP | território | Sem tarifas, os dois lados vendem mais um para o outro e cada um se especializa no que faz melhor. | Blocos econômicos e vantagem comparativa |
 | 🧱 Tarifas de importação | 1 CP | potência | Taxar importados protege a indústria nacional por um tempo, mas encarece produtos, provoca retaliação e encolhe o comércio mundial. | Protecionismo e guerra comercial |
+| 📜 Acordo comercial bilateral | 2 CP | potência | Tarifas menores e contratos longos enriquecem os dois lados e deixam as economias mais ligadas: o comércio vira um laço (e uma dependência). | Blocos econômicos e interdependência |
 | 🏗️ Infraestrutura no exterior | 3 CP + 1 💎 | território | Portos, ferrovias e usinas financiados de fora geram desenvolvimento, mas também dívida e dependência. | Investimento externo (ex.: Nova Rota da Seda) |
 | 🌽 Exportar commodities | 1 CP | — | Vender grãos e minérios traz dinheiro rápido, mas deixa a economia dependente do preço internacional. | Commodities e divisão internacional do trabalho |
 | 🏭 Política industrial | 2 CP + 1 ⚡ | — | Fábricas novas geram empregos e tecnologia, mas consomem energia e, se ela for fóssil, aumentam as emissões. | Industrialização |
@@ -810,6 +872,7 @@ Sempre disponíveis: Missão diplomática e Negociar (troca de recursos, sem CP)
 | Ação | Custo | Alvo | Por quê | Conceito |
 | --- | --- | --- | --- | --- |
 | 🛡️ Ampliar a defesa | 2 CP + 2 💰 | — | Gastar mais com defesa dá segurança, mas os vizinhos se sentem ameaçados e também se armam: é o dilema de segurança. | Dilema de segurança e corrida armamentista |
+| 🎖️ Exercício militar conjunto | 2 CP + 1 💰 | potência | Treinar tropas juntas mostra que a aliança é de verdade, mas quem está do outro lado enxerga uma ameaça e também se prepara. | Alianças militares e dilema de segurança |
 | 🔐 Ciberdefesa | 1 CP + 1 💻 | — | Hospitais, bancos e redes de energia dependem da internet; proteger esses sistemas é segurança nacional. | Ciberespaço e soberania digital |
 | 🕊️ Mediação de paz | 2 CP | território | Um mediador precisa da confiança dos dois lados: influência no lugar, um mundo cooperativo e não ser parte da briga. Força não basta, e cessar-fogo não é garantido. | Resolução pacífica de conflitos |
 | 🧰 Ajuda à reconstrução | 2 CP + 2 💰 | território | Reconstruir escolas, hospitais e estradas depois de um conflito permite que as pessoas voltem para casa. | Reconstrução pós-conflito |
@@ -834,12 +897,14 @@ Sempre disponíveis: Missão diplomática e Negociar (troca de recursos, sem CP)
 | Ação | Custo | Alvo | Por quê | Conceito |
 | --- | --- | --- | --- | --- |
 | 🔬 Pesquisa e inovação | 2 CP + 2 💰 | — | Universidades e laboratórios criam vacinas, chips e energia limpa: quem inova depende menos dos outros. | Ciência, tecnologia e poder |
+| 🕵️ Espionagem e sabotagem | 1 CP | potência | Roubar tecnologia dá vantagem, mas se o governo for pego a crise diplomática é certa: espionar um país vale o risco de perder a confiança dele e dos amigos dele. | Ciberespaço, espionagem e soberania digital |
+| 🔒 Embargo de tecnologia | 2 CP + 1 💻 | potência | Proibir a venda de chips e máquinas avançadas freia a indústria do rival, mas o rival investe para não depender mais de você e o comércio encolhe. | Geotecnologias e disputa por supremacia tecnológica |
 | 📰 Combate à desinformação | 1 CP + 1 💻 | — | Educação midiática e checagem de fatos reduzem o poder das notícias falsas sobre as eleições e a saúde. | Desinformação e cidadania digital |
 | 🛰️ Programa espacial e satélites | 3 CP + 2 💻 | até 3 territórios | Satélites monitoram florestas, safras e desastres e conectam regiões isoladas, e dados de satélite podem ser compartilhados com outros países. | Geotecnologias e espaço |
 | 🎬 Diplomacia cultural | 1 CP | até 3 territórios | Música, cinema, futebol, novelas e games fazem o mundo admirar um país: é o "poder brando" (soft power). | Soft power e globalização cultural |
 | 🌐 Internet e cabos submarinos | 2 CP + 1 💻 | território | Quase todo o tráfego da internet passa por cabos no fundo do mar; levar conexão a um país abre negócios, escolas e dados. | Redes, fluxos de informação e infraestrutura |
 
-### Dilemas de governo (48)
+### Dilemas de governo (66)
 
 Um por vez, sem repetir na partida e sem resposta certa. O ícone mostra a categoria do conselheiro de cada saída.
 
@@ -847,28 +912,28 @@ Um por vez, sem repetir na partida e sem resposta certa. O ícone mostra a categ
 | --- | --- | --- | --- | --- |
 | ⚓ Uma base militar no vizinho? (`base_vizinho`) | todas | 🛡️ Instalar a base · 🤝 Cooperação civil · 🤝 Recusar a base | Soberania e projeção de poder | EM13CHS204, EM13CHS603, EM13CHS203 |
 | 🗺️ Tensão no Essequibo (`essequibo`) | Brasil | 🤝 Apoiar a via judicial · 🛡️ Reforçar a fronteira · 🤝 Oferecer mediação | Fronteiras e solução pacífica de controvérsias | EM13CHS204, EM13CHS203, EM13CHS604 |
-| 🧊 Quem manda no Ártico? (`artico`) | Estados Unidos, União Europeia, Rússia, China | 🛡️ Militarizar o Ártico · 🤝 Regras comuns · 💰 Explorar o Ártico | Bens comuns e disputa pelo Ártico | EM13CHS204, EM13CHS305, EM13CHS603 |
+| 🧊 Quem manda no Ártico? (`artico`) | Estados Unidos, União Europeia, Rússia, China, Reino Unido, Japão | 🛡️ Militarizar o Ártico · 🤝 Regras comuns · 💰 Explorar o Ártico | Bens comuns e disputa pelo Ártico | EM13CHS204, EM13CHS305, EM13CHS603 |
 | 🚢 A Rota Marítima do Norte (`rota_norte`) | Rússia | 💰 Abrir e cobrar pedágio · 🛡️ Controle e escolta · 🌱 Regras com os vizinhos | Rotas marítimas, fluxos e soberania no mar | EM13CHS206, EM13CHS204, EM13CHS201 |
 | 🐪 Pastores sem fronteira (`nomades`) | todas | 🤝 Corredores negociados · 🛡️ Cercar as fronteiras · 💰 Fixar em vilas | Povos nômades, fronteiras e territorialidade | EM13CHS105, EM13CHS204, EM13CHS203 |
-| ✋ Vetar a resolução contra um parceiro? (`veto_parceiro`) | Estados Unidos, China, Rússia, União Europeia | 🤝 Vetar · 🤝 Abster-se · 🤝 Votar a favor | Conselho de Segurança e poder de veto | EM13CHS604, EM13CHS603, EM13CHS605 |
+| ✋ Vetar a resolução contra um parceiro? (`veto_parceiro`) | Estados Unidos, China, Rússia, União Europeia, Reino Unido | 🤝 Vetar · 🤝 Abster-se · 🤝 Votar a favor | Conselho de Segurança e poder de veto | EM13CHS604, EM13CHS603, EM13CHS605 |
 | 🚪 Sair de um organismo internacional? (`sair_organismo`) | todas | 💰 Sair · 🤝 Ficar e reformar · 🤝 Ampliar a contribuição | Multilateralismo e seus limites | EM13CHS604, EM13CHS603, EM13CHS102 |
-| ⚖️ Entre dois polos (`entre_polos`) | Brasil, Índia | 🤝 Alinhar-se a um polo · 🤝 Autonomia estratégica · 🤝 Apostar no Sul Global | Multipolaridade e autonomia estratégica | EM13CHS201, EM13CHS603, EM13CHS604 |
+| ⚖️ Entre dois polos (`entre_polos`) | Brasil, Índia, África do Sul, Nigéria, Egito, Nova Zelândia, Austrália | 🤝 Alinhar-se a um polo · 🤝 Autonomia estratégica · 🤝 Apostar no Sul Global | Multipolaridade e autonomia estratégica | EM13CHS201, EM13CHS603, EM13CHS604 |
 | 🎪 Sediar a próxima cúpula? (`sediar_cupula`) | todas | 🤝 Agenda ambiciosa · 💰 Foco em negócios · 💰 Recusar | Diplomacia de cúpulas e poder brando | EM13CHS604, EM13CHS305, EM13CHS603 |
 | 🪖 Soldados para a missão de paz? (`tropas_paz`) | todas | 🛡️ Enviar e comandar · 🤝 Só financiar · 💰 Ficar de fora | Missões de paz e segurança coletiva | EM13CHS604, EM13CHS503, EM13CHS605 |
-| 🧱 Seu país levou uma tarifa (`sofrer_tarifa`) | Brasil, China, União Europeia, Índia | 💰 Retaliar · 🤝 Recorrer à OMC · 💰 Diversificar mercados | Guerra comercial e diversificação de mercados | EM13CHS201, EM13CHS604, EM13CHS202 |
+| 🧱 Seu país levou uma tarifa (`sofrer_tarifa`) | Brasil, China, União Europeia, Índia, Reino Unido, Japão, Austrália, Nova Zelândia, África do Sul, Nigéria, Egito | 💰 Retaliar · 🤝 Recorrer à OMC · 💰 Diversificar mercados | Guerra comercial e diversificação de mercados | EM13CHS201, EM13CHS604, EM13CHS202 |
 | ⚠️ Golpe de Estado na região (`golpe_vizinho`) | todas | 🤝 Suspender e sancionar · 🤝 Dialogar e cobrar eleições · 💰 Reconhecer o governo | Golpes de Estado e cláusula democrática | EM13CHS602, EM13CHS603, EM13CHS604 |
 | 🎤 A promessa fácil (`promessa_eleitoral`) | todas | 💰 Congelar e dar bônus · 💰 Manter o ajuste · 👥 Ajuda focalizada | Populismo e responsabilidade com o futuro | EM13CHS602, EM13CHS603, EM13CHS402 |
-| 🌱 Mais soja ou mais floresta? (`soja_floresta`) | Brasil | 💰 Abrir novas áreas · 💡 Produzir mais no mesmo lugar · 🌱 Moratória e rastreio | Commodities, agronegócio e floresta | EM13CHS302, EM13CHS306, EM13CHS201 |
+| 🌱 Mais soja ou mais floresta? (`soja_floresta`) | Brasil | 💰 Abrir novas áreas · 💡 Produzir mais no mesmo lugar · 🌱 Moratória e rastreio | Commodities, agronegócio e floresta | EM13CHS302, EM13CHS306, EM13CHS201, EM13CHS606 |
 | 🏭 Proteger a indústria nacional? (`proteger_industria`) | todas | 💰 Tarifa alta · 🤝 Negociar e modernizar · 💰 Mercado aberto | Protecionismo × livre comércio | EM13CHS201, EM13CHS402, EM13CHS604 |
 | 🧲 Terras raras: vender ou refinar? (`refino_minerais`) | Brasil | 💰 Vender bruto · 💡 Refinar no país · 💰 Sócio estrangeiro | Minerais críticos e agregação de valor | EM13CHS302, EM13CHS202, EM13CHS401 |
 | 💾 Uma fábrica de chips (`fabrica_chips`) | todas | 💡 Subsidiar a fábrica · 💰 Continuar importando · 🤝 Consórcio regional | Cadeias globais de valor e soberania tecnológica | EM13CHS202, EM13CHS401, EM13CHS201 |
 | 🤖 Robôs nas fábricas e escritórios (`automacao`) | todas | 💰 Automatizar rápido · 👥 Automatizar e requalificar · 👥 Proteger os empregos | Tecnologia e mundo do trabalho | EM13CHS401, EM13CHS403, EM13CHS402 |
 | 🎒 Jovens sem estudo e sem trabalho (`primeiro_emprego`) | todas | 👥 Ensino técnico · 💰 Contratos flexíveis · 👥 Bolsa de estudo | Juventude, trabalho e renda | EM13CHS404, EM13CHS402, EM13CHS403 |
 | 📲 A plataforma que não cumpre a lei (`plataforma_lei`) | todas | 🛡️ Bloquear até cumprir · 💡 Multar e exigir transparência · 💰 Não intervir | Soberania digital e empresas transnacionais | EM13CHS205, EM13CHS202, EM13CHS504 |
-| 🛢️ Toda a energia por um estreito só (`rota_unica`) | China, União Europeia, Índia | 💰 Estoques e rotas novas · 🛡️ Escoltar com a Marinha · 🌱 Acelerar a energia limpa | Gargalos logísticos e segurança energética | EM13CHS201, EM13CHS206, EM13CHS202 |
+| 🛢️ Toda a energia por um estreito só (`rota_unica`) | China, União Europeia, Índia, Japão | 💰 Estoques e rotas novas · 🛡️ Escoltar com a Marinha · 🌱 Acelerar a energia limpa | Gargalos logísticos e segurança energética | EM13CHS201, EM13CHS206, EM13CHS202 |
 | 🤝 O acordo Mercosul–União Europeia (`mercosul_ue`) | Brasil, União Europeia | 💰 Abrir de vez · 🤝 Salvaguardas e prazos · 🌱 Cobrar regras ambientais | Blocos econômicos e acordos comerciais | EM13CHS201, EM13CHS604, EM13CHS402 |
 | 🔋 Montanhas de lixo eletrônico (`lixo_eletronico`) | todas | 🌱 Reciclar em casa · 💰 Exportar o lixo · 🌱 Marcas recolhem | Resíduos, consumo e responsabilidade | EM13CHS301, EM13CHS304, EM13CHS306 |
-| ⛏️ Fechar as minas de carvão? (`minas_carvao`) | China, Índia, Estados Unidos, União Europeia | 🌱 Fechar já · 👥 Transição justa · 💰 Manter as minas | Transição energética justa | EM13CHS306, EM13CHS402, EM13CHS304 |
+| ⛏️ Fechar as minas de carvão? (`minas_carvao`) | China, Índia, Estados Unidos, União Europeia, Japão, Austrália, África do Sul | 🌱 Fechar já · 👥 Transição justa · 💰 Manter as minas | Transição energética justa | EM13CHS306, EM13CHS402, EM13CHS304 |
 | 💧 As águas do Indo (`rio_indo`) | Índia | 💰 Represar mais · 🤝 Voltar ao tratado · 💡 Partilhar dados | Bacias compartilhadas: montante × jusante | EM13CHS302, EM13CHS204, EM13CHS305 |
 | 🎯 Que meta levar à Cúpula do Clima? (`meta_climatica`) | todas | 🌱 Ambiciosa e financiada · 💰 Modesta e realista · 🤝 Só no papel | Acordo de Paris e credibilidade | EM13CHS305, EM13CHS304, EM13CHS306 |
 | 🌳 Dinheiro de fora pela floresta? (`floresta_soberania`) | Brasil | 🤝 Aceitar com metas · 🌱 Proteger sozinho · 💰 Liberar a expansão | Amazônia: soberania e cooperação | EM13CHS305, EM13CHS204, EM13CHS302 |
@@ -878,21 +943,39 @@ Um por vez, sem repetir na partida e sem resposta certa. O ícone mostra a categ
 | 🛰️ Abrir as imagens de satélite? (`satelites_dados`) | todas | 💡 Dados abertos · 💰 Vender os dados · 🛡️ Sigilo militar | Geotecnologias e poder | EM13CHS106, EM13CHS202, EM13CHS305 |
 | 🐧 Uma base nova na Antártida (`antartida`) | todas | 💡 Nova estação científica · 💰 Rever a mineração · 🤝 Pesquisa conjunta | Bens comuns globais e o Tratado da Antártida | EM13CHS305, EM13CHS204, EM13CHS203 |
 | 🐟 Pescar no alto-mar (`alto_mar`) | todas | 🌱 Ratificar e proteger · 💰 Pescar mais · 🛡️ Ratificar e fiscalizar | Tragédia dos comuns no oceano | EM13CHS305, EM13CHS302, EM13CHS301 |
-| 💣 Vender armas para um país em guerra? (`vender_armas`) | Estados Unidos, Rússia, China, União Europeia | 💰 Vender as armas · 🤝 Embargo de armas · 🛡️ Só defesa, fiscalizada | Comércio de armas e conflitos | EM13CHS503, EM13CHS504, EM13CHS605 |
-| 🚀 O rival testou mísseis novos (`corrida_armas`) | Estados Unidos, China, Rússia, Índia | 🛡️ Armar-se também · 🤝 Tratado com inspeção · 🤝 Linha direta | Dilema de segurança e controle de armas | EM13CHS504, EM13CHS603, EM13CHS604 |
+| 💣 Vender armas para um país em guerra? (`vender_armas`) | Estados Unidos, Rússia, China, União Europeia, Reino Unido | 💰 Vender as armas · 🤝 Embargo de armas · 🛡️ Só defesa, fiscalizada | Comércio de armas e conflitos | EM13CHS503, EM13CHS504, EM13CHS605 |
+| 🚀 O rival testou mísseis novos (`corrida_armas`) | Estados Unidos, China, Rússia, Índia, Japão | 🛡️ Armar-se também · 🤝 Tratado com inspeção · 🤝 Linha direta | Dilema de segurança e controle de armas | EM13CHS504, EM13CHS603, EM13CHS604 |
 | 🚨 Atentado e pressão por resposta (`atentado`) | todas | 🛡️ Retaliar · 🛡️ Inteligência e finanças · 🛡️ Vigilância ampla | Terrorismo, resposta e escalada | EM13CHS503, EM13CHS504, EM13CHS605 |
 | 🕊️ Cessar-fogo rápido ou paz completa? (`cessar_fogo`) | todas | 🤝 Cessar-fogo rápido · 🤝 Paz completa · 💰 Não se envolver | Cessar-fogo × acordo de paz | EM13CHS503, EM13CHS604, EM13CHS204 |
 | 🎁 Ajudar fora ou gastar em casa? (`ajuda_externa`) | todas | 💰 Cortar a ajuda · 🤝 Manter · 👥 Aumentar a ajuda | Solidariedade internacional e interesse nacional | EM13CHS501, EM13CHS605, EM13CHS102 |
 | 🧳 Refugiados na fronteira (`refugiados_porta`) | todas | 👥 Acolher e integrar · 🤝 Financiar quem acolhe · 🛡️ Fechar a fronteira | Refugiados e direito de asilo | EM13CHS201, EM13CHS605, EM13CHS502 |
 | 🚌 Abrigos lotados em Roraima (`interiorizacao`) | Brasil | 👥 Interiorizar com emprego · 🛡️ Manter na fronteira · 🤝 Dividir os custos | Migração, acolhida e interiorização | EM13CHS201, EM13CHS606, EM13CHS404 |
 | 🗣️ Onda de xenofobia (`xenofobia`) | todas | 👥 Educar e punir · 🛡️ Endurecer as regras · 👥 Acolher nas cidades | Xenofobia e direitos humanos | EM13CHS502, EM13CHS503, EM13CHS605 |
-| 🪶 O “vazio” no mapa (`terras_indigenas`) | Brasil | 👥 Demarcar · 🤝 Consulta prévia · 💰 Liberar a obra | Territorialidades indígenas: o vazio que não é vazio | EM13CHS601, EM13CHS203, EM13CHS205 |
-| 🏺 Devolver um tesouro colonial? (`patrimonio_colonial`) | União Europeia | 🤝 Devolver · 🤝 Emprestar · 💰 Manter no museu | Colonialismo, patrimônio e restituição | EM13CHS104, EM13CHS102, EM13CHS204 |
+| 🪶 O “vazio” no mapa (`terras_indigenas`) | Brasil | 👥 Demarcar · 🤝 Consulta prévia · 💰 Liberar a obra | Territorialidades indígenas: o vazio que não é vazio | EM13CHS601, EM13CHS203, EM13CHS205, EM13CHS606 |
+| 🏺 Devolver um tesouro colonial? (`patrimonio_colonial`) | União Europeia, Reino Unido | 🤝 Devolver · 🤝 Emprestar · 💰 Manter no museu | Colonialismo, patrimônio e restituição | EM13CHS104, EM13CHS102, EM13CHS204 |
 | 🎭 O vídeo falso da eleição (`video_falso`) | todas | 🛡️ Remover o vídeo · 💡 Checagem e educação · 💰 Não interferir | Desinformação e democracia | EM13CHS101, EM13CHS202, EM13CHS504 |
-| 📊 Contar o país ou economizar? (`censo`) | Brasil | 💰 Adiar · 💡 Pesquisa completa · 💡 Registros e amostra | Dados públicos e políticas públicas | EM13CHS103, EM13CHS606, EM13CHS106 |
+| 📊 Contar o país ou economizar? (`censo`) | Brasil | 💰 Adiar · 💡 Pesquisa completa · 💡 Registros e amostra | Dados públicos e políticas públicas | EM13CHS103, EM13CHS606, EM13CHS106, EM13CHS601 |
 | 🎬 Cultura que viaja (`soft_power_cultura`) | todas | 🤝 Exportar cultura · 👥 Cota nacional · 💰 Mercado livre | Poder brando e indústria cultural | EM13CHS303, EM13CHS205, EM13CHS104 |
 | 🦠 Um surto perigoso (`surto_vizinho`) | todas | 👥 Mandar equipes · 🛡️ Fechar voos · 💰 Esperar | Saúde global e pandemias | EM13CHS604, EM13CHS605, EM13CHS201 |
-| 🌾 Armazéns cheios num mundo com fome (`graos_doar`) | Brasil, Estados Unidos, Rússia, União Europeia, Índia | 💰 Vender · 👥 Doar · 🛡️ Guardar estoque | Segurança alimentar e solidariedade | EM13CHS605, EM13CHS302, EM13CHS501 |
+| 🌾 Armazéns cheios num mundo com fome (`graos_doar`) | Brasil, Estados Unidos, Rússia, União Europeia, Índia, Austrália, Nova Zelândia | 💰 Vender · 👥 Doar · 🛡️ Guardar estoque | Segurança alimentar e solidariedade | EM13CHS605, EM13CHS302, EM13CHS501 |
+| 🛃 Brexit: reaproximar da União Europeia? (`brexit_comercio`) | Reino Unido | 🤝 Reaproximar da UE · 💰 Acordos pelo mundo · 💰 Subsidiar exportadores | Blocos econômicos e soberania | EM13CHS201, EM13CHS604, EM13CHS402 |
+| 🏝️ Devolver Chagos e manter a base? (`chagos_commonwealth`) | Reino Unido | 🤝 Devolver e arrendar · 🛡️ Suspender e renegociar · 🛡️ Manter o controle | Descolonização, soberania e bases militares | EM13CHS204, EM13CHS603, EM13CHS604 |
+| 👵 Envelhecer ou abrir as portas? (`japao_imigracao`) | Japão | 👥 Abrir e integrar · 💡 Robôs e mais gente ativa · 👥 Incentivar a natalidade | Demografia, migrações e mercado de trabalho | EM13CHS201, EM13CHS404, EM13CHS502 |
+| ☢️ Religar as usinas nucleares? (`japao_nuclear`) | Japão | 🌱 Religar com testes · 🌱 Renováveis e redes · 💰 Importar mais gás | Matriz energética, risco e segurança energética | EM13CHS304, EM13CHS306, EM13CHS202 |
+| 🛰️ Ilhas disputadas e a rota dos chips (`japao_senkaku_chips`) | Japão | 🛡️ Reforçar as defesas · 🤝 Diálogo e regras · 💡 Fábricas e novos parceiros | Territórios disputados e rotas do comércio | EM13CHS204, EM13CHS203, EM13CHS206 |
+| 🚢 A China compra, os EUA protegem (`australia_china_aukus`) | Austrália | 🛡️ Aprofundar o AUKUS · 💰 Aproximar da China · 🤝 Diversificar mercados | Dependência comercial e alianças militares | EM13CHS201, EM13CHS603, EM13CHS202 |
+| 🪸 Carvão e a Grande Barreira de Corais (`australia_carvao_barreira`) | Austrália | 💰 Aprovar a mina · 🌱 Negar e investir no verde · 🌱 Mina com limite e fundo | Desenvolvimento econômico e sustentabilidade | EM13CHS305, EM13CHS304, EM13CHS306 |
+| 🕊️ Entre a China e os aliados no Pacífico (`nz_pacifico_neutralidade`) | Nova Zelândia | 🤝 Ajuda sem blocos · 🛡️ Alinhar aos aliados · 💰 Acordos com a China | Neutralidade, alianças e influência regional | EM13CHS603, EM13CHS204, EM13CHS201 |
+| 🐄 O metano das vacas (`nz_metano_vacas`) | Nova Zelândia | 🌱 Cobrar pelas emissões · 💡 Pesquisa em vez de taxa · 💰 Comprar créditos | Pecuária, emissões e economia exportadora | EM13CHS302, EM13CHS304, EM13CHS306 |
+| 🔌 Apagões: quem financia a energia? (`sa_eskom_apagao`) | África do Sul | 🌱 Leilões de renováveis · 💰 Reformar o carvão · 💰 Abrir a rede ao setor privado | Infraestrutura, energia e desigualdade | EM13CHS302, EM13CHS402, EM13CHS306 |
+| ⛏️ Platina para fora ou baterias em casa? (`sa_minerais_beneficiar`) | África do Sul | 💰 Taxar o minério bruto · 🤝 Atrair fábricas parceiras · 💰 Vender bruto e reinvestir | Minerais críticos e agregação de valor | EM13CHS302, EM13CHS202, EM13CHS401 |
+| 🧭 BRICS ou Ocidente? (`sa_brics_ocidente`) | África do Sul | 🤝 Aproximar-se do BRICS · 💰 Negociar com os EUA · 🤝 Não alinhamento ativo | Multipolaridade e não alinhamento | EM13CHS603, EM13CHS604, EM13CHS201 |
+| ⛽ Subsídio da gasolina: manter ou cortar? (`ng_subsidio_gasolina`) | Nigéria | 👥 Reintroduzir o subsídio · 👥 Corte com renda direta · 💰 Refinar no país | Subsídios, renda do petróleo e desigualdade | EM13CHS402, EM13CHS302, EM13CHS603 |
+| 🛡️ Violência no norte e o Sahel (`ng_sahel_seguranca`) | Nigéria | 🛡️ Força conjunta regional · 🛡️ Armas da Rússia ou da China · 👥 Desenvolver o nordeste | Segurança regional e grupos armados | EM13CHS503, EM13CHS604, EM13CHS201 |
+| 🎓 Muitos jovens, poucas vagas (`ng_jovens_emprego`) | Nigéria | 💡 Ensino técnico e polos digitais · 🤝 Migração legal organizada · 💰 Crédito e agricultura | Bônus demográfico e mercado de trabalho | EM13CHS404, EM13CHS403, EM13CHS201 |
+| 🌊 O Nilo e a Grande Barragem (`eg_nilo_barragem`) | Egito | 🤝 Negociar a operação · 🛡️ Água como segurança · 💡 Poupar e dessalinizar | Bacias compartilhadas e segurança hídrica | EM13CHS302, EM13CHS204, EM13CHS305 |
+| 🍞 Pão barato, trigo importado (`eg_trigo_pao`) | Egito | 💰 Contratos longos com a Rússia · 🤝 Diversificar fornecedores · 👥 Reformar o subsídio | Segurança alimentar e dependência de importações | EM13CHS302, EM13CHS201, EM13CHS605 |
+| 🚢 Suez sem navios (`eg_suez_receita`) | Egito | 🛡️ Descontos e escolta · 🤝 Mediar a paz · 💰 Diversificar a renda | Gargalos logísticos e dependência de uma rota | EM13CHS206, EM13CHS201, EM13CHS204 |
 
 ### Eventos que pedem a decisão de todas as potências
 
@@ -902,6 +985,12 @@ Um por vez, sem repetir na partida e sem resposta certa. O ícone mostra a categ
 - **🚢 Tensão no Estreito de Taiwan** (`taiwan_estreito`): 💰 Estocar e diversificar · 🤝 Pedir diálogo · 🛡️ Mandar navios. Ação coletiva: 4 ou mais potências escolhendo “Pedir diálogo”.
 - **🛶 Travessias perigosas** (`travessias_perigosas`): 👥 Rotas legais · 🤝 Pagar os países de trânsito · 🛡️ Endurecer a fronteira.
 - **🧲 Terras raras na disputa** (`terras_raras`): 🌱 Reciclar e diversificar · 🤝 Negociar as licenças · 💰 Retaliar.
+- **🍷 China barra produtos australianos** (`china_australia_comercio`): 💰 Comprar o que sobrou · 🤝 Pedir diálogo · 💰 Ocupar o mercado.
+- **🌀 Ciclone alaga a Nova Zelândia** (`ciclone_nova_zelandia`): 👥 Enviar equipes · 💰 Oferecer crédito · 💰 Só condolências.
+- **🔌 Apagão paralisa a África do Sul** (`apagao_africa_do_sul`): 🌱 Financiar energia limpa · 💰 Vender equipamentos · 💰 Não se envolver.
+- **🛢️ Petróleo barato aperta a Nigéria** (`petroleo_barato_nigeria`): 💰 Crédito e estoque · 🤝 Diversificar a economia · 💰 Aproveitar o preço baixo.
+- **🏜️ Nilo baixo e barragem cheia** (`nilo_seca_barragem`): 🤝 Mediar o Nilo · 💡 Vender irrigação · 💰 Ficar neutro.
+- **🌊 Terremoto e tsunami no Japão** (`terremoto_japao`): 👥 Enviar resgate · 💰 Buscar outros fornecedores · 💰 Esperar a recuperação.
 
 ### Resoluções da ONU
 
@@ -924,12 +1013,17 @@ Um por vez, sem repetir na partida e sem resposta certa. O ícone mostra a categ
 - **Celeiro do mundo:** Exporte ou doe 10 alimentos (🌾) ao longo da partida.
 - **Vale do Silício:** Termine com 10 de tecnologia (💻) em estoque.
 - **Anfitriã solidária:** Acolha refugiados ou envie ajuda humanitária 3 vezes.
-- **Guardiã do Ártico:** Seja parceira da Groenlândia e Ártico e do Canadá ou do Reino Unido e Noruega.
+- **Guardiã do Ártico:** Seja parceira da Groenlândia e Ártico e do Canadá ou da Noruega, Islândia e Suíça.
 - **Diplomata-chefe:** Proponha 2 resoluções na ONU que sejam aprovadas.
 - **Ilha de estabilidade:** Termine com 85 de segurança e a tensão mundial abaixo de 70.
 - **Revolução educacional:** Aumente o bem-estar em 10 pontos.
 - **Ásia conectada:** Seja parceiro de 4 territórios da Ásia.
 - **Mediadora da paz:** Faça 2 mediações de paz bem-sucedidas.
+- **Rede de aliados:** Termine 2050 com 3 alianças estratégicas.
+- **Amiga de muitos:** Termine com relação Amiga (40 ou mais) com 6 potências.
+- **Sem inimigos:** Termine sem nenhuma relação pior que Tensa (−30) com outra potência.
+- **Voz do Sul Global:** Termine com relação Amiga (40 ou mais) com 3 potências do Sul Global (Brasil, Índia, África do Sul, Nigéria e Egito).
+- **Ponte entre os blocos:** Termine com relação Cordial (10 ou mais) com os EUA e com a China ao mesmo tempo.
 
 ### Agendas do agente infiltrado
 

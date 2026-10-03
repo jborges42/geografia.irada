@@ -8,12 +8,12 @@
 //    resumo: 'O papel do lugar no mundo, em 2 ou 3 frases (até 420 caracteres)',
 //    fatos:  [ { texto: 'Um “Você sabia?” com número e ano (até 300 caracteres)', fonte: 'Órgão, ano' }, … ],
 //    bncc:   ['EM13CHS201', …],   // habilidades que a ficha ajuda a trabalhar
-//    // só nas 6 potências:
+//    // só nas 13 potências:
 //    dado: 'IDH e população, cada um com ano e fonte (uma linha)',
 //    emissoesPerCapita:  { valor, unidade: 't CO₂ por pessoa', ano, fonte, nota },
 //    emissoesHistoricas: { valor, unidade: '% das emissões acumuladas desde 1850', ano, fonte, nota },
 //  }
-//  Os ids são os de potencias.js e territorios.js (6 potências + 33 territórios).
+//  Os ids são os de potencias.js e territorios.js (13 potências + 32 territórios, a Antártida incluída).
 //
 //  Por que três números de emissão? Quem mais emite hoje nem sempre é quem mais
 //  emite por pessoa, nem quem mais emitiu desde 1850. Olhar os três evita culpar
@@ -120,6 +120,119 @@ const FICHAS = {
     bncc: ['EM13CHS204', 'EM13CHS302', 'EM13CHS503', 'EM13CHS604', 'EM13CNT309'],
   },
 
+  reino_unido: {
+    resumo: 'O Reino Unido é uma das maiores economias da Europa e um centro financeiro mundial. Tem assento permanente e veto no Conselho de Segurança da ONU, lidera a Commonwealth e saiu da União Europeia em 2020, o Brexit, mas segue muito ligado a ela pelo comércio.',
+    dado: 'IDH 0,946, 13º de 193 países (dado de 2023; PNUD, RDH 2025) · 69,5 milhões de habitantes (Banco Mundial, dado de 2025)',
+    emissoesPerCapita: { valor: 4.5, unidade: 't CO₂ por pessoa', ano: 2024, fonte: 'Our World in Data / Global Carbon Project (Global Carbon Budget 2025)',
+      nota: 'Só combustíveis fósseis e cimento. Média mundial: 4,7 t.' },
+    emissoesHistoricas: { valor: 2.9, unidade: '% das emissões acumuladas desde 1850', ano: 2024, fonte: 'Our World in Data / Global Carbon Project (Global Carbon Budget 2025)',
+      nota: 'CO₂ de combustíveis fósseis, cimento e uso da terra (desmatamento), de 1850 a 2024. O Reino Unido foi o berço da Revolução Industrial, movida a carvão.' },
+    fatos: [
+      { texto: 'Em 23/06/2016, 51,9% dos votantes escolheram sair da União Europeia, e o Reino Unido deixou o bloco em 31/01/2020.', fonte: 'Comissão Eleitoral do Reino Unido, 2016; Biblioteca da Câmara dos Comuns, 2020' },
+      { texto: 'Mesmo depois do Brexit, a UE segue sendo a maior parceira comercial do Reino Unido: em 2024, comprou 41% das exportações e forneceu 51% das importações britânicas (bens e serviços).', fonte: 'Biblioteca da Câmara dos Comuns, 2026 (dados de 2024)' },
+      { texto: 'Em 19/05/2025, na primeira cúpula UE–Reino Unido desde o Brexit, os dois lados fecharam uma parceria de segurança e defesa, o acesso mútuo às águas de pesca até 30/06/2038 e a negociação de regras sanitárias para alimentos.', fonte: 'Conselho da União Europeia; Biblioteca da Câmara dos Comuns, 2025' },
+      { texto: 'O Reino Unido integra a Commonwealth, com 56 países, e usou o veto 29 vezes no Conselho de Segurança da ONU, a última em 23/12/1989.', fonte: 'Secretariado da Commonwealth; Security Council Report' },
+    ],
+    bncc: ['EM13CHS201', 'EM13CHS402', 'EM13CHS603', 'EM13CHS604'],
+  },
+
+  japao: {
+    resumo: 'O Japão é uma potência tecnológica e industrial, aliada dos EUA, com poucos recursos naturais e uma das populações mais idosas do mundo. Importa a maior parte da energia que usa, convive com terremotos e tsunamis e disputa ilhas no mar com a China.',
+    dado: 'IDH 0,925, 23º de 193 países (dado de 2023; PNUD, RDH 2025) · 123,4 milhões de habitantes (Banco Mundial, dado de 2025)',
+    emissoesPerCapita: { valor: 7.8, unidade: 't CO₂ por pessoa', ano: 2024, fonte: 'Our World in Data / Global Carbon Project (Global Carbon Budget 2025)',
+      nota: 'Só combustíveis fósseis e cimento. Média mundial: 4,7 t.' },
+    emissoesHistoricas: { valor: 2.7, unidade: '% das emissões acumuladas desde 1850', ano: 2024, fonte: 'Our World in Data / Global Carbon Project (Global Carbon Budget 2025)',
+      nota: 'CO₂ de combustíveis fósseis, cimento e uso da terra (desmatamento), de 1850 a 2024.' },
+    fatos: [
+      { texto: 'Em 21/09/2026, o governo informou que 29,6% dos japoneses (36,24 milhões de pessoas) têm 65 anos ou mais, recorde e o maior índice entre 39 países com mais de 40 milhões de habitantes.', fonte: 'Ministério de Assuntos Internos e Comunicações do Japão, 2026' },
+      { texto: 'No fim de 2025, havia 4.125.395 estrangeiros morando no Japão, recorde e a primeira vez acima de 4 milhões. Os maiores grupos são de chineses, vietnamitas e sul-coreanos.', fonte: 'Agência de Serviços de Imigração do Japão, 2026' },
+      { texto: 'No ano fiscal de 2023, o Japão atendeu só 15,3% da energia que usou com produção própria. Desde Fukushima (2011), 15 reatores foram religados, e a energia nuclear gerou 9% da eletricidade em 2024.', fonte: 'ANRE/METI (Japão); EIA, 2025' },
+      { texto: 'Entre 19/11/2024 e 19/10/2025, navios do governo chinês ficaram 335 dias seguidos na zona contígua das ilhas Senkaku, controladas pelo Japão: a maior permanência já registrada.', fonte: 'Guarda Costeira do Japão (via Stars and Stripes), 2025' },
+      { texto: 'O Brasil tem a maior população de origem japonesa fora do Japão: cerca de 2,7 milhões de pessoas (2023). A imigração começou em 1908, com o navio Kasato Maru.', fonte: 'Ministério das Relações Exteriores do Japão, 2024' },
+    ],
+    bncc: ['EM13CHS201', 'EM13CHS202', 'EM13CHS204', 'EM13CHS404'],
+  },
+
+  australia: {
+    resumo: 'A Austrália é um país rico e democrático da Oceania, grande exportadora de minério de ferro, carvão, gás e lítio. A China é sua maior compradora, e os EUA são o principal aliado de defesa, no AUKUS. Sofre com secas, incêndios e o branqueamento da Grande Barreira de Corais, e conduz as negociações da COP31.',
+    dado: 'IDH 0,958, 7º de 193 países (dado de 2023; PNUD, RDH 2025) · 27,6 milhões de habitantes (Banco Mundial, dado de 2025)',
+    emissoesPerCapita: { valor: 14.5, unidade: 't CO₂ por pessoa', ano: 2024, fonte: 'Our World in Data / Global Carbon Project (Global Carbon Budget 2025)',
+      nota: 'Só combustíveis fósseis e cimento. É mais de três vezes a média mundial, de 4,7 t.' },
+    emissoesHistoricas: { valor: 1.2, unidade: '% das emissões acumuladas desde 1850', ano: 2024, fonte: 'Our World in Data / Global Carbon Project (Global Carbon Budget 2025)',
+      nota: 'CO₂ de combustíveis fósseis, cimento e uso da terra (desmatamento), de 1850 a 2024.' },
+    fatos: [
+      { texto: 'A China comprou 29,2% de tudo o que a Austrália exportou em 2024–25 (A$ 188,7 bilhões). Entre 2020 e 2024, barrou produtos como cevada e vinho; as tarifas foram retiradas em 05/08/2023 (cevada) e 29/03/2024 (vinho).', fonte: 'DFAT, 2024–25; governo da Austrália; CNBC, 2024' },
+      { texto: 'O AUKUS, pacto com EUA e Reino Unido, foi anunciado em 15/09/2021. Em 13/03/2023, ficou definido que os EUA venderão 3 submarinos nucleares Virginia à Austrália, a partir de 2032, e uma revisão do Pentágono, em 2025, manteve o plano.', fonte: 'Governo da Austrália; Congresso dos EUA (CRS), 2023–2025' },
+      { texto: 'Depois do branqueamento em massa de 2024, a cobertura de coral duro no norte da Grande Barreira caiu de 39,8% para 30,0% em 2025, a maior queda anual em 39 anos de monitoramento.', fonte: 'AIMS (Instituto Australiano de Ciência Marinha), 2025' },
+      { texto: 'A COP31 será em Antália, na Turquia, de 09 a 20/11/2026. Pelo acordo fechado na COP30, a Turquia tem a presidência formal, e a Austrália preside as negociações, com o ministro Chris Bowen.', fonte: 'UNFCCC; governo da Austrália, 2025–2026' },
+    ],
+    bncc: ['EM13CHS201', 'EM13CHS302', 'EM13CHS306', 'EM13CHS603'],
+  },
+
+  nova_zelandia: {
+    resumo: 'A Nova Zelândia é um país pequeno e distante, de natureza preservada, forte em leite, carne e turismo, com quase toda a eletricidade vinda de fontes renováveis. Tem fama de pacifista desde que se declarou livre de armas nucleares, em 1987, e voz ativa entre as ilhas do Pacífico.',
+    dado: 'IDH 0,938, 17º de 193 países (dado de 2023; PNUD, RDH 2025) · 5,3 milhões de habitantes (Banco Mundial, dado de 2025)',
+    emissoesPerCapita: { valor: 6.2, unidade: 't CO₂ por pessoa', ano: 2024, fonte: 'Our World in Data / Global Carbon Project (Global Carbon Budget 2025)',
+      nota: 'Só combustíveis fósseis e cimento. Média mundial: 4,7 t.' },
+    emissoesHistoricas: { valor: 0.19, unidade: '% das emissões acumuladas desde 1850', ano: 2024, fonte: 'Our World in Data / Global Carbon Project (Global Carbon Budget 2025)',
+      nota: 'CO₂ de combustíveis fósseis, cimento e uso da terra (desmatamento), de 1850 a 2024.' },
+    fatos: [
+      { texto: 'Em 2024, a agricultura respondeu por 53% das emissões brutas de gases de efeito estufa da Nova Zelândia (75,8 milhões de toneladas de CO₂ equivalente), sobretudo metano do gado.', fonte: 'Ministério do Meio Ambiente da Nova Zelândia, inventário 1990–2024 (abr. 2026)' },
+      { texto: 'Em 30/06/2025, a Nova Zelândia tinha 23,3 milhões de ovelhas para cerca de 5,3 milhões de habitantes: quase 4,4 ovelhas por pessoa.', fonte: 'Stats NZ, 2025 (razão calculada pelo projeto)' },
+      { texto: 'Em 2025, 88,5% da eletricidade neozelandesa veio de fontes renováveis (85,5% em 2024), o maior índice desde 1981, com hidrelétricas, geotérmica e eólica.', fonte: 'MBIE (Ministério da Economia da Nova Zelândia), Energy in New Zealand 2026' },
+      { texto: 'A lei sancionada em 08/06/1987 declarou o país zona livre de armas nucleares e proibiu armas e propulsão nuclear em suas terras, águas e espaço aéreo. Os EUA reagiram rebaixando a Nova Zelândia de “aliada” para “amiga”.', fonte: 'Governo da Nova Zelândia (lei de 1987); NZHistory' },
+    ],
+    bncc: ['EM13CHS302', 'EM13CHS304', 'EM13CHS306', 'EM13CHS603'],
+  },
+
+  africa_do_sul: {
+    resumo: 'A África do Sul é a economia mais industrializada da África, membro do BRICS e do G20, que presidiu em 2025, e superou o apartheid, regime de segregação racial que durou até o início dos anos 1990. Líder mundial em platina, convive com apagões de energia, desemprego alto e uma das maiores desigualdades do planeta.',
+    dado: 'IDH 0,741, 106º de 193 países (dado de 2023; PNUD, RDH 2025) · 64,7 milhões de habitantes (Banco Mundial, dado de 2025)',
+    emissoesPerCapita: { valor: 6.9, unidade: 't CO₂ por pessoa', ano: 2024, fonte: 'Our World in Data / Global Carbon Project (Global Carbon Budget 2025)',
+      nota: 'Só combustíveis fósseis e cimento. Cerca de 84% da eletricidade vem do carvão (2024). Média mundial: 4,7 t.' },
+    emissoesHistoricas: { valor: 1.1, unidade: '% das emissões acumuladas desde 1850', ano: 2024, fonte: 'Our World in Data / Global Carbon Project (soma das séries anuais do Global Carbon Budget 2025, cálculo do projeto)',
+      nota: 'CO₂ de combustíveis fósseis, cimento e uso da terra (desmatamento), de 1850 a 2024.' },
+    fatos: [
+      { texto: 'Em 1994, a África do Sul fez sua primeira eleição com voto de todos os cidadãos, pondo fim ao apartheid. Nelson Mandela, que passou 27 anos preso, foi eleito presidente.', fonte: 'ONU; Fundação Nelson Mandela' },
+      { texto: 'Em 2023, houve cortes de energia programados em 335 dias, o pior ano já registrado. De abril de 2024 a março de 2025, houve cortes em só 13 dias, mas o carvão ainda gerou 83,6% da eletricidade em 2024.', fonte: 'CSIR; Eskom; Ember via Our World in Data, 2023–2025' },
+      { texto: 'Em 2025, a África do Sul extraiu cerca de 71% da platina do mundo e, em 2024, cerca de 40% do manganês: minerais de catalisadores, aço e baterias.', fonte: 'USGS, Mineral Commodity Summaries 2026; USGS, National Minerals Information Center' },
+      { texto: 'No 2º trimestre de 2026, o desemprego oficial foi de 33,6%, chegando a 47,4% entre jovens de 15 a 34 anos. O índice de Gini, que mede a desigualdade de renda, era 54,1 em 2022.', fonte: 'Stats SA, 2026 (via SAnews); Banco Mundial, 2022' },
+    ],
+    bncc: ['EM13CHS302', 'EM13CHS502', 'EM13CHS603', 'EM13CHS604'],
+  },
+
+  nigeria: {
+    resumo: 'A Nigéria é o país mais populoso da África, com uma população muito jovem. Vive do petróleo, mas enfrenta violência de grupos armados no norte, desigualdade e inflação alta. A Dangote, uma das maiores refinarias do mundo, e as empresas de tecnologia de Lagos mostram que a economia tenta se diversificar.',
+    dado: 'IDH 0,560, 164º de 193 países (dado de 2023; PNUD, RDH 2025) · 237,5 milhões de habitantes (Banco Mundial, dado de 2025)',
+    emissoesPerCapita: { valor: 0.6, unidade: 't CO₂ por pessoa', ano: 2024, fonte: 'Our World in Data / Global Carbon Project (Global Carbon Budget 2025)',
+      nota: 'Só combustíveis fósseis e cimento. Média mundial: 4,7 t. A população é enorme, mas o consumo de energia por pessoa é baixo.' },
+    emissoesHistoricas: { valor: 0.63, unidade: '% das emissões acumuladas desde 1850', ano: 2024, fonte: 'Our World in Data / Global Carbon Project (soma das séries anuais do Global Carbon Budget 2025, cálculo do projeto)',
+      nota: 'CO₂ de combustíveis fósseis, cimento e uso da terra (desmatamento), de 1850 a 2024. Boa parte vem do uso da terra, e não dos combustíveis.' },
+    fatos: [
+      { texto: 'A Nigéria tem cerca de 37,5 bilhões de barris de reservas provadas de petróleo, e o petróleo bruto respondeu por cerca de 71% das suas exportações em 2024.', fonte: 'OPEP, 2024 (via EIA); Escritório Nacional de Estatística da Nigéria, 2024 (via Intelpoint)' },
+      { texto: 'Em 29/05/2023, o governo anunciou o fim do subsídio à gasolina, e o litro subiu de cerca de 195 para mais de 400 nairas em poucos dias.', fonte: 'NNPC; Al Jazeera, 2023' },
+      { texto: 'A refinaria Dangote, em Lagos, tem capacidade de 650 mil barris por dia, a maior de uma só linha do mundo. Começou a produzir diesel em janeiro de 2024 e gasolina em setembro de 2024.', fonte: 'EIA, 2025; AllAfrica, 2024' },
+      { texto: 'A Nigéria tinha 237,5 milhões de habitantes em 2025 e idade mediana de cerca de 18 anos, contra cerca de 31 na média mundial.', fonte: 'Banco Mundial, 2025; ONU, World Population Prospects 2024' },
+    ],
+    bncc: ['EM13CHS201', 'EM13CHS302', 'EM13CHS503', 'EM13CHS604'],
+  },
+
+  egito: {
+    resumo: 'O Egito liga a África à Ásia e à Europa: o Canal de Suez, em seu território, é um dos atalhos mais importantes do comércio mundial. O país vive do Nilo, do turismo e do canal, é um dos maiores importadores de trigo do mundo, entrou no BRICS em 2024 e costuma mediar negociações no Oriente Médio.',
+    dado: 'IDH 0,754, 100º de 193 países (dado de 2023; PNUD, RDH 2025) · 118,4 milhões de habitantes (Banco Mundial, dado de 2025)',
+    emissoesPerCapita: { valor: 2.2, unidade: 't CO₂ por pessoa', ano: 2024, fonte: 'Our World in Data / Global Carbon Project (Global Carbon Budget 2025)',
+      nota: 'Só combustíveis fósseis e cimento. Média mundial: 4,7 t.' },
+    emissoesHistoricas: { valor: 0.29, unidade: '% das emissões acumuladas desde 1850', ano: 2024, fonte: 'Our World in Data / Global Carbon Project (soma das séries anuais do Global Carbon Budget 2025, cálculo do projeto)',
+      nota: 'CO₂ de combustíveis fósseis, cimento e uso da terra (desmatamento), de 1850 a 2024.' },
+    fatos: [
+      { texto: 'Cerca de 97% dos recursos hídricos renováveis do Egito vêm de fora do país, quase todos do Rio Nilo. O acordo de 1959 com o Sudão garante ao Egito 55,5 bilhões de m³ de água por ano.', fonte: 'FAO, AQUASTAT (perfil do Egito)' },
+      { texto: 'Inaugurada em 09/09/2025 no Nilo Azul, a Grande Barragem do Renascimento da Etiópia tem reservatório de 74 bilhões de m³ e mais de 5.000 MW. O Egito a chamou de ato unilateral e recorreu ao Conselho de Segurança da ONU.', fonte: 'Ecofin Agency; Al Jazeera; Ahram Online, 2025' },
+      { texto: 'O Egito importou cerca de 12,5 milhões de toneladas de trigo em 2024/25, entre os maiores importadores do mundo. O pão subsidiado passou de 5 para 20 piastras em junho de 2024.', fonte: 'USDA, 2025; The National, 2024' },
+      { texto: 'A receita do Canal de Suez caiu de US$ 10,25 bilhões, em 2023, para US$ 3,99 bilhões, em 2024 (−61%), por causa dos ataques no Mar Vermelho. Em 2025, foi de cerca de US$ 4,1 bilhões.', fonte: 'Autoridade do Canal de Suez (via EgyptToday); Bloomberg, 2026' },
+    ],
+    bncc: ['EM13CHS201', 'EM13CHS206', 'EM13CHS302', 'EM13CHS604'],
+  },
+
   // ======================= AMÉRICA DO NORTE =======================
   canada: {
     resumo: 'Segundo maior país do mundo em área, o Canadá tem petróleo, minérios, água doce e enormes florestas boreais. Membro do G7 e da OTAN, tem nos EUA, seu vizinho, o maior parceiro comercial.',
@@ -203,11 +316,12 @@ const FICHAS = {
   },
 
   // ======================= EUROPA =======================
-  reino_unido: {
-    resumo: 'Reino Unido, Noruega, Islândia e Suíça são países europeus ricos que ficaram fora da União Europeia, mas mantêm laços fortes com ela. O Reino Unido tem assento permanente com veto no Conselho de Segurança da ONU; a Noruega exporta petróleo e gás; e a Suíça abriga, em Genebra, sedes de órgãos internacionais.',
+  noruega_suica: {
+    resumo: 'Noruega, Islândia e Suíça são países europeus ricos que ficaram fora da União Europeia, mas comerciam muito com ela: Noruega e Islândia participam do mercado único pelo Espaço Econômico Europeu. A Noruega exporta petróleo e gás e guarda o maior fundo soberano do mundo; a Suíça abriga, em Genebra, a sede de organismos internacionais.',
     fatos: [
-      { texto: 'Em 2016, 51,9% dos eleitores britânicos votaram por sair da União Europeia. O Brexit aconteceu em 31 de janeiro de 2020.', fonte: 'Comissão Eleitoral do Reino Unido, 2016' },
       { texto: 'O fundo soberano da Noruega, criado em 1990 com a renda do petróleo, valia cerca de 22,7 trilhões de coroas norueguesas (perto de US$ 2,4 trilhões) em junho de 2026: é o maior fundo do tipo no mundo.', fonte: 'Norges Bank (banco central da Noruega); Reuters, 2026' },
+      { texto: 'Em 2025, 95,9% dos carros novos registrados na Noruega eram 100% elétricos (179.550 carros), contra 88,9% em 2024.', fonte: 'OFV (Federação Rodoviária Norueguesa), 2026' },
+      { texto: 'A Noruega rejeitou entrar na União Europeia em referendos: 53,5% de “não” em 1972 e 52,2% em 1994. Participa do mercado único pelo Espaço Econômico Europeu, em vigor desde 01/01/1994.', fonte: 'Governo da Noruega; Parlamento Europeu, 2025' },
       { texto: 'Islândia (0,972), Noruega e Suíça (0,970) têm os três maiores IDHs do mundo.', fonte: 'PNUD, RDH 2025 (dados de 2023)' },
     ],
     bncc: ['EM13CHS402', 'EM13CHS603', 'EM13CHS604', 'EM13MAT104'],
@@ -235,10 +349,10 @@ const FICHAS = {
 
   // ======================= ÁFRICA =======================
   norte_africa: {
-    resumo: 'Do Marrocos ao Egito, a região une o Deserto do Saara, o Mar Mediterrâneo e o Rio Nilo, com população majoritariamente árabe e berbere. Vende gás e petróleo para a Europa, controla o Canal de Suez e é ponto de partida de travessias de migrantes rumo à Europa.',
+    resumo: 'Do Marrocos à Líbia, a região une o Deserto do Saara, o Mar Mediterrâneo e povos árabes e berberes. Vende gás e petróleo para a Europa, fica ao lado do Egito e do Canal de Suez e é ponto de partida de travessias de migrantes rumo à Europa.',
     fatos: [
       { texto: 'O Marrocos tem cerca de 68% das reservas mundiais de rocha fosfática, matéria-prima de adubos. Não existe substituto para o fósforo na agricultura.', fonte: 'USGS, Mineral Commodity Summaries 2026' },
-      { texto: 'Inaugurado em 1869, o Canal de Suez é o atalho marítimo entre a Europa e a Ásia. Desde o fim de 2023, ataques a navios no Mar Vermelho fizeram muitas empresas desviarem pelo sul da África.', fonte: 'Conselho de Segurança da ONU, Resolução 2722 (2024)' },
+      { texto: 'Desde 2014, mais de 86 mil migrantes morreram ou desapareceram nas rotas do mundo, mais de 35 mil deles no Mediterrâneo, onde fica a travessia a partir da costa norte-africana.', fonte: 'OIM, 2026' },
       { texto: 'A Primavera Árabe, onda de protestos por democracia e emprego, começou na Tunísia em dezembro de 2010 e se espalhou por vários países árabes em 2011.', fonte: 'Encyclopaedia Britannica' },
     ],
     bncc: ['EM13CHS201', 'EM13CHS302', 'EM13CHS603'],
@@ -255,11 +369,11 @@ const FICHAS = {
   },
 
   africa_ocidental: {
-    resumo: 'Região do país mais populoso da África, a Nigéria, e de grandes metrópoles como Lagos. Produz petróleo, ouro e cacau e reúne seus países na CEDEAO; Guiné-Bissau e Cabo Verde falam português e têm laços históricos com o Brasil.',
+    resumo: 'Região de grandes metrópoles, de cacau, ouro e petróleo. Seus países se reúnem na CEDEAO, e a vizinha Nigéria, o país mais populoso da África, pesa muito na região. Guiné-Bissau e Cabo Verde falam português e têm laços históricos com o Brasil.',
     fatos: [
       { texto: 'Em 2024, os países da África Ocidental colheram 56% do cacau do mundo; só a Costa do Marfim produziu 36%.', fonte: 'FAO (FAOSTAT), 2026' },
-      { texto: 'Com cerca de 237 milhões de habitantes em 2025, a Nigéria é o país mais populoso da África e o 6º do mundo.', fonte: 'Banco Mundial, 2026' },
       { texto: 'A CEDEAO, bloco criado em 1975, garante a livre circulação de pessoas entre seus membros. Em janeiro de 2025, Mali, Burkina Faso e Níger deixaram o bloco.', fonte: 'CEDEAO, 2025' },
+      { texto: 'Guiné-Bissau e Cabo Verde, de língua portuguesa, fundaram a CPLP (Comunidade dos Países de Língua Portuguesa) com o Brasil e outros países, em 1996.', fonte: 'CPLP' },
     ],
     bncc: ['EM13CHS201', 'EM13CHS302', 'EM13CHS604'],
   },
@@ -292,16 +406,6 @@ const FICHAS = {
       { texto: 'Em 2019, o ciclone Idai atingiu Moçambique, Zimbábue e Malawi e afetou mais de 3 milhões de pessoas: um dos piores desastres climáticos do Hemisfério Sul, segundo a OMM.', fonte: 'OMM (Organização Meteorológica Mundial), 2019' },
     ],
     bncc: ['EM13CHS201', 'EM13CHS304', 'EM13CHS601'],
-  },
-
-  africa_do_sul: {
-    resumo: 'A África do Sul é a economia mais industrializada da África, membro do BRICS e do G20, e superou o apartheid, regime de segregação racial que durou até o início dos anos 1990. Lesoto e Essuatíni, pequenos reinos sem saída para o mar, são muito ligados à economia sul-africana.',
-    fatos: [
-      { texto: 'Em 1994, a África do Sul fez sua primeira eleição com voto de todos os cidadãos, pondo fim ao apartheid. Nelson Mandela, que passou 27 anos preso, foi eleito presidente.', fonte: 'ONU; Fundação Nelson Mandela' },
-      { texto: 'Em 2025, a África do Sul extraiu cerca de 71% da platina do mundo, metal usado em catalisadores de carros e na indústria.', fonte: 'USGS, Mineral Commodity Summaries 2026' },
-      { texto: 'Em 2025, a África do Sul foi o primeiro país africano a presidir o G20 e sediou a cúpula do grupo em Joanesburgo, depois da presidência do Brasil, em 2024.', fonte: 'G20, 2025' },
-    ],
-    bncc: ['EM13CHS302', 'EM13CHS502', 'EM13CHS603', 'EM13CHS604'],
   },
 
   // ======================= ÁSIA =======================
@@ -385,12 +489,13 @@ const FICHAS = {
     bncc: ['EM13CHS202', 'EM13CHS204', 'EM13CHS603', 'EM13CHS604'],
   },
 
-  japao_coreia: {
-    resumo: 'Japão e Coreia do Sul são democracias ricas e potências tecnológicas, aliadas dos EUA, com poucos recursos naturais e populações que envelhecem rápido. Exportam carros, eletrônicos, chips e cultura pop para o mundo todo.',
+  coreia_sul: {
+    resumo: 'Potência de chips, baterias, carros, navios e cultura pop, a Coreia do Sul é uma democracia rica, aliada dos EUA, com a vizinha Coreia do Norte armada a poucos quilômetros da capital. Tem uma das menores taxas de fecundidade do mundo e envelhece muito rápido.',
     fatos: [
-      { texto: 'O Japão tem uma das populações mais idosas do mundo: metade dos japoneses tem quase 50 anos ou mais (idade mediana de 49,8 anos em 2025).', fonte: 'ONU, World Population Prospects 2024' },
-      { texto: 'Em 2023, a Coreia do Sul teve uma das menores taxas de fecundidade do mundo: 0,72 filho por mulher, bem abaixo dos 2,1 que mantêm o tamanho da população.', fonte: 'ONU, World Population Prospects 2024' },
-      { texto: 'O Brasil tem a maior população de origem japonesa fora do Japão: cerca de 2,7 milhões de pessoas (2023). A imigração começou em 1908, com o navio Kasato Maru.', fonte: 'Ministério das Relações Exteriores do Japão, 2024' },
+      { texto: 'A taxa de fecundidade da Coreia do Sul foi de 0,80 filho por mulher em 2025, contra 0,75 em 2024; os nascimentos subiram 6,7%, para 254,3 mil. Para manter o tamanho da população, seriam necessários 2,1.', fonte: 'Ministério de Dados e Estatísticas da Coreia do Sul, 2026 (via Korea Times)' },
+      { texto: 'Em 2025, as exportações coreanas de chips chegaram a US$ 173,4 bilhões, recorde: cerca de um quarto de tudo o que o país vendeu ao exterior.', fonte: 'Dados do governo coreano citados pela TrendForce, 2025' },
+      { texto: 'Em dezembro de 2024, 20% dos coreanos (10,24 milhões) tinham 65 anos ou mais: o país virou “sociedade superenvelhecida” em cerca de 24 anos, contra 35 no Japão.', fonte: 'Ministério do Interior e Segurança da Coreia do Sul, 2024' },
+      { texto: 'Em 2024, as exportações de conteúdo cultural coreano (jogos, música, séries) chegaram a US$ 14,08 bilhões, recorde; os jogos foram 60,4% do total.', fonte: 'Ministério da Cultura, Esportes e Turismo da Coreia do Sul, 2024 (via Korea Herald)' },
     ],
     bncc: ['EM13CHS201', 'EM13CHS202', 'EM13CHS206'],
   },
@@ -426,26 +531,23 @@ const FICHAS = {
   },
 
   // ======================= OCEANIA =======================
-  australia: {
-    resumo: 'Austrália e Nova Zelândia são países ricos e democráticos da Oceania, aliados dos EUA e cada vez mais ligados à Ásia, seu principal mercado. Exportam minérios, carne e laticínios e sofrem com secas, incêndios e o branqueamento de corais causado pelo aquecimento do mar.',
+  melanesia: {
+    resumo: 'Papua-Nova Guiné, Fiji, Ilhas Salomão, Vanuatu e Nova Caledônia formam a Melanésia: ilhas de floresta tropical, ouro, cobre e níquel e centenas de línguas. É o vizinho mais próximo da Austrália e um ponto de disputa por acordos de segurança, portos e investimentos entre Austrália, EUA e China.',
     fatos: [
-      { texto: 'Em 2025, a Austrália foi a maior produtora de lítio do mundo: cerca de 32% do total extraído, metal essencial para baterias.', fonte: 'USGS, Mineral Commodity Summaries 2026' },
-      { texto: 'Desde 2016, a Grande Barreira de Corais, maior sistema de recifes do mundo, sofreu pelo menos cinco branqueamentos em massa causados por ondas de calor no mar.', fonte: 'Autoridade do Parque Marinho da Grande Barreira de Corais, 2024' },
-      { texto: 'Os maoris, povo indígena da Nova Zelândia, eram 17,8% da população no censo de 2023. O Tratado de Waitangi, de 1840, é a base da relação entre eles e o Estado.', fonte: 'Stats NZ (Estatísticas da Nova Zelândia), 2024' },
+      { texto: 'Papua-Nova Guiné é o país com mais línguas do mundo: cerca de 840 línguas vivas.', fonte: 'Ethnologue; Britannica, 2025' },
+      { texto: 'Em 2019, 27 estudantes de Direito de ilhas do Pacífico começaram a campanha que levou a Corte Internacional de Justiça a decidir, por unanimidade, em julho de 2025, que os países têm o dever jurídico de proteger o clima.', fonte: 'Corte Internacional de Justiça, 2025' },
     ],
-    bncc: ['EM13CHS204', 'EM13CHS302', 'EM13CHS306', 'EM13CNT206'],
+    bncc: ['EM13CHS104', 'EM13CHS201', 'EM13CHS204', 'EM13CHS604'],
   },
 
   pacifico: {
-    resumo: 'Países formados por ilhas e atóis espalhados pelo maior oceano do planeta, com culturas melanésias, micronésias e polinésias. Emitem muito pouco, mas estão entre os mais ameaçados pela subida do mar e lideram a cobrança por ação climática na ONU; EUA, China e Austrália disputam influência na região.',
+    resumo: 'Atóis e ilhas baixas da Polinésia e da Micronésia, como Samoa, Tonga, Kiribati, Tuvalu e Palau. Emitem quase nada, mas estão entre os lugares mais ameaçados pela subida do mar e lideram a cobrança por ação climática na ONU; Nova Zelândia, Austrália, EUA e China disputam influência na região.',
     fatos: [
-      { texto: 'Em 2019, 27 estudantes de Direito de ilhas do Pacífico começaram a campanha que levou a Corte Internacional de Justiça a decidir, por unanimidade, em julho de 2025, que os países têm o dever jurídico de proteger o clima.', fonte: 'Corte Internacional de Justiça, 2025' },
       { texto: 'Pelo Tratado da União Falepili, de 2023, até 280 moradores de Tuvalu por ano podem obter residência permanente na Austrália, por causa das mudanças climáticas.', fonte: 'Governo da Austrália, 2023' },
-      { texto: 'Papua-Nova Guiné é o país com mais línguas do mundo: cerca de 840 línguas vivas.', fonte: 'Ethnologue; Britannica, 2025' },
+      { texto: 'No oeste do Pacífico tropical, o nível do mar subiu de 10 a 15 cm entre 1993 e 2023, quase o dobro da taxa global.', fonte: 'OMM, State of the Climate in the South-West Pacific 2023 (2024)' },
     ],
     bncc: ['EM13CHS104', 'EM13CHS201', 'EM13CHS305', 'EM13CHS604'],
   },
-
   // ======================= POLOS =======================
   antartida: {
     resumo: 'Continente mais frio, seco e ventoso do planeta, sem população permanente e sem dono. O Tratado da Antártida, de 1959, reserva a região para a paz e a ciência, e o Protocolo de Madri, de 1991, proíbe a mineração; o Brasil pesquisa no continente desde 1982.',

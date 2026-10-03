@@ -6,7 +6,6 @@
    Laço: abertura (ano, Plantão, COP) → vez de cada potência (dilema + ações | computador) → balanço → … → fim. */
 
 const Jogo = (() => {
-  const PIDS = ['brasil', 'eua', 'china', 'ue', 'india', 'russia'];
   const SALVO = 'gi:partida';
   const carta = id => POLITICAS.find(c => c.id === id);
   const tem = (modulo, f) => typeof modulo?.[f] === 'function';   // módulos de outras frentes podem estar incompletos
@@ -99,7 +98,8 @@ const Jogo = (() => {
   }
   const apagarSalvo = () => { try { localStorage.removeItem(SALVO); } catch { /* indisponível */ } };
   function lerSalvo() {
-    try { const d = JSON.parse(localStorage.getItem(SALVO)); return d?.versao === 1 && d.estado && d.passo ? d : null; } catch { return null; }
+    // partida salva com 6 potências (estado versão 2) não serve mais
+    try { const d = JSON.parse(localStorage.getItem(SALVO)); return d?.versao === 1 && d.estado?.versao === 3 && d.passo ? d : null; } catch { return null; }
   }
   const temSalvo = () => !!lerSalvo();
 
@@ -412,6 +412,11 @@ const Jogo = (() => {
       efeitoSom('sucesso');
     }
     await comTeto(Promise.all(montagem), 1800);
+    // "O que o mundo fez": as respostas das outras potências (res.reacoes) + as relações de quem jogou que mudaram de faixa (mudanca v === 'relacao')
+    const rot = typeof Simulacao.rotuloRelacao === 'function' ? Simulacao.rotuloRelacao : null;
+    const relacoes = !rot ? [] : (res.mudancas || []).filter(x => x.v === 'relacao' && x.quem === pid && x.de && typeof x.antes === 'number' && rot(x.antes).texto !== rot(x.depois).texto)
+      .map(x => ({ quem: x.de, tipo: 'relacao', texto: `Relação com ${Simulacao.com(x.de)}: ${rot(x.antes).texto} → ${rot(x.depois).texto}` }));
+    Hud.reacoes?.([...(res.reacoes || []), ...relacoes]);
   }
   // Aliança com outra equipe humana: a equipe convidada aceita ou recusa na tela
   function perguntarAlianca(de, para) {
@@ -670,7 +675,7 @@ const Jogo = (() => {
     Object.assign(Hud.ao, {
       acao: escolherAcao, passar: passarAcao, sair: sairAcao, trocar: trocarAcoes, negociar, encerrar, reuniao,
       menu: abrirPausa, som: alternarSom, ajuda: () => typeof Manual !== 'undefined' && Manual.abrir(),
-      perto: () => zoom(-1), longe: () => zoom(1), geral: () => mapa()?.visaoGeral(), jornal: () => Hud.abrirJornal(estado),
+      perto: () => zoom(-1), longe: () => zoom(1), geral: () => mapa()?.visaoGeral(), jornal: () => Hud.abrirJornal(estado), relacoes: () => Hud.abrirRelacoes(estado, vez?.pid),
     });
   }
 
@@ -682,6 +687,7 @@ const Jogo = (() => {
     if (k === 'Escape') { ev.preventDefault(); if (vez?.sel) cancelar(); else abrirPausa(); }
     else if (k === 'p') abrirPausa();
     else if (k === 'h') Hud.ocultar();
+    else if (k === 'r') Hud.abrirRelacoes(estado, vez?.pid);
     else if (k === 'm' && typeof Som !== 'undefined') { const on = Som.alternarMusica(); atualizarBotaoSom(); aviso(on ? 'Música ligada.' : 'Música desligada.', { tipo: 'neutro', icone: imgIcone('🎤') }); }
     else if (k === 'f') telaCheia();
     else if (k === ' ' && pularIA) { ev.preventDefault(); pularIA(); }

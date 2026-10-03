@@ -8,13 +8,11 @@
 
 const Hud = (() => {
   const ic = (e, px = 48) => imgIcone(e, px);
-  const PIDS = ['brasil', 'eua', 'china', 'ue', 'india', 'russia'];
   const nomePot = id => (typeof Simulacao !== 'undefined' ? Simulacao.nome(id) : id);
   const com = (id, prep) => (typeof Simulacao !== 'undefined' ? Simulacao.com(id, prep) : nomePot(id));
   const carta = id => POLITICAS.find(c => c.id === id);
   const r0 = v => Math.round(v);
-  const DE = { brasil: 'do', eua: 'dos', china: 'da', ue: 'da', india: 'da', russia: 'da' };
-  const vezDe = pid => `Vez ${DE[pid] || 'de'} ${nomeCurto(pid)}`;   // "Vez dos EUA": cabe no painel
+  const vezDe = pid => `Vez ${prepDe(pid)} ${nomeCurto(pid)}`;   // "Vez dos EUA": cabe no painel
   const plural = pid => /s$/.test(TERRITORIOS.find(t => t.id === pid)?.artigo || POTENCIAS.find(p => p.id === pid)?.artigo || '');
   const maiuscula = t => t.charAt(0).toUpperCase() + t.slice(1);
 
@@ -149,10 +147,11 @@ const Hud = (() => {
           <span class="selo ind-selo" aria-hidden="true"></span><span class="zebra" hidden></span><span class="so-leitor ind-fala"></span></button></li>`).join('')}</ul>
       </header>
       <nav class="hud-menu" aria-label="Menu">${btnIc('pausa', 'Pausa e ajustes (P ou Esc)', 'data-teste="menu" data-ao="menu"')}
-        ${btnIc(somLigado() ? 'som' : 'mudo', 'Som ligado ou desligado (M)', 'data-ao="som"', 'hud-som')}${btnIc('ajuda', 'Manual do Diplomata', 'data-ao="ajuda" data-teste="manual"')}</nav>
+        ${btnIc(somLigado() ? 'som' : 'mudo', 'Som ligado ou desligado (M)', 'data-ao="som"', 'hud-som')}${btnIc('ajuda', 'Manual do Diplomata', 'data-ao="ajuda" data-teste="manual"')}
+        <button class="btn btn-ic peca" data-ao="relacoes" data-teste="relacoes" aria-label="Relações entre as potências (R)" title="Relações entre as potências (R)">${ic('🤝', 64)}</button></nav>
       <nav class="hud-mapa" aria-label="Câmera do mapa">${btnIc('mais', 'Aproximar', 'data-ao="perto"', 'redondo')}${btnIc('menos', 'Afastar', 'data-ao="longe"', 'redondo')}
         ${btnIc('visao', 'Ver o mundo todo', 'data-ao="geral"', 'redondo')}</nav>
-      <aside class="hud-coluna" aria-label="Placar das delegações"><ol class="coluna-lista"></ol></aside>
+      <aside class="hud-coluna" tabindex="0" aria-label="Placar das delegações (role para ver todas)"><ol class="coluna-lista"></ol></aside>
       <div class="hud-doca" role="toolbar" aria-label="Ações do governo"></div>
       <button class="btn btn-principal peca pinos grandes hud-encerrar" data-teste="encerrar-vez" data-ao="encerrar" hidden>
         <span>Encerrar vez<small>Enter</small></span><span class="hud-tempo cronometro peca" role="timer" hidden></span></button>
@@ -186,7 +185,8 @@ const Hud = (() => {
   }
 
   // ============================== FASES (guia §5.19: o que aparece em cada uma) ==============================
-  function fase(nome) { if (raiz) raiz.dataset.fase = nome; if (nome !== 'decisoes') { ficha(null); instrucao(null); } balao(null); }
+  // só escreve se mudou: cada troca de data-fase recalcula o estilo do HUD inteiro (~20 ms no PC fraco)
+  function fase(nome) { if (raiz && raiz.dataset.fase !== nome) raiz.dataset.fase = nome; if (nome !== 'decisoes') { ficha(null); instrucao(null); fecharReacoes(); } balao(null); }
   const ocultar = sim => raiz?.classList.toggle('oculto', sim ?? !raiz.classList.contains('oculto'));
 
   // ============================== ATUALIZAR ==============================
@@ -267,6 +267,7 @@ const Hud = (() => {
     const ordem = vez ? [vez, ...base.filter(id => id !== vez)] : base;
     const chave = ordem.join() + '|' + vez + '|' + e.config.modo + '|' + !!e.reuniaoUsada;
     const lista = raiz.querySelector('.coluna-lista');
+    lista.dataset.denso = PIDS.length > 8;   // 13 potências: linhas mais baixas e a coluna rola (css/jogo.css)
     if (chave !== chaveColuna) {
       const antes = Object.fromEntries([...lista.children].map(li => [li.dataset.pid, li.getBoundingClientRect()]));
       lista.innerHTML = ordem.map(id => (id === vez ? painelVez(e, id, pos[id]) : linha(e, id, pos[id]))).join('');
@@ -294,7 +295,7 @@ const Hud = (() => {
   function linha(e, id, p) {
     const pot = e.potencias[id];
     const quem = pot.humano ? esc(pot.nomeJogador && pot.nomeJogador !== 'Computador' ? pot.nomeJogador : nomeEquipe(id)) : 'Computador';
-    return `<li class="linha peca" data-pid="${id}">
+    return `<li class="linha peca" data-pid="${id}" data-humano="${!!pot.humano}">
       <span class="selo pos" ${e.config.modo === 'cooperativo' ? 'hidden' : ''}></span>
       <span class="aba" data-equipe="${id}">${retratoHTML(id)}</span>
       <span class="linha-nome"><b>${esc(nomeCurto(id))}</b><small>${quem}</small></span>
@@ -381,7 +382,7 @@ const Hud = (() => {
       <b class="segredo-nome">${esc(m?.nome || 'Missão secreta')}</b><span>${esc(m?.texto || '')}</span>
       <span class="pilula ${ok ? 'ganho' : 'fantasma'}">${ok ? GLIFOS.ok + ' Cumprida por enquanto' : 'Ainda não cumprida'}</span>`;
   }
-  const comecarVez = (pid, cp) => { vez = pid; cpInicio = cp; };
+  const comecarVez = (pid, cp) => { vez = pid; cpInicio = cp; fecharReacoes(); };
 
   // ============================== DOCA: BARRA DE AÇÕES (guia §5.4, §5.9) ==============================
   // Estado de um tijolo: { ok, motivo, faltas: { cp?, recurso? } } (sem alvo: testa com um alvo possível)
@@ -533,10 +534,11 @@ const Hud = (() => {
   function decidindo(pid, aoPular) {
     const el = raiz?.querySelector('.hud-decidindo');
     if (!el) return;
+    gsap.killTweensOf(el.querySelectorAll('.dec-ampulheta'));   // o laço infinito da ampulheta antiga morre junto com ela
     if (!pid) { el.hidden = true; return; }
     el.style.setProperty('--faixa', corDe(pid));
     el.innerHTML = `<span class="dec-quem">${retratoHTML(pid, 'medio')}${arte('ampulheta', { px: 96, classe: 'dec-ampulheta' })}</span>
-      <div class="dec-textos"><b class="dec-tit">${maiuscula(DE[pid].slice(1))} ${esc(nomeCurto(pid))} ${plural(pid) ? 'estão' : 'está'} decidindo…</b>
+      <div class="dec-textos"><b class="dec-tit">${maiuscula(prepDe(pid).slice(1))} ${esc(nomeCurto(pid))} ${plural(pid) ? 'estão' : 'está'} decidindo…</b>
       <span class="dec-sub">Computador: cada governo pesa as coisas do seu jeito</span></div><ol class="dec-log" aria-live="polite"></ol>
       <button class="btn btn-neutro peca dec-pular" data-teste="pular">Pular <small>Espaço</small></button>`;
     el.querySelector('.dec-pular').onclick = () => { efeitoSom('clique'); aoPular?.(); };
@@ -785,9 +787,72 @@ const Hud = (() => {
     return abrirPainel(p, { esc: true });
   }
 
+  // ============================== RELAÇÕES (diplomacia): como as outras potências veem a da vez ==============================
+  // Barra de −100 a +100 com o zero no meio, sempre com a palavra (Hostil … Aliada) e o número: nunca só a cor.
+  const SINAL_REL = { '-3': '−−−', '-2': '−−', '-1': '−', 1: '+', 2: '++', 3: '+++' };
+  const comercioTxt = c => (c >= .2 ? 'Comércio forte' : c >= .1 ? 'Comércio médio' : c > 0 ? 'Comércio pequeno' : '');
+  function linhaRelacao(r) {
+    const v = Math.round(r.valor), nivel = r.rotulo?.nivel ?? 0, texto = r.rotulo?.texto ?? '';
+    const larg = Math.min(50, Math.abs(v) / 2), esq = v < 0 ? 50 - larg : 50;
+    const selos = [r.aliada && `<span class="pilula rel-selo aliada">${ic('🤝', 40)}Aliança</span>`, r.sancionada && `<span class="pilula rel-selo sancao">${ic('🔒', 40)}Sanção</span>`,
+      comercioTxt(r.comercio) && `<span class="pilula rel-selo comercio">${ic('🚢', 40)}${comercioTxt(r.comercio)}</span>`].filter(Boolean).join('');
+    const sit = [texto, r.aliada ? 'aliança' : '', r.sancionada ? 'sanção' : '', comercioTxt(r.comercio).toLowerCase()].filter(Boolean).join(', ');
+    return `<li><button class="rel-linha" data-id="${r.id}" data-nivel="${nivel}" aria-label="${esc(nomeCurto(r.id))}: ${esc(sit)}, ${sinal(v)} de 100. Ver no mapa.">
+      <span class="rel-quem" data-equipe="${r.id}">${formaDe(r.id)}<b>${esc(nomeCurto(r.id))}</b></span>
+      <span class="rel-barra" aria-hidden="true"><i class="rel-fill" style="left:${esq}%;width:${larg}%"></i><b class="rel-zero"></b></span>
+      <span class="rel-rotulo"><span class="rel-sinal">${SINAL_REL[nivel] ?? ''}</span>${esc(texto)} <span class="num rel-valor">${sinal(v)}</span></span>
+      <span class="rel-selos">${selos}</span></button></li>`;
+  }
+  function abrirRelacoes(e, de) {
+    de ||= vez || Object.keys(e.potencias).find(p => e.potencias[p].humano) || PIDS[0];
+    if (typeof Simulacao === 'undefined' || !Simulacao.relacoesDe) { aviso('A diplomacia ainda não está disponível.', { tipo: 'neutro' }); return null; }
+    const lista = Simulacao.relacoesDe(e, de);
+    const p = document.createElement('section');
+    p.className = 'painel peca pinos painel-m hud-relacoes';
+    p.dataset.equipe = de;
+    p.setAttribute('aria-labelledby', 'rel-titulo');
+    p.innerHTML = `<header class="painel-cab"><h2 class="painel-titulo" id="rel-titulo">Relações ${esc(prepDe(de))} ${esc(nomeCurto(de))}<small class="painel-sub">Como as outras potências enxergam vocês. Toque numa para ver no mapa.</small></h2>
+        <button class="btn btn-ic peca rel-fechar" aria-label="Fechar as relações"><img src="${ICONES_BOTAO.fechar}" alt=""></button></header>
+      <div class="tela rel-tela"><p class="rel-legenda">Esquerda do traço branco: relação ruim (listrada). Direita: boa (lisa). Quanto mais longe, mais forte.</p>
+        <ul class="rel-lista">${lista.map(linhaRelacao).join('')}</ul></div>`;
+    p.querySelector('.rel-fechar').onclick = () => fecharPainel(p);
+    p.querySelector('.rel-lista').addEventListener('click', ev => {
+      const b = ev.target.closest('.rel-linha');
+      if (!b) return;
+      fecharPainel(p);
+      if (typeof Mapa3D !== 'undefined' && Mapa3D.focar) Mapa3D.focar(b.dataset.id, { duracao: RM ? 0 : 1.1 });
+    });
+    return abrirPainel(p, { esc: true });
+  }
+
+  // ============================== O QUE O MUNDO FEZ: reações às ações (resultado.reacoes do motor) ==============================
+  const ICONE_REACAO = { relacao: '🤝', retaliacao: '⚔️', apoio: '🙌', corrida: '🚀', furaram: '🔓', aliados: '🛡️' };
+  let reacoesEl = null, reacoesTimer = 0;
+  const fecharReacoes = () => { clearTimeout(reacoesTimer); reacoesEl?.remove(); reacoesEl = null; };
+  function reacoes(lista, { ms } = {}) {
+    fecharReacoes();
+    const itens = (lista || []).filter(r => r?.texto).slice(0, 7);
+    if (!raiz || !itens.length) return null;
+    const el = document.createElement('aside');
+    el.className = 'hud-reacoes peca flutua';
+    el.setAttribute('role', 'status');
+    el.innerHTML = `<header><b>O que o mundo fez</b><button class="btn btn-ic peca" aria-label="Fechar"><img src="${ICONES_BOTAO.fechar}" alt=""></button></header>
+      <ul>${itens.map(r => `<li data-tipo="${esc(r.tipo || '')}">${r.quem ? `<span data-equipe="${esc(r.quem)}">${formaDe(r.quem)}</span>` : ''}${ic(ICONE_REACAO[r.tipo] || '🌍', 40)}<span>${esc(r.texto)}</span></li>`).join('')}</ul>`;
+    raiz.append(el);
+    reacoesEl = el;
+    const fechar = () => { clearTimeout(reacoesTimer); if (reacoesEl !== el) return; reacoesEl = null; gsap.to(el, { opacity: 0, y: RM ? 0 : uPx(), duration: RM ? .12 : .25, onComplete: () => el.remove() }); };
+    el.querySelector('button').onclick = fechar;
+    if (RM) gsap.fromTo(el, { opacity: 0 }, { opacity: 1, duration: .18 });
+    else gsap.fromTo(el, { y: 3 * uPx(), opacity: 0, scale: .9 }, { y: 0, opacity: 1, scale: 1, duration: .35, ease: 'back.out(2)' });
+    efeitoSom('pop');
+    anunciar('O que o mundo fez: ' + itens.map(r => r.texto).join(' '));
+    reacoesTimer = setTimeout(fechar, ms ?? 4500 + itens.reduce((n, r) => n + r.texto.length, 0) * 45);
+    return el;
+  }
+
   return {
     montar, atualizar, manchete, fase, ocultar, previa, doca, voo, lembrarBalanco, selecionar, tijoloEl, ficha, instrucao, decidindo, jogadaIA, cronometro, balao,
-    abrirJornal, comecarVez, focar, estadoAcao, retratoUrl: pid => retratos[pid + '|rosto'] || null, alvosDe, chipsEfeitos, curto, retratoHTML, pedirRetrato, limparRetratos, ao,
+    abrirJornal, abrirRelacoes, reacoes, comecarVez, focar, estadoAcao, retratoUrl: pid => retratos[pid + '|rosto'] || null, alvosDe, chipsEfeitos, curto, retratoHTML, pedirRetrato, limparRetratos, ao,
     get raiz() { return raiz; }, get vez() { return vez; }, NACAO, RECURSOS,
   };
 })();

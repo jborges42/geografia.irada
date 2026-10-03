@@ -116,7 +116,6 @@
 <script src="../js/cenas3d.js"></script>
 <script>
 'use strict';
-const PIDS = ['brasil', 'eua', 'china', 'ue', 'india', 'russia'];
 const ic = (e, px = 64) => (typeof imgIcone === 'function' ? imgIcone(e, px) : '');
 // objeto do kit (js/arte.js) ou, enquanto não existir, o ícone 3D grande
 const objeto = (nome, emoji, classe = 'painel-objeto') =>
@@ -275,7 +274,7 @@ const PRANCHAS = [
       <div class="tipo"><span class="legenda">Nunito 900 · números</span><span class="num" style="font-size:calc(4.4 * var(--u))">0:45 · 1:11 · ${fmtAno(2050)}</span></div>
     </div>`, '', 'escura')}
     <div class="coluna">
-    ${grupo('As 6 potências: cor + nome + forma', `<div class="equipes">${PIDS.map(pid => `<div class="equipe peca creme">${formaDe(pid)}<b>${esc(nomeCurto(pid))}</b>
+    ${grupo('As 13 potências: cor + nome + forma', `<div class="equipes">${PIDS.map(pid => `<div class="equipe peca creme">${formaDe(pid)}<b>${esc(nomeCurto(pid))}</b>
       <span class="tons">${['cor', 'lado', 'clara'].map(t => `<i style="background:${corDe(pid, t)}"></i>`).join('')}</span></div>`).join('')}</div>`)}
     ${grupo('Categorias (o quê = pastel, sempre com ícone)', `<div class="cats">${Object.entries(CATEGORIAS).map(([id, c]) => `<span class="pilula grande cat-${id}">${ic(c.icone, 48)} ${esc(c.nome)}</span>`).join('')}</div>`)}
     ${grupo('Interface e continentes', `<div class="amostras"><div class="chips-cor">${[['tinta', '#1A1433'], ['ladrilho', '#FFF9EC'], ['amarelo', '#FFD21F'], ['verde-ok', '#3CD46A'], ['vermelho', '#F0303A'], ['cinza-peça', '#E3E9F4'], ['placa', '#2E2752'], ['mesa', '#3550C8']]

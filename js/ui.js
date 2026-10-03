@@ -43,7 +43,7 @@ const FINO = ' ';                                     // espaço fino não sep
 const fmtAno = ano => String(Math.round(ano));             // 2030 (fmt daria "2.030")
 const fmtGraus = (t, casas = 2) => fmt(t, casas) + FINO + '°C';                                   // "1,45 °C"
 const fmtMilhoes = (n, curto = false) => fmt(n, Number.isInteger(n) ? 0 : 1) + FINO + (curto ? 'mi' : Math.abs(n) < 2 ? 'milhão' : 'milhões');  // "120 mi" / "120 milhões"
-const uPx = () => Math.min(innerHeight, innerWidth * .5625) / 100;                              // 1u em px
+const uPx = () => (document.documentElement.classList.contains('retrato') ? Math.min(innerWidth / 52, innerHeight / 112) : Math.min(innerHeight, innerWidth * .5625) / 100);                              // 1u em px
 // Tamanho em px de uma ficha de fonte (ex.: pxDe('--fs-min') → 18 em 1366×768)
 function pxDe(ficha) {
   const s = document.createElement('i');
@@ -69,6 +69,14 @@ window.FORMAS = {
   estrela: 'M45.3,17.1A5,5 0 0,1 54.7,17.1L61.9,35.8A2,2 0 0,0 63.6,37.1L83.7,38.2A5,5 0 0,1 86.5,47.0L71.0,59.7A2,2 0 0,0 70.3,61.7L75.5,81.1A5,5 0 0,1 67.9,86.6L51.1,75.7A2,2 0 0,0 48.9,75.7L32.1,86.6A5,5 0 0,1 24.5,81.1L29.7,61.7A2,2 0 0,0 29.0,59.7L13.5,47.0A5,5 0 0,1 16.3,38.2L36.4,37.1A2,2 0 0,0 38.1,35.8Z',
   losango: 'M43.6,9.4A9,9 0 0,1 56.4,9.4L90.6,43.6A9,9 0 0,1 90.6,56.4L56.4,90.6A9,9 0 0,1 43.6,90.6L9.4,56.4A9,9 0 0,1 9.4,43.6Z',
   hexagono: 'M46.0,5.3A8,8 0 0,1 54.0,5.3L86.7,24.2A8,8 0 0,1 90.7,31.1L90.7,68.9A8,8 0 0,1 86.7,75.8L54.0,94.7A8,8 0 0,1 46.0,94.7L13.3,75.8A8,8 0 0,1 9.3,68.9L9.3,31.1A8,8 0 0,1 13.3,24.2Z',
+  // as sete formas das potências novas (cruz, anel, gota, pentágono, octógono, escudo, trapézio): mesma área visual, cantos por arcos
+  cruz: 'M36,18A6,6 0 0,1 42,12L58,12A6,6 0 0,1 64,18L64,33A3,3 0 0,0 67,36L82,36A6,6 0 0,1 88,42L88,58A6,6 0 0,1 82,64L67,64A3,3 0 0,0 64,67L64,82A6,6 0 0,1 58,88L42,88A6,6 0 0,1 36,82L36,67A3,3 0 0,0 33,64L18,64A6,6 0 0,1 12,58L12,42A6,6 0 0,1 18,36L33,36A3,3 0 0,0 36,33Z',
+  anel: 'M50,9A41,41 0 1,1 49.99,9ZM50,28A22,22 0 1,0 50.01,28Z',
+  gota: 'M46.8,13.5A4,4 0 0,1 53.2,13.5L75.1,43.9A31,31 0 1,1 24.9,43.9Z',
+  pentagono: 'M45.9,14.1A7,7 0 0,1 54.1,14.1L86.8,37.8A7,7 0 0,1 89.3,45.7L76.8,84.1A7,7 0 0,1 70.2,88.9L29.8,88.9A7,7 0 0,1 23.2,84.1L10.7,45.7A7,7 0 0,1 13.2,37.8Z',
+  octogono: 'M91.1,65.7A3.2,3.2 0 0,1 90.2,68L68,90.2A3.2,3.2 0 0,1 65.7,91.1L34.3,91.1A3.2,3.2 0 0,1 32,90.2L9.8,68A3.2,3.2 0 0,1 8.9,65.7L8.9,34.3A3.2,3.2 0 0,1 9.8,32L32,9.8A3.2,3.2 0 0,1 34.3,8.9L65.7,8.9A3.2,3.2 0 0,1 68,9.8L90.2,32A3.2,3.2 0 0,1 91.1,34.3Z',
+  trapezio: 'M26.5,25A7,7 0 0,1 33.2,20L66.8,20A7,7 0 0,1 73.5,25L87.3,71A7,7 0 0,1 80.6,80L19.4,80A7,7 0 0,1 12.7,71Z',
+  escudo: 'M24,13L76,13A9,9 0 0,1 85,22L85,50C85,71 70,82 50,92C30,82 15,71 15,50L15,22A9,9 0 0,1 24,13Z',
 };
 // Equipes, categorias, continentes e cores de interface por id (tons: cor, lado, clara, contorno, brilho, b)
 const CORES_GUIA = {
@@ -78,6 +86,13 @@ const CORES_GUIA = {
   ue: { cor: '#9645EE', lado: '#651C94', clara: '#AD6EF2', contorno: '#12031C', forma: 'estrela', nomeCor: 'Roxa', curto: 'UE' },
   india: { cor: '#FF9C0A', lado: '#9E3400', clara: '#FFC267', contorno: '#1C0900', forma: 'losango', nomeCor: 'Laranja', curto: 'Índia' },
   russia: { cor: '#F2248F', lado: '#960773', clara: '#F66EB5', contorno: '#1C0015', forma: 'hexagono', nomeCor: 'Rosa', curto: 'Rússia' },
+  reino_unido: { cor: '#00B3A4', lado: '#00666B', clara: '#46E5D7', contorno: '#011917', forma: 'cruz', nomeCor: 'Turquesa', curto: 'Reino Unido' },
+  japao: { cor: '#6C7A96', lado: '#414B5A', clara: '#A4ABB8', contorno: '#0E1118', forma: 'anel', nomeCor: 'Grafite', curto: 'Japão' },
+  australia: { cor: '#9CCB1F', lado: '#507A13', clara: '#BDD776', contorno: '#121705', forma: 'gota', nomeCor: 'Lima', curto: 'Austrália' },
+  nova_zelandia: { cor: '#8E1B3A', lado: '#551027', clara: '#CA5A78', contorno: '#150509', forma: 'pentagono', nomeCor: 'Bordô', curto: 'Nova Zelândia' },
+  africa_do_sul: { cor: '#9A5B2E', lado: '#5C321C', clara: '#C49574', contorno: '#140C07', forma: 'octogono', nomeCor: 'Marrom', curto: 'África do Sul' },
+  nigeria: { cor: '#FF7A66', lado: '#B53A2B', clara: '#FFB0A3', contorno: '#2B0803', forma: 'escudo', nomeCor: 'Coral', curto: 'Nigéria' },
+  egito: { cor: '#4DB6FF', lado: '#0B69A8', clara: '#9BCEF1', contorno: '#01111C', forma: 'trapezio', nomeCor: 'Celeste', curto: 'Egito' },
   diplomacia: { cor: '#DCCFFF', lado: '#8F79CC', brilho: '#E4DBFF' }, economia: { cor: '#FFE08A', lado: '#CCA742', brilho: '#FFE8A8' },
   natureza: { cor: '#B3EFC6', lado: '#65BF82', brilho: '#C6F3D4' }, seguranca: { cor: '#FFC4AE', lado: '#CC7C5E', brilho: '#FFD2C1' },
   pessoas: { cor: '#FFCAE6', lado: '#CC75A3', brilho: '#FFD7EC' }, ciencia: { cor: '#99CDF8', lado: '#4F90C6', brilho: '#B2D9FA' },
@@ -86,6 +101,10 @@ const CORES_GUIA = {
   amarelo: { cor: '#FFD21F', lado: '#B98A00' }, verde: { cor: '#3CD46A', lado: '#1F9A47' }, vermelho: { cor: '#F0303A', lado: '#A3141F' },
   ladrilho: { cor: '#FFF9EC', lado: '#B3AA98' }, anil: { cor: '#3550C8', lado: '#141F66' }, tinta: { cor: '#1A1433', lado: '#1A1433' },
 };
+// Fonte única das potências na interface: a ordem e o elenco vêm de conteudo/potencias.js; cor, forma e nome da equipe, de CORES_GUIA
+const PIDS = typeof POTENCIAS !== 'undefined' ? POTENCIAS.map(p => p.id) : [];
+// preposição + artigo de cada potência, vindos de POTENCIAS[].artigo: "do" Brasil, "da" China, "dos" EUA
+const prepDe = pid => ({ o: 'do', a: 'da', os: 'dos', as: 'das' })[typeof POTENCIAS !== 'undefined' ? POTENCIAS.find(p => p.id === pid)?.artigo : ''] || 'de';
 const corDe = (id, tom = 'cor') => CORES_GUIA[id]?.[tom] ?? CORES_GUIA[id]?.cor;
 const nomeEquipe = pid => (CORES_GUIA[pid]?.nomeCor ? 'Equipe ' + CORES_GUIA[pid].nomeCor : '');      // "Equipe Verde"
 const nomeCurto = pid => CORES_GUIA[pid]?.curto ?? (typeof POTENCIAS !== 'undefined' ? POTENCIAS.find(p => p.id === pid)?.nome : '') ?? '';

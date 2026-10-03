@@ -119,7 +119,7 @@ const DEMO_CASA = { brasil: ['energia_renovavel', 'desmatamento_zero', 'educacao
   india: ['saude', 'educacao', 'cupula_regional', 'crime_transnacional', 'fronteira_agricola'], russia: ['explorar_petroleo', 'defesa', 'fechar_fronteiras', 'tarifas', 'alianca'] };
 const DEMO_ALVO = [['china', 'infraestrutura_exterior', 'africa_oriental'], ['eua', 'livre_comercio', 'mexico'], ['ue', 'ajuda_humanitaria', 'sahel'], ['brasil', 'cooperacao_sul_sul', 'africa_ocidental'],
   ['india', 'missao_diplomatica', 'sul_asia'], ['china', 'minerais_criticos', 'africa_central'], ['russia', 'base_militar', 'asia_central'], ['ue', 'mediacao', 'leste_europeu'],
-  ['eua', 'emprestimo', 'andes'], ['brasil', 'internet_para_todos', 'cone_sul'], ['ue', 'reconstrucao', 'levante'], ['eua', 'soft_power', ['japao_coreia', 'australia', 'cone_sul']],
+  ['eua', 'emprestimo', 'andes'], ['brasil', 'internet_para_todos', 'cone_sul'], ['ue', 'reconstrucao', 'levante'], ['eua', 'soft_power', ['japao', 'australia', 'cone_sul']],
   ['china', 'sancoes', 'eua'], ['ue', 'florestas_tropicais', null], ['eua', 'fundo_climatico', null]];
 async function demo() {
   for (const [pid, lista] of Object.entries(DEMO_CASA)) for (const carta of lista) e.construcoes.push({ carta, potencia: pid, alvo: carta === 'alianca' ? 'india' : pid, ano: e.ano });

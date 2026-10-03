@@ -1123,6 +1123,13 @@ const KIT = (() => {
     'bandeira-estrela': { montar: () => bandeira('estrela', '#9645EE', '#651C94'), cam: { giro: -20, elev: 14 } },
     'bandeira-losango': { montar: () => bandeira('losango', '#FF9C0A', '#9E3400'), cam: { giro: -20, elev: 14 } },
     'bandeira-hexagono': { montar: () => bandeira('hexagono', '#F2248F', '#960773'), cam: { giro: -20, elev: 14 } },
+    'bandeira-cruz': { montar: () => bandeira('cruz', '#00B3A4', '#00666B'), cam: { giro: -20, elev: 14 } },
+    'bandeira-anel': { montar: () => bandeira('anel', '#6C7A96', '#414B5A'), cam: { giro: -20, elev: 14 } },
+    'bandeira-gota': { montar: () => bandeira('gota', '#9CCB1F', '#507A13'), cam: { giro: -20, elev: 14 } },
+    'bandeira-pentagono': { montar: () => bandeira('pentagono', '#8E1B3A', '#551027'), cam: { giro: -20, elev: 14 } },
+    'bandeira-octogono': { montar: () => bandeira('octogono', '#9A5B2E', '#5C321C'), cam: { giro: -20, elev: 14 } },
+    'bandeira-escudo': { montar: () => bandeira('escudo', '#FF7A66', '#B53A2B'), cam: { giro: -20, elev: 14 } },
+    'bandeira-trapezio': { montar: () => bandeira('trapezio', '#4DB6FF', '#0B69A8'), cam: { giro: -20, elev: 14 } },
     'caixa-ajuda': { montar: caixaAjuda },
     'selo-missao-2050': { montar: seloMissao, cam: { giro: 0, elev: 8 } },
     'carimbo': { montar: carimbo, cam: { giro: -24, elev: 30 } },
@@ -1206,7 +1213,7 @@ const MONTAR = {
   },
   graficos() {
     V.style.gridTemplateColumns = '1fr 1fr';
-    const pids = ['brasil', 'eua', 'china', 'ue', 'india', 'russia'];
+    const pids = PIDS.slice(0, 6);   // os gráficos de exemplo usam as 6 primeiras
     V.innerHTML =
       cartao('Barras = pilhas de tijolos (IGI)', graficoTijolos(pids.map((pid, i) => ({ pid, valor: [62, 71, 68, 74, 55, 49][i] })), { max: 100 })) +
       cartao('Linhas com pinos (destaque: Índia)', graficoLinhas(pids.map((pid, i) => ({ pid, pontos: [[40, 46, 51, 55, 60, 62], [70, 69, 72, 71, 70, 71], [60, 64, 66, 69, 68, 68], [66, 68, 70, 72, 73, 74], [38, 42, 47, 50, 53, 55], [52, 50, 47, 49, 48, 49]][i] })), { anos: [2026, 2030, 2034, 2038, 2042, 2046], destaque: 'india' })) +
@@ -1219,7 +1226,7 @@ const MONTAR = {
     const chip = (cat, ic, nome) => `<span class="v-chip-cat cat-${cat}">${imgIcone(ic, 40)}${nome}</span>`;
     const noticia = (cat, ic, nomeCat, obj, titulo, texto) => `<article style="--cat:var(--cat-${cat})"><div class="v-foto">${arte(obj)}</div>${chip(cat, ic, nomeCat)}<h3>${titulo}</h3><p>${texto}</p></article>`;
     const jornal = `<div class="jornal peca v-jornal">${cabecalhoJornal({ ano: 2034, mandato: 3, total: 6, extra: true })}<div class="v-noticias">` +
-      noticia('natureza', '🌱', 'Natureza e Energia', 'termometro', 'Acordo histórico na Cúpula do Clima', 'As seis potências prometem cortar emissões. A temperatura sobe mais devagar.') +
+      noticia('natureza', '🌱', 'Natureza e Energia', 'termometro', 'Acordo histórico na Cúpula do Clima', 'As potências prometem cortar emissões. A temperatura sobe mais devagar.') +
       noticia('economia', '💰', 'Economia', 'navio', 'Rota pelo Ártico abre', 'O gelo derreteu e encurtou o caminho dos navios.') +
       noticia('pessoas', '👥', 'Pessoas', 'tenda', 'Brasil acolhe 2 milhões', 'Tendas de acolhimento no Norte do país.') +
       `</div><div class="v-critico">${imgIcone('⚠', 44)}<span>Situação crítica no Sahel: seca e conflito</span><i class="zebra"></i></div></div>`;
@@ -1233,7 +1240,7 @@ const MONTAR = {
       opcao('natureza', 'caixa-alimentos', 'Conselheira de Natureza', 'Proteger o Cerrado e pagar mais caro pela terra', true) +
       opcao('economia', 'moedas', 'Conselheiro de Economia', 'Ampliar as exportações e a renda do campo') +
       opcao('ciencia', 'lampada', 'Conselheira de Ciência', 'Investir em produtividade sem desmatar') + '</div></div></section>';
-    const pids = ['brasil', 'eua', 'china', 'ue', 'india', 'russia'];
+    const pids = PIDS.slice(0, 6);   // os gráficos de exemplo usam as 6 primeiras
     const balanco = `<div class="v-balanco"><div class="v-indic peca">${'<h4>' + imgIcone('🌡', 40) + 'Temperatura</h4>'}<span class="num">1,45 ${GLIFOS.seta} 1,62 °C</span>${termometroTijolos(1.62, { valor: false })}</div>` +
       `<div class="v-indic peca"><h4>Relógio do Juízo Final</h4><div style="display:flex;align-items:center;gap:calc(2*var(--u))">${relogioJuizo(84, { grande: true })}<span class="num">84 s</span></div></div>` +
       `<div class="v-indic peca" style="grid-column:1/-1"><h4>${imgIcone('📊', 40)}Índice de Influência (IGI)</h4>${graficoTijolos(pids.map((pid, i) => ({ pid, valor: [62, 71, 68, 74, 55, 49][i] })), { max: 100 })}</div>` +

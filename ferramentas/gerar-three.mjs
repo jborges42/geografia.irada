@@ -6,13 +6,13 @@
 import { build } from 'esbuild';
 import { writeFileSync, rmSync, readFileSync, readdirSync } from 'node:fs';
 
-const USADOS = `AdditiveBlending AmbientLight BackSide Box3 BoxGeometry BufferAttribute BufferGeometry CanvasTexture CapsuleGeometry
+const USADOS = `AdditiveBlending AmbientLight BackSide BatchedMesh Box3 BoxGeometry BufferAttribute BufferGeometry CanvasTexture CapsuleGeometry
   CircleGeometry Clock Color ConeGeometry CylinderGeometry DirectionalLight DoubleSide Euler ExtrudeGeometry Float32BufferAttribute
   FrontSide Group HemisphereLight IcosahedronGeometry InstancedBufferAttribute InstancedMesh LatheGeometry LinearFilter MOUSE
   MathUtils Matrix4 Mesh MeshBasicMaterial MeshLambertMaterial MeshStandardMaterial NearestFilter NeutralToneMapping Object3D
   PCFShadowMap PMREMGenerator Path PerspectiveCamera Plane PlaneGeometry PointLight Quaternion REVISION Raycaster RepeatWrapping
-  RingGeometry SRGBColorSpace Scene ShadowMaterial Shape Sphere SphereGeometry Sprite SpriteMaterial SpotLight TOUCH Texture
-  Timer TorusGeometry Vector2 Vector3 Vector4 WebGLRenderer`.split(/\s+/).filter(Boolean);
+  RingGeometry SRGBColorSpace Scene ShadowMaterial Shape Skeleton SkinnedMesh Sphere SphereGeometry Sprite SpriteMaterial SpotLight TOUCH Texture
+  Timer TorusGeometry Uint16BufferAttribute Vector2 Vector3 Vector4 WebGLRenderer`.split(/\s+/).filter(Boolean);
 const ADDONS = `
 export { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 export { mergeGeometries, mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';

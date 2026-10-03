@@ -100,7 +100,7 @@ do jogo. Ações, categorias, territórios neutros e indicadores usam tons claro
 **Lateral (relevo) de qualquer peça:** `color-mix(in oklab, <face> 64%, var(--tinta))` — sombra tingida de índigo, automática
 para qualquer cor (a regra das sombras coloridas). Brilho do topo: `color-mix(in oklab, <face>, #fff 24%)`.
 
-### 2.3 As 6 potências (validadas por ΔE2000 em visão normal, protanopia, deuteranopia, tritanopia e projetor lavado)
+### 2.3 As 13 potências (as 6 primeiras validadas por ΔE2000 em visão normal, protanopia, deuteranopia, tritanopia e projetor lavado; as 7 novas seguem a mesma regra: cor + forma)
 
 Cada potência é **cor + nome da cor + forma**. A forma substitui os antigos emblemas de animal (águia, dragão, urso,
 elefante: clichês de charge) e aparece em tudo o que identifica a potência: bandeira, tampa das torres, broche do boneco,
@@ -114,7 +114,15 @@ selo do placar, ponta das linhas dos gráficos, tijolos de voto.
 | União Europeia | **Roxa** | `#9645EE` | `#651C94` | `#AD6EF2` | `#12031C` | **estrela** ★ de 5 pontas arredondadas |
 | Índia | **Laranja** | `#FF9C0A` | `#9E3400` | `#FFC267` | `#1C0900` | **losango** ◆ |
 | Rússia | **Rosa** | `#F2248F` | `#960773` | `#F66EB5` | `#1C0015` | **hexágono** ⬢ |
+| Reino Unido | **Turquesa** | `#00B3A4` | `#00666B` | `#46E5D7` | `#011917` | **cruz** ✚ |
+| Japão | **Grafite** | `#6C7A96` | `#414B5A` | `#A4ABB8` | `#0E1118` | **anel** ◎ (círculo vazado: o furo é lido a 20 px) |
+| Austrália | **Lima** | `#9CCB1F` | `#507A13` | `#BDD776` | `#121705` | **gota** (ponta para cima) |
+| Nova Zelândia | **Bordô** | `#8E1B3A` | `#551027` | `#CA5A78` | `#150509` | **pentágono** ⬟ |
+| África do Sul | **Marrom** | `#9A5B2E` | `#5C321C` | `#C49574` | `#140C07` | **octógono** (lados retos: não confundir com o círculo) |
+| Nigéria | **Coral** | `#FF7A66` | `#B53A2B` | `#FFB0A3` | `#2B0803` | **escudo** (topo reto, base em ponta) |
+| Egito | **Celeste** | `#4DB6FF` | `#0B69A8` | `#9BCEF1` | `#01111C` | **trapézio** (base larga embaixo) |
 
+- **As 7 novas formas** (`FORMAS` em `js/ui.js`, mesma área visual das antigas, cantos por arcos) foram conferidas lado a lado em 20, 32 e 96 px: nenhuma se confunde com outra. Verde (Brasil) e Turquesa (Reino Unido), e Azul (EUA) e Celeste (Egito), são os pares de cor mais próximos: ali a forma (círculo × cruz, quadrado × trapézio) é que separa. As bandeiras 3D `bandeira-<forma>` das 7 novas saem de `ferramentas/renderizar-arte.mjs` (kit em `vitrine-arte.html`).
 - **A Rússia é rosa (aprovado):** o ciano antigo some no mar (ΔE < 4 para daltônicos).
 - **Desenho das formas:** SVG em `viewBox 0 0 100 100`, caminhos arredondados de `arte/maquetes/formas.js` (copiar para
   `js/ui.js` como `FORMAS`, Fundação). Nunca usar os caracteres ● ■ ▲ ★ ◆ ⬢ de fonte (mudam de sistema para sistema e
